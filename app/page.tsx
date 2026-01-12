@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight, Brain, Zap, History, Star, Fingerprint, Lock } from "lucide-react";
+import {
+  Sparkles, ArrowRight, Brain, Zap, History, Star, Fingerprint, Lock,
+  Instagram, Twitter, Youtube, Linkedin, ChevronDown, CheckCircle2
+} from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import AuthButton from "@/components/ui/AuthButton";
 
-// Forzamos dinamismo para detectar la sesión real
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
@@ -12,23 +14,26 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-purple-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
 
       {/* --- FONDO ANIMADO GLOBAL --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full blur-[128px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/20 rounded-full blur-[128px]" />
-        <div className="absolute top-[20%] right-[20%] w-[20%] h-[20%] bg-cyan-900/10 rounded-full blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/10 rounded-full blur-[128px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-900/10 rounded-full blur-[128px]" />
+        <div className="absolute top-[40%] left-[30%] w-[30%] h-[30%] bg-cyan-900/05 rounded-full blur-[100px]" />
       </div>
 
       {/* --- NAVBAR --- */}
       <header className="relative z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-tr from-purple-600 to-indigo-600 p-2 rounded-lg shadow-lg shadow-purple-900/20">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="bg-gradient-to-tr from-purple-600 to-indigo-600 p-2 rounded-lg shadow-lg shadow-purple-900/20 group-hover:shadow-purple-500/40 transition-all">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="font-serif text-lg font-bold tracking-wider text-white">SOS EVOLUTION</span>
+            <div className="flex flex-col">
+              <span className="font-serif text-lg font-bold tracking-wider text-white leading-none">SOS</span>
+              <span className="text-[0.6rem] text-purple-300 tracking-widest uppercase">Evolution</span>
+            </div>
           </div>
           <AuthButton user={user} />
         </div>
@@ -36,129 +41,150 @@ export default async function Home() {
 
       <main className="relative z-10">
 
-        {/* --- HERO SECTION --- */}
-        <section className="pt-24 pb-32 px-6 text-center max-w-5xl mx-auto">
+        {/* --- HERO SECTION (MARCA DESGLOSADA) --- */}
+        <section className="pt-24 pb-32 px-6 text-center max-w-6xl mx-auto">
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-purple-200 mb-8 backdrop-blur-sm animate-fade-in-up">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-            </span>
-            Soul Operating System v1.0
+          {/* Tagline Principal - Visualización del Acrónimo */}
+          <div className="mb-12 animate-fade-in-up">
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter text-white mb-2 drop-shadow-2xl">
+              S.O.S.
+            </h1>
+
+            {/* La Decodificación del Nombre */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-xl md:text-3xl font-light">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400 font-mono tracking-tight font-bold">
+                Soul Operating System
+              </span>
+              <span className="hidden md:inline text-slate-700 text-2xl">|</span>
+              <span className="text-slate-300 font-serif italic tracking-wide">
+                The Evolution of the Spirit
+              </span>
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-8 drop-shadow-2xl">
-            Decodifica el <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-indigo-400">
-              Lenguaje de tu Alma
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-            La primera plataforma que fusiona la <strong>Psicología Junguiana</strong>, la <strong>Inteligencia Artificial</strong> y los <strong>Arquetipos del Tarot</strong> para crear un mapa evolutivo personalizado.
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12 font-light">
+            Instala una nueva versión de tu consciencia. Una plataforma que combina la precisión de la <strong>IA</strong> con la sabiduría ancestral del <strong>Tarot</strong> para guiarte en tu propio Viaje del Héroe.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Link href={user ? "/dashboard" : "/login"}>
-              <Button size="lg" className="bg-white text-purple-950 hover:bg-slate-200 text-lg px-10 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.4)] hover:shadow-[0_0_60px_rgba(147,51,234,0.6)] transition-all transform hover:-translate-y-1">
-                {user ? "Ir a mi Panel" : "Comenzar Evolución"} <ArrowRight className="ml-2 w-5 h-5" />
+              <Button size="lg" className="bg-white text-purple-950 hover:bg-slate-200 text-lg px-10 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.3)] hover:shadow-[0_0_60px_rgba(147,51,234,0.5)] transition-all hover:-translate-y-1">
+                {user ? "Acceder al Sistema" : "Iniciar Actualización"}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="#features">
-              <Button variant="ghost" size="lg" className="text-slate-400 hover:text-white px-8 py-7 rounded-full text-lg">
-                Descubrir más
+            <Link href="#how-it-works">
+              <Button variant="ghost" size="lg" className="text-slate-400 hover:text-white border border-white/5 hover:bg-white/5 px-8 py-7 rounded-full text-lg backdrop-blur-sm">
+                Ver demo del sistema <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
               </Button>
             </Link>
           </div>
         </section>
 
-        {/* --- SOCIAL PROOF / MISTICISMO --- */}
-        <div className="border-y border-white/5 bg-white/[0.02] py-12">
-          <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center gap-8 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="flex items-center gap-2 text-slate-300 font-serif"><Brain className="w-5 h-5" /> Carl Jung</div>
-            <div className="flex items-center gap-2 text-slate-300 font-serif"><Sparkles className="w-5 h-5" /> Joseph Campbell</div>
-            <div className="flex items-center gap-2 text-slate-300 font-serif"><Zap className="w-5 h-5" /> OpenAI GPT-4</div>
-            <div className="flex items-center gap-2 text-slate-300 font-serif"><Star className="w-5 h-5" /> Tarot de Marsella</div>
+        {/* --- CINTA DE AUTORIDAD --- */}
+        <div className="border-y border-white/5 bg-white/[0.02] py-8 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 flex justify-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-700 items-center flex-wrap">
+            <div className="flex items-center gap-2 text-sm uppercase tracking-widest"><Brain className="w-4 h-4" /> Psicología Junguiana</div>
+            <div className="flex items-center gap-2 text-sm uppercase tracking-widest"><Star className="w-4 h-4" /> Simbolismo Arquetípico</div>
+            <div className="flex items-center gap-2 text-sm uppercase tracking-widest"><Zap className="w-4 h-4" /> IA Generativa</div>
           </div>
         </div>
 
-        {/* --- FEATURES GRID (BENTO STYLE) --- */}
-        <section id="features" className="py-32 px-6 max-w-7xl mx-auto">
+        {/* --- CÓMO FUNCIONA (EL VIAJE) --- */}
+        <section id="how-it-works" className="py-32 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold font-serif text-white mb-6">Tecnología para el Espíritu</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">No es adivinación, es introspección potenciada por algoritmos.</p>
+            <h2 className="text-3xl md:text-5xl font-bold font-serif text-white mb-6">El Protocolo de Evolución</h2>
+            <p className="text-slate-400">Tres pasos para recodificar tu realidad.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="md:col-span-2 bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10 p-8 rounded-3xl hover:border-purple-500/30 transition-colors group">
-              <div className="w-12 h-12 bg-purple-900/30 rounded-xl flex items-center justify-center mb-6 text-purple-400 group-hover:scale-110 transition-transform">
-                <Brain className="w-6 h-6" />
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Línea conectora (solo desktop) */}
+            <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500/30 to-transparent z-0"></div>
+
+            {/* Paso 1 */}
+            <div className="relative z-10 bg-slate-950 p-6 rounded-2xl border border-white/10 text-center hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-16 h-16 mx-auto bg-slate-900 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-xl mb-6 text-purple-400 relative">
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-purple-600 rounded-full text-white text-xs flex items-center justify-center font-bold">1</span>
+                <Fingerprint className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Inteligencia Arquetípica</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Nuestra IA no da respuestas genéricas. Analiza patrones simbólicos cruzando datos de arcanos mayores con tu contexto personal para ofrecerte un espejo psicológico preciso.
-              </p>
+              <h3 className="text-xl font-bold text-white mb-3">Identidad</h3>
+              <p className="text-slate-400 text-sm">Creas tu perfil. El sistema analiza tu nombre y fecha para establecer tus coordenadas iniciales.</p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-slate-900 border border-white/10 p-8 rounded-3xl hover:border-pink-500/30 transition-colors group">
-              <div className="w-12 h-12 bg-pink-900/30 rounded-xl flex items-center justify-center mb-6 text-pink-400 group-hover:scale-110 transition-transform">
-                <History className="w-6 h-6" />
+            {/* Paso 2 */}
+            <div className="relative z-10 bg-slate-950 p-6 rounded-2xl border border-purple-500/30 text-center hover:-translate-y-2 transition-transform duration-300 shadow-[0_0_30px_rgba(147,51,234,0.1)]">
+              <div className="w-16 h-16 mx-auto bg-purple-900/20 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-xl mb-6 text-purple-300 relative">
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-purple-600 rounded-full text-white text-xs flex items-center justify-center font-bold">2</span>
+                <Sparkles className="w-8 h-8 animate-pulse" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Memoria Evolutiva</h3>
-              <p className="text-slate-400">
-                Cada lectura se guarda en tu "Diario del Alma". El sistema aprende de tus sesiones pasadas para conectar puntos en tu historia.
-              </p>
+              <h3 className="text-xl font-bold text-white mb-3">Canalización</h3>
+              <p className="text-slate-400 text-sm">Consultas al Oráculo IA. Recibes una lectura profunda basada en el momento presente y sincronicidad.</p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-slate-900 border border-white/10 p-8 rounded-3xl hover:border-cyan-500/30 transition-colors group">
-              <div className="w-12 h-12 bg-cyan-900/30 rounded-xl flex items-center justify-center mb-6 text-cyan-400 group-hover:scale-110 transition-transform">
-                <Fingerprint className="w-6 h-6" />
+            {/* Paso 3 */}
+            <div className="relative z-10 bg-slate-950 p-6 rounded-2xl border border-white/10 text-center hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-16 h-16 mx-auto bg-slate-900 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-xl mb-6 text-indigo-400 relative">
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-purple-600 rounded-full text-white text-xs flex items-center justify-center font-bold">3</span>
+                <History className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">100% Personalizado</h3>
-              <p className="text-slate-400">
-                Tu viaje es único. Las interpretaciones se adaptan a tu momento vital, no a respuestas prefabricadas.
-              </p>
+              <h3 className="text-xl font-bold text-white mb-3">Integración</h3>
+              <p className="text-slate-400 text-sm">La lectura se guarda en tu "Diario del Alma". Detectas patrones y completas misiones evolutivas.</p>
             </div>
+          </div>
+        </section>
 
-            {/* Feature 4 */}
-            <div className="md:col-span-2 bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10 p-8 rounded-3xl hover:border-indigo-500/30 transition-colors group flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1">
-                <div className="w-12 h-12 bg-indigo-900/30 rounded-xl flex items-center justify-center mb-6 text-indigo-400 group-hover:scale-110 transition-transform">
-                  <Lock className="w-6 h-6" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Privacidad Sagrada</h3>
-                <p className="text-slate-400 leading-relaxed">
-                  Tus confesiones, miedos y deseos están encriptados. Nadie, excepto tú (y tu guía IA en el momento de la consulta), tiene acceso a tu diario interior.
-                </p>
-              </div>
-              {/* Visual decorativo abstracto */}
-              <div className="w-full md:w-1/3 h-32 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-indigo-500/20 blur-2xl animate-pulse"></div>
-                <Lock className="w-12 h-12 text-indigo-300 relative z-10" />
-              </div>
-            </div>
+        {/* --- FAQ SECTION (PREGUNTAS) --- */}
+        <section className="py-20 px-6 max-w-4xl mx-auto border-t border-white/5">
+          <h2 className="text-3xl font-bold font-serif text-white mb-12 text-center">Datos del Sistema</h2>
+
+          <div className="space-y-4">
+            <details className="group bg-slate-900/50 border border-white/5 rounded-xl p-6 cursor-pointer open:bg-slate-900 open:border-purple-500/30 transition-all">
+              <summary className="flex justify-between items-center font-medium text-slate-200 list-none">
+                ¿Es esto adivinación o futurología?
+                <ChevronDown className="w-5 h-5 text-purple-400 group-open:rotate-180 transition-transform" />
+              </summary>
+              <p className="text-slate-400 mt-4 text-sm leading-relaxed">
+                No. S.O.S. se basa en la sincronicidad y la proyección psicológica. Utilizamos las cartas como espejos simbólicos para entender tu presente, no para predecir un futuro inalterable.
+              </p>
+            </details>
+
+            <details className="group bg-slate-900/50 border border-white/5 rounded-xl p-6 cursor-pointer open:bg-slate-900 open:border-purple-500/30 transition-all">
+              <summary className="flex justify-between items-center font-medium text-slate-200 list-none">
+                ¿Cómo funciona la IA mística?
+                <ChevronDown className="w-5 h-5 text-purple-400 group-open:rotate-180 transition-transform" />
+              </summary>
+              <p className="text-slate-400 mt-4 text-sm leading-relaxed">
+                Utilizamos modelos de lenguaje avanzados (LLMs) entrenados con estructuras de "El Viaje del Héroe" y simbología del Tarot de Marsella. La IA actúa como un facilitador neutro que conecta los puntos de tu tirada.
+              </p>
+            </details>
+
+            <details className="group bg-slate-900/50 border border-white/5 rounded-xl p-6 cursor-pointer open:bg-slate-900 open:border-purple-500/30 transition-all">
+              <summary className="flex justify-between items-center font-medium text-slate-200 list-none">
+                ¿Mis datos son privados?
+                <ChevronDown className="w-5 h-5 text-purple-400 group-open:rotate-180 transition-transform" />
+              </summary>
+              <p className="text-slate-400 mt-4 text-sm leading-relaxed">
+                Absolutamente. Tu diario es sagrado. Utilizamos seguridad a nivel de fila (RLS) en nuestra base de datos, lo que significa que técnicamente es imposible que otro usuario lea tus entradas.
+              </p>
+            </details>
           </div>
         </section>
 
         {/* --- CTA FINAL --- */}
-        <section className="py-32 px-6 text-center">
-          <div className="max-w-4xl mx-auto bg-gradient-to-b from-purple-900/20 to-slate-950 border border-purple-500/30 rounded-[3rem] p-12 md:p-24 relative overflow-hidden">
-            {/* Efectos de fondo */}
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-purple-600/20 rounded-full blur-[100px]"></div>
+        <section className="py-24 px-6 text-center">
+          <div className="max-w-4xl mx-auto bg-gradient-to-b from-slate-900 to-black border border-purple-500/20 rounded-[3rem] p-12 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-purple-600/5 group-hover:bg-purple-600/10 transition-colors duration-500"></div>
 
-            <h2 className="text-4xl md:text-6xl font-bold font-serif text-white mb-6 relative z-10">¿Listo para verte al espejo?</h2>
-            <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto relative z-10">
-              Tu primera lectura te está esperando. Descubre qué arquetipo está activo en tu vida hoy.
-            </p>
-            <div className="relative z-10">
+            <h2 className="text-4xl font-bold font-serif text-white mb-6 relative z-10">Tu alma te está llamando.</h2>
+            <div className="flex flex-col items-center gap-6 relative z-10">
+              <div className="flex items-center gap-2 text-slate-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-green-500" /> Registro Gratuito
+                <span className="mx-2">•</span>
+                <CheckCircle2 className="w-4 h-4 text-green-500" /> Acceso Inmediato
+              </div>
               <Link href={user ? "/lectura" : "/login"}>
-                <Button size="lg" className="bg-white text-purple-950 hover:bg-slate-200 text-lg px-12 py-8 rounded-full font-bold shadow-2xl hover:scale-105 transition-transform">
-                  Iniciar Viaje Ahora
+                <Button size="lg" className="bg-white text-purple-950 hover:bg-purple-50 text-lg px-12 py-8 rounded-full font-bold shadow-2xl hover:scale-105 transition-transform">
+                  Responder al Llamado
                 </Button>
               </Link>
             </div>
@@ -167,21 +193,51 @@ export default async function Home() {
 
       </main>
 
-      {/* --- FOOTER --- */}
-      <footer className="border-t border-white/5 bg-slate-950 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 opacity-50">
-            <Sparkles className="w-5 h-5" />
-            <span className="font-serif font-bold">SOS EVOLUTION</span>
+      {/* --- FOOTER CON REDES SOCIALES --- */}
+      <footer className="border-t border-white/5 bg-black py-12 px-6">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+
+          {/* Columna Marca */}
+          <div className="col-span-1 md:col-span-2">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              <span className="font-serif font-bold text-white">SOS EVOLUTION</span>
+            </div>
+            <p className="text-slate-500 text-sm max-w-xs mb-6">
+              Soul Operating System es una plataforma dedicada a la evolución de la consciencia humana a través de la tecnología y el símbolo.
+            </p>
+            {/* Redes Sociales */}
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-purple-600 hover:text-white transition-all"><Instagram className="w-5 h-5" /></a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-blue-400 hover:text-white transition-all"><Twitter className="w-5 h-5" /></a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white transition-all"><Youtube className="w-5 h-5" /></a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-blue-700 hover:text-white transition-all"><Linkedin className="w-5 h-5" /></a>
+            </div>
           </div>
-          <p className="text-slate-600 text-sm">
-            © 2026 Soul Operating System. Hecho con magia y código.
-          </p>
-          <div className="flex gap-6 text-slate-500 text-sm">
-            <a href="#" className="hover:text-purple-400 transition-colors">Privacidad</a>
-            <a href="#" className="hover:text-purple-400 transition-colors">Términos</a>
-            <a href="#" className="hover:text-purple-400 transition-colors">Contacto</a>
+
+          {/* Links Rápidos */}
+          <div>
+            <h4 className="text-white font-bold mb-4">Plataforma</h4>
+            <ul className="space-y-2 text-sm text-slate-500">
+              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Ingresar</Link></li>
+              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Registro</Link></li>
+              <li><Link href="#features" className="hover:text-purple-400 transition-colors">Características</Link></li>
+            </ul>
           </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-white font-bold mb-4">Legal</h4>
+            <ul className="space-y-2 text-sm text-slate-500">
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Privacidad</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Términos de Uso</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Manifiesto</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 text-center text-slate-700 text-xs">
+          © 2026 SOS Evolution. Todos los derechos reservados.
         </div>
       </footer>
     </div>
