@@ -1,26 +1,22 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Button } from "./button";
 import { LogIn, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+// IMPORTANTE: Importamos la acción del servidor
+import { logout } from "@/app/login/actions";
 
 export default function AuthButton({ user }: { user: any }) {
-    const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     const handleLogout = async () => {
         setLoading(true);
         try {
-            // 1. Cerrar sesión en Supabase
-            await supabase.auth.signOut();
-
-            // 2. SOLUCIÓN AL BUG: Forzar recarga completa a la raíz
-            // Esto limpia caché del navegador y asegura que el usuario se vea como "desconectado"
-            window.location.href = "/";
-
+            // Llamamos a la Server Action. 
+            // Ella se encargará de borrar la cookie y redirigir.
+            await logout();
         } catch (error) {
             console.error("Error al salir:", error);
             setLoading(false);
@@ -42,7 +38,7 @@ export default function AuthButton({ user }: { user: any }) {
     // LOGUEADO
     return (
         <div className="flex items-center gap-4">
-            {/* Email del usuario (visible en desktop) */}
+            {/* Email del usuario */}
             <div className="hidden md:flex items-center gap-2 text-xs font-medium text-slate-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
                 <User className="w-3 h-3 text-purple-400" />
                 <span className="truncate max-w-[150px]">{user.email}</span>

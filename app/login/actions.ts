@@ -54,3 +54,14 @@ export async function signup(formData: FormData) {
     // CAMBIO PARA EL PUNTO 2: No redirigimos al dashboard, sino a un mensaje de éxito
     redirect("/login?message=check_email");
 }
+
+export async function logout() {
+    const supabase = await createClient();
+
+    // 1. El servidor cierra la sesión y borra la cookie
+    await supabase.auth.signOut();
+
+    // 2. Redirigimos a la raíz
+    // (No necesitas revalidatePath porque redirect ya fuerza una nueva navegación)
+    redirect("/");
+}
