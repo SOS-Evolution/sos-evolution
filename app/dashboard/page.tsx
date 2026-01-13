@@ -74,7 +74,7 @@ export default async function DashboardPage() {
 
                         <div className="mt-auto">
                             <Link href="/historial" className="block w-full">
-                                <Button variant="outline" className="w-full border-slate-600 text-slate-200 hover:text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
+                                <Button className="w-full bg-white text-purple-950 hover:bg-slate-200 font-bold shadow-lg shadow-slate-900/20 transition-all hover:translate-y-[-2px]">
                                     Ver Historial <HistoryIcon className="w-4 h-4 ml-2" />
                                 </Button>
                             </Link>

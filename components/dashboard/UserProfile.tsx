@@ -128,29 +128,31 @@ export default function UserProfile({ user }: UserProfileProps) {
                     )}
                 </div>
 
-                {/* COLUMNA 2: Estadísticas Calculadas (Solo visibles si hay fecha) */}
+                {/* COLUMNA 2: Estadísticas Calculadas */}
                 {!isEditing && birthDate && (
-                    <div className="w-full md:w-auto flex flex-row md:flex-col gap-4">
+                    // CAMBIO AQUÍ: Usamos Grid. 
+                    // grid-cols-1 (móvil vertical) -> sm:grid-cols-2 (móvil horizontal) -> md:flex-col (desktop lateral)
+                    <div className="w-full md:w-64 grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-col gap-4 mt-6 md:mt-0">
 
                         {/* Signo Zodiacal */}
-                        <div className="flex-1 bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex items-center gap-4 min-w-[160px]">
-                            <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-serif text-lg">
+                        <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex items-center gap-4 shadow-lg">
+                            <div className="min-w-[2.5rem] h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-serif text-lg">
                                 ♒
                             </div>
-                            <div>
-                                <p className="text-xs text-indigo-300 uppercase tracking-widest font-bold">Signo Solar</p>
-                                <p className="text-xl text-white font-bold">{zodiac}</p>
+                            <div className="overflow-hidden">
+                                <p className="text-[10px] text-indigo-300 uppercase tracking-widest font-bold truncate">Signo Solar</p>
+                                <p className="text-lg text-white font-bold truncate">{zodiac}</p>
                             </div>
                         </div>
 
                         {/* Numerología */}
-                        <div className="flex-1 bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/30 p-4 rounded-xl flex items-center gap-4 min-w-[160px]">
-                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-serif text-lg">
+                        <div className="bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/30 p-4 rounded-xl flex items-center gap-4 shadow-lg">
+                            <div className="min-w-[2.5rem] h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-serif text-lg">
                                 #
                             </div>
-                            <div>
-                                <p className="text-xs text-purple-300 uppercase tracking-widest font-bold">Camino de Vida</p>
-                                <p className="text-xl text-white font-bold">{lifePath}</p>
+                            <div className="overflow-hidden">
+                                <p className="text-[10px] text-purple-300 uppercase tracking-widest font-bold truncate">Camino de Vida</p>
+                                <p className="text-lg text-white font-bold truncate">{lifePath}</p>
                             </div>
                         </div>
 
