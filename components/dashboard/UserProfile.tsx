@@ -8,6 +8,7 @@ import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2 } from "l
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { getLifePathNumber, getZodiacSign } from "@/utils/soul-math";
+import { updateProfile } from "@/app/dashboard/actions"; // Importar la acción nueva
 
 interface UserProfileProps {
     user: any;
@@ -32,20 +33,21 @@ export default function UserProfile({ user }: UserProfileProps) {
     const handleSave = async () => {
         setLoading(true);
         try {
-            const { error } = await supabase.auth.updateUser({
-                data: {
-                    full_name: fullName,
-                    birth_date: birthDate,
-                    birth_place: birthPlace,
-                },
-            });
+            // Preparamos los datos para enviar al servidor
+            const formData = new FormData();
+            formData.append("fullName", fullName);
+            formData.append("birthDate", birthDate);
+            formData.append("birthPlace", birthPlace);
 
-            if (error) throw error;
+            // Llamamos a la Server Action
+            await updateProfile(formData);
+
+            // Si todo sale bien
             setIsEditing(false);
-            router.refresh(); // Recargar para actualizar datos en el servidor si fuera necesario
+            // No necesitamos router.refresh() porque revalidatePath lo hace solo
         } catch (error) {
-            console.error("Error actualizando perfil:", error);
-            alert("No se pudo guardar el perfil.");
+            console.error("Error guardando:", error);
+            alert("Hubo un error al guardar. Intenta de nuevo.");
         } finally {
             setLoading(false);
         }

@@ -27,7 +27,8 @@ export function getZodiacSign(day: number, month: number): string {
 
 // Calcula el Número de Camino de Vida (Numerología)
 export function getLifePathNumber(dateString: string): number {
-    const date = new Date(dateString);
+    const date = new Date(dateString.includes("T") ? dateString : dateString + "T00:00:00");
+    if (isNaN(date.getTime())) return 0;
     // Obtenemos día, mes y año como números
     // Ojo: getMonth() devuelve 0-11, sumamos 1.
     let sum = date.getUTCDate() + (date.getUTCMonth() + 1) + date.getUTCFullYear();

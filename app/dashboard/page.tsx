@@ -33,13 +33,12 @@ export default async function DashboardPage() {
                 {/* 2. GRID DE ACCIONES PRINCIPALES */}
                 <div className="grid md:grid-cols-2 gap-6">
 
-                    {/* TARJETA: NUEVA LECTURA */}
-                    <Card className="bg-gradient-to-br from-purple-900/10 to-slate-900 border-purple-500/30 p-8 flex flex-col h-64 hover:border-purple-500/50 transition-all group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Sparkles className="w-32 h-32" />
-                        </div>
+                    {/* TARJETA 1: NUEVA LECTURA */}
+                    <Card className="bg-gradient-to-br from-purple-900/10 to-slate-900 border-purple-500/30 p-8 flex flex-col h-full min-h-[300px] hover:border-purple-500/50 transition-all group relative overflow-hidden">
+                        {/* ... Icono flotante ... */}
 
-                        <div className="mb-4">
+                        {/* WRAPPER DEL CONTENIDO: Usamos flex-grow para ocupar espacio */}
+                        <div className="flex-grow mb-6">
                             <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-900/30">
                                 <Sparkles className="w-6 h-6 text-white" />
                             </div>
@@ -49,9 +48,9 @@ export default async function DashboardPage() {
                             </p>
                         </div>
 
-                        {/* mt-auto empuja el botón al fondo para alinear */}
+                        {/* BOTÓN AL FONDO */}
                         <div className="mt-auto">
-                            <Link href="/lectura">
+                            <Link href="/lectura" className="block w-full">
                                 <Button className="w-full bg-white text-purple-950 hover:bg-slate-200 font-bold shadow-lg shadow-purple-900/10 transition-all hover:translate-y-[-2px]">
                                     Iniciar Lectura <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
@@ -59,13 +58,11 @@ export default async function DashboardPage() {
                         </div>
                     </Card>
 
-                    {/* TARJETA: HISTORIAL */}
-                    <Card className="bg-slate-900/50 border-slate-800 p-8 flex flex-col h-64 hover:border-slate-600 transition-all group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <ScrollText className="w-32 h-32 text-slate-400" />
-                        </div>
+                    {/* TARJETA 2: HISTORIAL (Misma estructura) */}
+                    <Card className="bg-slate-900/50 border-slate-800 p-8 flex flex-col h-full min-h-[300px] hover:border-slate-600 transition-all group relative overflow-hidden">
+                        {/* ... Icono flotante ... */}
 
-                        <div className="mb-4">
+                        <div className="flex-grow mb-6">
                             <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 border border-slate-700">
                                 <ScrollText className="w-6 h-6 text-slate-300" />
                             </div>
@@ -76,7 +73,7 @@ export default async function DashboardPage() {
                         </div>
 
                         <div className="mt-auto">
-                            <Link href="/historial">
+                            <Link href="/historial" className="block w-full">
                                 <Button variant="outline" className="w-full border-slate-600 text-slate-200 hover:text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
                                     Ver Historial <HistoryIcon className="w-4 h-4 ml-2" />
                                 </Button>
