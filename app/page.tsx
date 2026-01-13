@@ -50,18 +50,24 @@ export default async function Home() {
             Instala una nueva versión de tu consciencia. Una plataforma que combina la precisión de la <strong>IA</strong> con la sabiduría ancestral del <strong>Tarot</strong> para guiarte en tu propio Viaje del Héroe.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-            <Link href={user ? "/dashboard" : "/login"}>
-              <Button size="lg" className="bg-white text-purple-950 hover:bg-slate-200 text-lg px-10 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.3)] hover:shadow-[0_0_60px_rgba(147,51,234,0.5)] transition-all hover:-translate-y-1">
-                {user ? "Acceder al Sistema" : "Iniciar Actualización"}
+          {/* BOTONES MODIFICADOS: Verticales (Arriba y Abajo) */}
+          <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto">
+
+            {/* BOTÓN 1: ¡INICIAR VIAJE! (Arriba) */}
+            <Link href={user ? "/dashboard" : "/login"} className="w-full">
+              <Button size="lg" className="w-full bg-white text-purple-950 hover:bg-slate-200 text-lg px-8 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.3)] hover:shadow-[0_0_60px_rgba(147,51,234,0.5)] transition-all hover:-translate-y-1">
+                {user ? "ACCEDER AL SISTEMA" : "¡INICIAR VIAJE!"}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="#how-it-works">
-              <Button variant="ghost" size="lg" className="text-slate-400 hover:text-white border border-white/5 hover:bg-white/5 px-8 py-7 rounded-full text-lg backdrop-blur-sm">
-                Ver demo del sistema <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
+
+            {/* BOTÓN 2: ¿Cómo Funciona? (Abajo) */}
+            <Link href="#how-it-works" className="w-full">
+              <Button variant="ghost" size="lg" className="w-full text-slate-400 hover:text-white border border-transparent hover:border-white/10 hover:bg-white/5 px-8 py-6 rounded-full text-lg backdrop-blur-sm transition-all">
+                ¿Cómo Funciona? <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
               </Button>
             </Link>
+
           </div>
         </section>
 
