@@ -33,15 +33,24 @@ export async function signup(formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    // Obtenemos la URL base automáticamente (localhost o vercel)
+    // OJO: En Vercel a veces es necesario definir NEXT_PUBLIC_SITE_URL en variables de entorno
+    // Si da problemas, puedes poner tu dominio "hardcoded" temporalmente.
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
     const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            // AQUÍ ESTÁ EL CAMBIO: Le decimos a dónde volver
+            emailRedirectTo: `${origin}/auth/callback`,
+        },
     });
 
     if (error) {
         return redirect("/login?error=Error al registrarse");
     }
 
-    revalidatePath("/", "layout");
-    redirect("/dashboard");
+    // CAMBIO PARA EL PUNTO 2: No redirigimos al dashboard, sino a un mensaje de éxito
+    redirect("/login?message=check_email");
 }

@@ -6,12 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Sparkles, Lock, Mail, Loader2 } from "lucide-react";
 import { login, signup } from "./actions";
 import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react"; // <--- Importamos Suspense
+import { useState, Suspense } from "react";
 
 // 1. COMPONENTE INTERNO (Lógica del formulario)
 function LoginForm() {
-    const searchParams = useSearchParams(); // Esto es lo que causaba el error
+    const searchParams = useSearchParams();
     const errorMsg = searchParams.get("error");
+    const message = searchParams.get("message");
     const [isSignUp, setIsSignUp] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -33,48 +34,62 @@ function LoginForm() {
                 </p>
             </div>
 
+            {/* ALERTA DE ÉXITO (CORREO ENVIADO) */}
+            {message === "check_email" && (
+                <div className="bg-green-900/30 border border-green-500/50 text-green-200 p-4 rounded-md text-sm text-center mb-6 flex flex-col items-center animate-fade-in">
+                    <Mail className="w-6 h-6 mb-2 text-green-400" />
+                    <p className="font-bold">¡Casi listo!</p>
+                    <p>Hemos enviado un enlace mágico a tu correo.</p>
+                    <p className="text-xs mt-2 opacity-70">Revisa tu bandeja de entrada (y spam) para confirmar.</p>
+                </div>
+            )}
+
+            {/* ALERTA DE ERROR */}
             {errorMsg && (
                 <div className="bg-red-900/30 border border-red-500/50 text-red-200 p-3 rounded-md text-sm text-center mb-6">
                     ⚠️ {errorMsg}
                 </div>
             )}
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="space-y-2">
-                    <div className="relative">
-                        <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
-                        <Input
-                            name="email"
-                            type="email"
-                            placeholder="correo@ejemplo.com"
-                            className="pl-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus:ring-purple-500"
-                            required
-                        />
+            {/* Ocultamos el formulario si acabamos de registrarnos para que no intenten entrar sin confirmar */}
+            {message !== "check_email" && (
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                    <div className="space-y-2">
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
+                            <Input
+                                name="email"
+                                type="email"
+                                placeholder="correo@ejemplo.com"
+                                className="pl-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus:ring-purple-500"
+                                required
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div className="space-y-2">
-                    <div className="relative">
-                        <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
-                        <Input
-                            name="password"
-                            type="password"
-                            placeholder="••••••••"
-                            className="pl-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus:ring-purple-500"
-                            required
-                            minLength={6}
-                        />
+                    <div className="space-y-2">
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500" />
+                            <Input
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                className="pl-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus:ring-purple-500"
+                                required
+                                minLength={6}
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <Button
-                    formAction={isSignUp ? signup : login}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6"
-                    disabled={loading}
-                >
-                    {loading ? <Loader2 className="animate-spin" /> : (isSignUp ? "Crear Cuenta" : "Entrar")}
-                </Button>
-            </form>
+                    <Button
+                        formAction={isSignUp ? signup : login}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6"
+                        disabled={loading}
+                    >
+                        {loading ? <Loader2 className="animate-spin" /> : (isSignUp ? "Crear Cuenta" : "Entrar")}
+                    </Button>
+                </form>
+            )}
 
             <div className="mt-6 text-center text-sm">
                 <span className="text-slate-500">
