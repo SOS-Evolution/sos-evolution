@@ -57,14 +57,6 @@ export default function ReadingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4">
 
-      {/* HEADER SIMPLE */}
-      <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-50">
-        <h1 className="text-xl font-serif tracking-widest text-purple-300">SOS EVOLUTION</h1>
-        <a href="/dashboard" className="text-slate-400 hover:text-white text-sm uppercase tracking-wider">
-          ✕ Salir
-        </a>
-      </nav>
-
       {/* ZONA CENTRAL */}
       <main className="flex flex-col items-center gap-8 max-w-md w-full z-10">
 

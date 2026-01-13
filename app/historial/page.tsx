@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import AppNavbar from "@/components/AppNavbar";
+//import AppNavbar from "@/components/AppNavbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Sparkles, ScrollText, ArrowRight } from "lucide-react";
@@ -33,8 +33,6 @@ export default async function HistoryPage() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-            {/* BARRA DE NAVEGACIÓN */}
-            <AppNavbar userEmail={user.email!} />
 
             <main className="max-w-4xl mx-auto p-6">
 

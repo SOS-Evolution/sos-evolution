@@ -23,22 +23,6 @@ export default async function Home() {
         <div className="absolute top-[40%] left-[30%] w-[30%] h-[30%] bg-cyan-900/05 rounded-full blur-[100px]" />
       </div>
 
-      {/* --- NAVBAR --- */}
-      <header className="relative z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="bg-gradient-to-tr from-purple-600 to-indigo-600 p-2 rounded-lg shadow-lg shadow-purple-900/20 group-hover:shadow-purple-500/40 transition-all">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-lg font-bold tracking-wider text-white leading-none">SOS</span>
-              <span className="text-[0.6rem] text-purple-300 tracking-widest uppercase">Evolution</span>
-            </div>
-          </div>
-          <AuthButton user={user} />
-        </div>
-      </header>
-
       <main className="relative z-10">
 
         {/* --- HERO SECTION (MARCA DESGLOSADA) --- */}

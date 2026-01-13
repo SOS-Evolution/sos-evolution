@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import AppNavbar from "@/components/AppNavbar";
+//import AppNavbar from "@/components/AppNavbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -20,8 +20,6 @@ export default async function DashboardPage() {
 
     return (
         <main className="min-h-screen bg-slate-950">
-            {/* Navbar presente */}
-            <AppNavbar userEmail={user.email!} />
 
             <div className="max-w-6xl mx-auto p-6 space-y-8">
 

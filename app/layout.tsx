@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // O la fuente que estés usando
+import { Inter } from "next/font/google";
 import "./globals.css";
+// IMPORTACIONES NUEVAS
+import Navbar from "@/components/Navbar";
+import { createClient } from "@/utils/supabase/server";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,14 +27,24 @@ export const metadata: Metadata = {
 };
 // ---------------------------
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 1. Obtenemos el usuario en el servidor (una sola vez para toda la app)
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="es">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} bg-slate-950`}>
+        {/* 2. Aquí va la Barra Global */}
+        <Navbar user={user} />
+
+        {/* El contenido de cada página se renderiza aquí abajo */}
+        {children}
+      </body>
     </html>
   );
 }
