@@ -55,9 +55,13 @@ export default async function Home() {
 
             {/* BOTÓN 1: ¡INICIAR VIAJE! (Arriba) */}
             <Link href={user ? "/dashboard" : "/login"} className="w-full">
-              <Button size="lg" className="w-full bg-white text-purple-950 hover:bg-slate-200 text-lg px-8 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.3)] hover:shadow-[0_0_60px_rgba(147,51,234,0.5)] transition-all hover:-translate-y-1">
-                {user ? "ACCEDER AL SISTEMA" : "¡INICIAR VIAJE!"}
-                <ArrowRight className="ml-2 w-5 h-5" />
+              <Button size="lg" className="w-full bg-white text-purple-950 hover:bg-slate-100 text-lg px-8 py-7 rounded-full font-bold shadow-[0_0_40px_rgba(147,51,234,0.3)] hover:shadow-[0_0_60px_rgba(147,51,234,0.5)] transition-all hover:-translate-y-1 group">
+                {user ? "ACCEDER AL SISTEMA" : "¡INICIA EL VIAJE!"}
+
+                {/* ICONO DE DESTELLO */}
+                {/* animate-pulse: Hace el efecto de parpadeo/brillo */}
+                {/* fill-purple-400: Rellena la estrella para que se vea sólida como tu imagen */}
+                <Sparkles className="ml-2 w-5 h-5 text-purple-600 fill-purple-400 animate-pulse" />
               </Button>
             </Link>
 
