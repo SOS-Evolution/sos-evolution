@@ -61,7 +61,7 @@ export default async function Home() {
                 {/* ICONO DE DESTELLO */}
                 {/* animate-pulse: Hace el efecto de parpadeo/brillo */}
                 {/* fill-purple-400: Rellena la estrella para que se vea sólida como tu imagen */}
-                <Sparkles className="ml-2 w-5 h-5 text-purple-600 fill-purple-400 animate-pulse" />
+                <Sparkles className="ml-2 w-5 h-5 text-purple-950 fill-purple-950 animate-pulse" />
               </Button>
             </Link>
 
