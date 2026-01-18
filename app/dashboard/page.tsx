@@ -17,7 +17,7 @@ export default async function DashboardPage() {
     if (!user) redirect("/login");
 
     return (
-        <main className="min-h-screen bg-slate-950 pb-20 relative overflow-hidden">
+        <main className="min-h-screen pb-20 relative overflow-hidden">
 
             {/* Fondo animado */}
             <div className="fixed inset-0 z-0 pointer-events-none">

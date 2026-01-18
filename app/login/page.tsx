@@ -141,7 +141,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-[calc(100vh-5rem)] bg-slate-950 flex flex-col items-center justify-center p-6 overflow-hidden relative">
+        <div className="min-h-[calc(100vh-5rem)] flex flex-col items-center justify-center p-6 overflow-hidden relative">
 
             {/* Fondo animado */}
             <div className="fixed inset-0 z-0 pointer-events-none">

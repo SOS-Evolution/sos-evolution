@@ -87,7 +87,7 @@ export default function ReadingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
 
       {/* Fondo animado */}
       <div className="fixed inset-0 z-0 pointer-events-none">

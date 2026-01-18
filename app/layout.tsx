@@ -4,6 +4,7 @@ import "./globals.css";
 // IMPORTACIONES NUEVAS
 import Navbar from "@/components/layout/Navbar";
 import { createClient } from "@/lib/supabase/server";
+import ParticlesBackground from "@/components/landing/ParticlesBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +40,8 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} bg-slate-950`}>
+        <ParticlesBackground />
+
         {/* 2. Aquí va la Barra Global */}
         <Navbar user={user} />
 

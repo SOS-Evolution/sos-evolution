@@ -5,7 +5,7 @@ import {
   Instagram, Twitter, Youtube, Linkedin, ChevronDown, CheckCircle2, Moon
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import ParticlesBackground from "@/components/landing/ParticlesBackground";
+
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 
@@ -16,10 +16,10 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans overflow-x-hidden">
+    <div className="min-h-screen text-slate-200 font-sans overflow-x-hidden">
 
       {/* ===== FONDO ANIMADO PREMIUM ===== */}
-      <ParticlesBackground />
+
 
       {/* Aurora Orbs */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
@@ -37,7 +37,7 @@ export default async function Home() {
           <div className="animate-fade-in-up mb-8">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-purple-300 border border-purple-500/20">
               <Moon className="w-4 h-4" />
-              Versión 2.0 — Rediseño Místico
+              Versión Beta — En Desarrollo
             </span>
           </div>
 
