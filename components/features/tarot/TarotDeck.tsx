@@ -26,7 +26,7 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, type: "spring" }}
-                className="relative w-[420px] h-[420px] md:w-[500px] md:h-[500px]"
+                className="relative w-full max-w-[600px] h-[400px] md:h-[600px]"
             >
                 {Array.from({ length: DECK_SIZE }).map((_, index) => {
                     // Abanico de 325 grados para dejar hueco visible
@@ -50,7 +50,7 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                             whileHover={
                                 !disabled
                                     ? {
-                                        scale: 1.25,
+                                        scale: 1.15,
                                         zIndex: 100,
                                         transition: { duration: 0.15 }, // Hover in rápido
                                     }
@@ -58,7 +58,7 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                             }
                             whileTap={!disabled ? { scale: 0.95 } : {}}
                             onClick={() => !disabled && onSelectCard(index)}
-                            className={`absolute left-1/2 top-1/2 cursor-pointer ${disabled ? "pointer-events-none" : ""}`}
+                            className={`absolute left-1/2 top-1/2 -translate-x-1/2 cursor-pointer ${disabled ? "pointer-events-none" : ""}`}
                             style={{
                                 transformOrigin: "center bottom",
                                 zIndex: index,
@@ -67,9 +67,8 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                             {/* Card Back - Proporciones reales y más grandes, con offset del centro */}
                             <div
                                 className={`
-                                    w-[70px] h-[105px] md:w-[80px] md:h-[120px]
-                                    -ml-[35px] md:-ml-[40px]
-                                    -mt-[140px] md:-mt-[160px]
+                                    w-[90px] h-[135px] md:w-[110px] md:h-[165px]
+                                    -mt-[180px] md:-mt-[220px]
                                     bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950
                                     border-2 border-purple-500/50
                                     rounded-xl shadow-lg
