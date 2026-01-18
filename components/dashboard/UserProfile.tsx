@@ -5,9 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { getLifePathNumber, getZodiacSign } from "@/utils/soul-math";
+import { getLifePathNumber, getZodiacSign } from "@/lib/soul-math";
 import { updateProfile } from "@/app/dashboard/actions"; // Importar la acción nueva
 
 interface UserProfileProps {

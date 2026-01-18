@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
-import { createClient } from '@/utils/supabase/server'; // <--- USAMOS EL CLIENTE DE SERVIDOR
+import { createClient } from '@/lib/supabase/server'; // <--- USAMOS EL CLIENTE DE SERVIDOR
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -30,6 +30,9 @@ const schema: Schema = {
 
 export async function POST(req: Request) {
     try {
+        const body = await req.json().catch(() => ({}));
+        const { question, cardIndex } = body;
+
         // 1. VERIFICAR USUARIO
         const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -50,19 +53,29 @@ export async function POST(req: Request) {
             },
         });
 
-        const randomCard = DECK[Math.floor(Math.random() * DECK.length)];
+        // Elegir carta: si el usuario seleccionó una (cardIndex), usarla; si no, random
+        const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < DECK.length)
+            ? DECK[cardIndex]
+            : DECK[Math.floor(Math.random() * DECK.length)];
+
+        let userContext = "Busca evolución personal.";
+        if (question) {
+            userContext = `Pregunta específica del usuario: "${question}". Busca respuesta y guía sobre esto.`;
+        }
 
         const prompt = `
-          Actúa como SOS (Soul Operating System). Carta: ${randomCard}.
-          Contexto del usuario: Busca evolución personal.
+          Actúa como SOS (Soul Operating System). Carta: ${selectedCard}.
+          Contexto del usuario: ${userContext}
           Dame lectura JSON en español.
         `;
 
         const result = await model.generateContent(prompt);
         const aiResponse = JSON.parse(result.response.text());
-        aiResponse.cardName = randomCard;
+        aiResponse.cardName = selectedCard;
 
         // 3. GUARDAR CON EL ID DEL USUARIO
+        // Nota: Si existiera columna 'question' la agregaríamos aquí.
+        // Por ahora se guarda el contexto implícito en la lectura generada.
         const { error: dbError } = await supabase
             .from('lecturas')
             .insert([
@@ -71,7 +84,7 @@ export async function POST(req: Request) {
                     keywords: aiResponse.keywords,
                     description: aiResponse.description,
                     action: aiResponse.action,
-                    user_id: user.id // <--- AQUÍ VINCULAMOS LA LECTURA AL USUARIO
+                    user_id: user.id
                 }
             ]);
 

@@ -1,27 +1,23 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-//import AppNavbar from "@/components/AppNavbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Sparkles, ScrollText, ArrowRight } from "lucide-react";
+import { Calendar, Sparkles, ScrollText, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
+import AnimatedSection from "@/components/landing/AnimatedSection";
+import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 
 export default async function HistoryPage() {
-    // 1. Verificación de Usuario y Conexión a DB
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-        redirect("/login");
-    }
+    if (!user) redirect("/login");
 
-    // 2. Obtener lecturas (Ordenadas por fecha descendente)
     const { data: lecturas } = await supabase
         .from('lecturas')
         .select('*')
         .order('created_at', { ascending: false });
 
-    // Función auxiliar para formatear fecha (dentro del componente server)
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("es-ES", {
             day: "numeric",
@@ -32,88 +28,100 @@ export default async function HistoryPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
+        <div className="min-h-screen bg-slate-950 text-slate-100 pb-20 relative overflow-hidden">
 
-            <main className="max-w-4xl mx-auto p-6">
+            {/* Fondo animado */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/15 rounded-full blur-[100px] animate-float" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[35%] h-[35%] bg-indigo-900/15 rounded-full blur-[80px] animate-float-delayed" />
+            </div>
 
-                {/* HEADER DE LA SECCIÓN */}
-                <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6 mt-4">
-                    <div>
-                        <h1 className="text-3xl font-serif text-purple-300 tracking-widest flex items-center gap-3">
-                            <ScrollText className="w-8 h-8" />
-                            DIARIO DEL ALMA
-                        </h1>
-                        <p className="text-slate-400 mt-2">Tu registro akásico de evolución personal.</p>
-                    </div>
+            <main className="max-w-5xl mx-auto p-6 relative z-10">
 
-                    {/* Botón para nueva lectura si el historial está vacío o lleno */}
-                    <Link href="/lectura">
-                        <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-900/20">
-                            Nueva Consulta <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                    </Link>
-                </div>
+                {/* HEADER */}
+                <AnimatedSection>
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 border-b border-white/10 pb-8 mt-4 gap-6">
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 bg-purple-600/20 rounded-xl">
+                                    <BookOpen className="w-6 h-6 text-purple-400" />
+                                </div>
+                                <h1 className="text-3xl md:text-4xl font-serif text-white tracking-wide">
+                                    Diario del <span className="text-gradient-purple">Alma</span>
+                                </h1>
+                            </div>
+                            <p className="text-slate-400">Tu registro akásico de evolución personal.</p>
+                        </div>
 
-                {/* LISTA DE LECTURAS */}
-                {(!lecturas || lecturas.length === 0) ? (
-                    // ESTADO VACÍO
-                    <div className="text-center py-20 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">
-                        <Sparkles className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <h3 className="text-xl text-slate-300 font-serif mb-2">Tu diario está esperando</h3>
-                        <p className="text-slate-500 mb-6">Aún no has realizado ninguna consulta al oráculo.</p>
                         <Link href="/lectura">
-                            <Button variant="outline" className="border-purple-500 text-purple-300 hover:bg-purple-900/20">
-                                Iniciar primera lectura
+                            <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-900/30 px-6 py-5 rounded-xl font-medium group">
+                                Nueva Consulta
+                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </Link>
                     </div>
+                </AnimatedSection>
+
+                {/* LISTA DE LECTURAS */}
+                {(!lecturas || lecturas.length === 0) ? (
+                    <AnimatedSection>
+                        <div className="text-center py-24 glass rounded-3xl">
+                            <Sparkles className="w-16 h-16 text-slate-600 mx-auto mb-6" />
+                            <h3 className="text-2xl text-slate-300 font-serif mb-3">Tu diario está esperando</h3>
+                            <p className="text-slate-500 mb-8 max-w-sm mx-auto">Aún no has realizado ninguna consulta al oráculo. Comienza tu viaje de autodescubrimiento.</p>
+                            <Link href="/lectura">
+                                <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-5 rounded-xl">
+                                    Iniciar primera lectura
+                                </Button>
+                            </Link>
+                        </div>
+                    </AnimatedSection>
                 ) : (
-                    // GRID DE TARJETAS
                     <div className="grid gap-6 md:grid-cols-2">
-                        {lecturas.map((item) => (
-                            <Card key={item.id} className="bg-slate-900/60 border-purple-500/20 p-6 hover:bg-slate-900/90 transition-all hover:border-purple-500/40 group relative overflow-hidden flex flex-col">
+                        {lecturas.map((item, index) => (
+                            <AnimatedSection key={item.id} delay={index * 0.1}>
+                                <GlowingBorderCard>
+                                    <div className="p-6">
+                                        {/* Header */}
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-white font-serif tracking-wide">{item.card_name}</h3>
+                                                <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {formatDate(item.created_at)}
+                                                </div>
+                                            </div>
+                                            <div className="p-2 bg-purple-900/30 rounded-xl">
+                                                <Sparkles className="w-4 h-4 text-purple-400" />
+                                            </div>
+                                        </div>
 
-                                {/* Decoración de fondo */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all pointer-events-none"></div>
+                                        {/* Keywords */}
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {item.keywords?.map((k: string, i: number) => (
+                                                <span key={i} className="text-[10px] uppercase tracking-wider bg-purple-950/50 text-purple-300 px-2 py-1 rounded-lg border border-purple-500/20">
+                                                    {k}
+                                                </span>
+                                            ))}
+                                        </div>
 
-                                {/* Encabezado Carta */}
-                                <div className="flex justify-between items-start mb-4 relative z-10">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white font-serif tracking-wide">{item.card_name}</h3>
-                                        <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                                            <Calendar className="w-3 h-3" />
-                                            {formatDate(item.created_at)}
+                                        {/* Description */}
+                                        <p className="text-sm text-slate-300 line-clamp-3 mb-5 font-light leading-relaxed">
+                                            "{item.description}"
+                                        </p>
+
+                                        {/* Mission */}
+                                        <div className="pt-4 border-t border-white/5">
+                                            <p className="text-[10px] text-purple-400 font-bold mb-2 uppercase flex items-center gap-1">
+                                                ⚡ Misión Evolutiva
+                                            </p>
+                                            <p className="text-xs text-slate-400 italic bg-purple-900/20 p-3 rounded-lg border-l-2 border-purple-500/50">
+                                                {item.action}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="p-2 bg-purple-900/20 rounded-full">
-                                        <Sparkles className="w-4 h-4 text-purple-400" />
-                                    </div>
-                                </div>
-
-                                {/* Palabras Clave */}
-                                <div className="flex flex-wrap gap-2 mb-4 relative z-10">
-                                    {item.keywords?.map((k: string, i: number) => (
-                                        <span key={i} className="text-[10px] uppercase tracking-wider bg-slate-800 text-purple-200 px-2 py-1 rounded border border-purple-500/10">
-                                            {k}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                {/* Descripción */}
-                                <p className="text-sm text-slate-300 line-clamp-4 mb-6 font-light leading-relaxed flex-grow">
-                                    "{item.description}"
-                                </p>
-
-                                {/* Footer Misión */}
-                                <div className="pt-4 border-t border-white/5 relative z-10 mt-auto">
-                                    <p className="text-[10px] text-purple-400 font-bold mb-1 uppercase flex items-center gap-1">
-                                        ⚡ Misión Evolutiva
-                                    </p>
-                                    <p className="text-xs text-slate-400 italic bg-purple-900/10 p-2 rounded border-l-2 border-purple-500/50">
-                                        {item.action}
-                                    </p>
-                                </div>
-                            </Card>
+                                </GlowingBorderCard>
+                            </AnimatedSection>
                         ))}
                     </div>
                 )}
