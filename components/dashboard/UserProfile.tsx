@@ -87,20 +87,20 @@ export default function UserProfile({ user }: UserProfileProps) {
         }
     };
 
-    if (!profile) return <div className="animate-pulse h-64 bg-slate-900/50 rounded-xl m-6"></div>;
+    if (!profile) return <div className="animate-pulse h-32 bg-slate-900/50 rounded-xl w-full"></div>;
 
     return (
         <>
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-6 md:p-8 relative overflow-hidden">
+            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 md:p-6 relative overflow-hidden">
                 {/* Fondo Decorativo */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none"></div>
 
-                <div className="flex flex-col md:flex-row gap-8 items-start relative z-10">
+                <div className="flex flex-col md:flex-row gap-6 items-start relative z-10">
 
                     {/* COLUMNA 1: Datos Personales */}
-                    <div className="flex-1 w-full space-y-6">
+                    <div className="flex-1 w-full space-y-4">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-serif text-white flex items-center gap-2">
+                            <h2 className="text-lg font-serif text-white flex items-center gap-2">
                                 <User className="w-5 h-5 text-purple-400" />
                                 Identidad del Alma
                             </h2>
@@ -205,8 +205,8 @@ export default function UserProfile({ user }: UserProfileProps) {
                                 </Button>
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                <div className="text-3xl font-bold text-white tracking-tight">
+                            <div className="space-y-2">
+                                <div className="text-2xl font-bold text-white tracking-tight">
                                     {fullName || "Viajero Sin Nombre"}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
