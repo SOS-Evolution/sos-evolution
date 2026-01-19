@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, Home, Layers, BookOpen } from "lucide-react";
+import { Sparkles, Home, Layers, BookOpen, Star, Hash } from "lucide-react";
 import AuthButton from "@/components/ui/AuthButton";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
 
 export default function Navbar({ user }: { user: any }) {
     const pathname = usePathname();
@@ -19,6 +20,8 @@ export default function Navbar({ user }: { user: any }) {
         { href: "/dashboard", icon: Home, label: "Inicio" },
         { href: "/lectura", icon: Layers, label: "Lectura" },
         { href: "/historial", icon: BookOpen, label: "Diario" },
+        { href: "/astrology", icon: Star, label: "Astrología" },
+        { href: "/numerology", icon: Hash, label: "Numerología" },
     ];
 
     return (
@@ -42,8 +45,8 @@ export default function Navbar({ user }: { user: any }) {
                         <div className="hidden md:flex items-center gap-1 ml-4 border-l border-white/10 pl-6 h-8">
                             {navItems.map((item, index) => (
                                 <div key={item.href} className="flex items-center">
-                                    {/* Separador después del primer elemento */}
-                                    {index === 1 && (
+                                    {/* Separadores: Antes de Lectura (index 1) y Astrología (index 3) */}
+                                    {(index === 1 || index === 3) && (
                                         <div className="w-px h-4 bg-white/10 mx-2" />
                                     )}
                                     <Link href={item.href}>
@@ -67,8 +70,9 @@ export default function Navbar({ user }: { user: any }) {
                     )}
                 </div>
 
-                {/* --- USUARIO / SALIR --- */}
-                <div>
+                {/* --- USUARIO / SALDOS --- */}
+                <div className="flex items-center gap-4">
+                    {user && <CreditsDisplay minimal />}
                     <AuthButton user={user} />
                 </div>
 

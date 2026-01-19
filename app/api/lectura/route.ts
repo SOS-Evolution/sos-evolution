@@ -31,7 +31,7 @@ const schema: Schema = {
 export async function POST(req: Request) {
     try {
         const body = await req.json().catch(() => ({}));
-        const { question, cardIndex } = body;
+        const { question, cardIndex, readingTypeCode = 'general' } = body;
 
         // 1. VERIFICAR USUARIO
         const supabase = await createClient();
@@ -44,7 +44,28 @@ export async function POST(req: Request) {
             );
         }
 
-        // 2. IA GENERATIVA
+        // 2. VALIDAR TIPO Y CRÉDITOS
+        const { data: readingType } = await supabase
+            .from('reading_types')
+            .select('*')
+            .eq('code', readingTypeCode)
+            .single();
+
+        if (!readingType) {
+            return NextResponse.json({ error: 'Tipo de lectura no válido' }, { status: 400 });
+        }
+
+        const cost = readingType.credit_cost;
+
+        // Verificación optimista de saldo (para no gastar IA si no alcanza)
+        if (cost > 0) {
+            const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+            if ((balance || 0) < cost) {
+                return NextResponse.json({ error: 'Créditos insuficientes para esta lectura.' }, { status: 402 });
+            }
+        }
+
+        // 3. IA GENERATIVA
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
             generationConfig: {
@@ -53,7 +74,7 @@ export async function POST(req: Request) {
             },
         });
 
-        // Elegir carta: si el usuario seleccionó una (cardIndex), usarla; si no, random
+        // Elegir carta
         const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < DECK.length)
             ? DECK[cardIndex]
             : DECK[Math.floor(Math.random() * DECK.length)];
@@ -63,8 +84,11 @@ export async function POST(req: Request) {
             userContext = `Pregunta específica del usuario: "${question}". Busca respuesta y guía sobre esto.`;
         }
 
+        let typeContext = `Tipo de lectura: ${readingType.name}. ${readingType.description}`;
+
         const prompt = `
           Actúa como SOS (Soul Operating System). Carta: ${selectedCard}.
+          ${typeContext}
           Contexto del usuario: ${userContext}
           Dame lectura JSON en español.
         `;
@@ -73,10 +97,8 @@ export async function POST(req: Request) {
         const aiResponse = JSON.parse(result.response.text());
         aiResponse.cardName = selectedCard;
 
-        // 3. GUARDAR CON EL ID DEL USUARIO
-        // Nota: Si existiera columna 'question' la agregaríamos aquí.
-        // Por ahora se guarda el contexto implícito en la lectura generada.
-        const { error: dbError } = await supabase
+        // 4. GUARDAR EN DB
+        const { data: savedReading, error: dbError } = await supabase
             .from('lecturas')
             .insert([
                 {
@@ -84,13 +106,39 @@ export async function POST(req: Request) {
                     keywords: aiResponse.keywords,
                     description: aiResponse.description,
                     action: aiResponse.action,
-                    user_id: user.id
+                    user_id: user.id,
+                    reading_type_id: readingType.id,
+                    question: question || null
                 }
-            ]);
+            ])
+            .select()
+            .single();
 
-        if (dbError) console.error("Error BD:", dbError);
+        if (dbError) {
+            console.error("Error BD:", dbError);
+            // Si la IA funcionó pero falló la BD, devolvemos resultado pero advertimos
+            // No cobramos créditos si falla el guardado
+        } else {
+            // 5. DESCONTAR CRÉDITOS (Si se guardó bien)
+            if (cost > 0) {
+                await supabase.rpc('spend_credits', {
+                    p_user_id: user.id,
+                    p_amount: cost,
+                    p_description: `Lectura: ${readingType.name}`,
+                    p_reference_id: savedReading.id
+                });
+            }
+        }
 
-        return NextResponse.json(aiResponse);
+        // Obtener nuevo saldo para actualizar UI
+        const { data: newBalance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+
+        return NextResponse.json({
+            ...aiResponse,
+            id: savedReading?.id,
+            creditsUsed: cost,
+            newBalance: newBalance || 0
+        });
 
     } catch (error) {
         console.error('Error general:', error);

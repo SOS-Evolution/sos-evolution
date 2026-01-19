@@ -1,53 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { getLifePathNumber, getZodiacSign, getLifePathDetails, LifePathDetails } from "@/lib/soul-math";
-import { updateProfile } from "@/app/dashboard/actions";
 import MagicModal from "@/components/ui/MagicModal";
+import type { Profile } from "@/types";
 
 interface UserProfileProps {
-    user: any;
+    user: any; // Mantenemos el usuario de auth como prop inicial
 }
 
 export default function UserProfile({ user }: UserProfileProps) {
     const router = useRouter();
-    const metadata = user.user_metadata || {};
-
-    const [isEditing, setIsEditing] = useState(!metadata.full_name);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Estados del formulario
-    const [fullName, setFullName] = useState(metadata.full_name || "");
-    const [birthDate, setBirthDate] = useState(metadata.birth_date || "");
-    const [birthPlace, setBirthPlace] = useState(metadata.birth_place || "");
+    const [fullName, setFullName] = useState("");
+    const [birthDate, setBirthDate] = useState("");
+    const [birthPlace, setBirthPlace] = useState("");
+    const [birthTime, setBirthTime] = useState("");
+    const [latitude, setLatitude] = useState<number | "">("");
+    const [longitude, setLongitude] = useState<number | "">("");
 
     const [selectedDetails, setSelectedDetails] = useState<LifePathDetails | null>(null);
 
-    // Cálculos en tiempo real (si hay fecha)
+    // Cargar perfil real desde nuestra tabla
+    useEffect(() => {
+        fetch('/api/profile')
+            .then(res => res.json())
+            .then(data => {
+                if (data && !data.error) {
+                    setProfile(data);
+                    setFullName(data.full_name || "");
+                    setBirthDate(data.birth_date || "");
+                    setBirthPlace(data.birth_place || "");
+                    setBirthTime(data.birth_time || "12:00");
+                    setLatitude(data.latitude || "");
+                    setLongitude(data.longitude || "");
+
+                    if (!data.full_name) setIsEditing(true);
+                }
+            })
+            .catch(err => console.error("Error loading profile:", err));
+    }, []);
+
+    // Cálculos en tiempo real
     const zodiac = birthDate ? getZodiacSign(new Date(birthDate).getDate(), new Date(birthDate).getMonth() + 1) : "---";
     const lifePath = birthDate ? getLifePathNumber(birthDate) : "---";
 
     const handleSave = async () => {
         setLoading(true);
         try {
-            // Preparamos los datos para enviar al servidor
-            const formData = new FormData();
-            formData.append("fullName", fullName);
-            formData.append("birthDate", birthDate);
-            formData.append("birthPlace", birthPlace);
+            const res = await fetch('/api/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    full_name: fullName,
+                    birth_date: birthDate,
+                    birth_place: birthPlace,
+                    birth_time: birthTime,
+                    latitude: latitude === "" ? 0 : latitude,
+                    longitude: longitude === "" ? 0 : longitude
+                })
+            });
 
-            // Llamamos a la Server Action
-            await updateProfile(formData);
+            const updatedProfile = await res.json();
 
-            // Si todo sale bien
+            if (updatedProfile.error) {
+                throw new Error(updatedProfile.error);
+            }
+
+            setProfile(updatedProfile);
             setIsEditing(false);
-            // No necesitamos router.refresh() porque revalidatePath lo hace solo
+            router.refresh();
         } catch (error) {
             console.error("Error guardando:", error);
             alert("Hubo un error al guardar. Intenta de nuevo.");
@@ -55,6 +86,8 @@ export default function UserProfile({ user }: UserProfileProps) {
             setLoading(false);
         }
     };
+
+    if (!profile) return <div className="animate-pulse h-64 bg-slate-900/50 rounded-xl m-6"></div>;
 
     return (
         <>
@@ -100,12 +133,70 @@ export default function UserProfile({ user }: UserProfileProps) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-xs text-slate-400 ml-1">Lugar (País/Ciudad)</label>
+                                        <label className="text-xs text-slate-400 ml-1">Hora (Aproximada)</label>
                                         <Input
-                                            value={birthPlace}
-                                            onChange={(e) => setBirthPlace(e.target.value)}
-                                            placeholder="Ej: Chile"
-                                            className="bg-slate-800/50 border-slate-700 text-white"
+                                            type="time"
+                                            value={birthTime}
+                                            onChange={(e) => setBirthTime(e.target.value)}
+                                            className="bg-slate-800/50 border-slate-700 text-white font-mono"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs text-slate-400 ml-1 flex justify-between items-center">
+                                        <span>Lugar (País/Ciudad)</span>
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (!birthPlace) return;
+                                                setLoading(true);
+                                                try {
+                                                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&limit=1`);
+                                                    const data = await res.json();
+                                                    if (data && data[0]) {
+                                                        setLatitude(parseFloat(data[0].lat));
+                                                        setLongitude(parseFloat(data[0].lon));
+                                                        alert("Coordenadas detectadas!");
+                                                    }
+                                                } catch (e) {
+                                                    console.error("Geocoding error", e);
+                                                } finally {
+                                                    setLoading(false);
+                                                }
+                                            }}
+                                            className="text-[10px] text-purple-400 hover:text-purple-300 underline"
+                                        >
+                                            Auto-Detectar Coordenadas
+                                        </button>
+                                    </label>
+                                    <Input
+                                        value={birthPlace}
+                                        onChange={(e) => setBirthPlace(e.target.value)}
+                                        placeholder="Ej: Santiago, Chile"
+                                        className="bg-slate-800/50 border-slate-700 text-white"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 opacity-70">
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-slate-400 ml-1">Latitud</label>
+                                        <Input
+                                            type="number"
+                                            value={latitude}
+                                            onChange={(e) => setLatitude(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                            placeholder="0.00"
+                                            className="bg-slate-800/50 border-slate-700 text-white text-xs"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-slate-400 ml-1">Longitud</label>
+                                        <Input
+                                            type="number"
+                                            value={longitude}
+                                            onChange={(e) => setLongitude(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                            placeholder="0.00"
+                                            className="bg-slate-800/50 border-slate-700 text-white text-xs"
                                         />
                                     </div>
                                 </div>
@@ -121,57 +212,18 @@ export default function UserProfile({ user }: UserProfileProps) {
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                         <CalendarIcon className="w-3 h-3" />
-                                        {birthDate || "Fecha desconocida"}
+                                        {birthDate || "Fecha desconocida"} {birthTime && `@ ${birthTime}`}
                                     </div>
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                         <MapPin className="w-3 h-3" />
                                         {birthPlace || "Lugar desconocido"}
+                                        {latitude && longitude && <span className="text-[10px] opacity-50">({latitude.toFixed(2)}, {longitude.toFixed(2)})</span>}
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* COLUMNA 2: Estadísticas Calculadas */}
-                    {!isEditing && birthDate && (
-                        <div className="w-full md:w-64 grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-col gap-4 mt-6 md:mt-0">
-
-                            {/* Signo Zodiacal */}
-                            <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex items-center gap-4 shadow-lg">
-                                <div className="min-w-[2.5rem] h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-serif text-lg">
-                                    {
-                                        {
-                                            "Aries": "♈", "Tauro": "♉", "Géminis": "♊", "Cáncer": "♋",
-                                            "Leo": "♌", "Virgo": "♍", "Libra": "♎", "Escorpio": "♏",
-                                            "Sagitario": "♐", "Capricornio": "♑", "Acuario": "♒", "Piscis": "♓"
-                                        }[zodiac] || "🌟"
-                                    }
-                                </div>
-                                <div className="overflow-hidden">
-                                    <p className="text-[10px] text-indigo-300 uppercase tracking-widest font-bold truncate">Signo Solar</p>
-                                    <p className="text-lg text-white font-bold truncate">{zodiac}</p>
-                                </div>
-                            </div>
-
-                            {/* Numerología */}
-                            <div
-                                onClick={() => lifePath !== "---" && setSelectedDetails(getLifePathDetails(Number(lifePath)))}
-                                className="bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/30 p-4 rounded-xl flex items-center gap-4 shadow-lg cursor-pointer hover:border-purple-400/50 hover:bg-purple-900/50 transition-all group"
-                            >
-                                <div className="min-w-[2.5rem] h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-bold text-lg font-mono group-hover:scale-110 transition-transform">
-                                    {lifePath}
-                                </div>
-                                <div className="overflow-hidden">
-                                    <p className="text-[10px] text-purple-300 uppercase tracking-widest font-bold truncate group-hover:text-purple-200 transition-colors"># Camino de Vida</p>
-                                    <p className="text-lg text-white font-bold truncate">
-                                        {lifePath !== "---" ? getLifePathDetails(Number(lifePath)).powerWord : "---"}
-                                    </p>
-                                </div>
-                                <Sparkles className="w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
-                            </div>
-
-                        </div>
-                    )}
                 </div>
             </Card>
 
