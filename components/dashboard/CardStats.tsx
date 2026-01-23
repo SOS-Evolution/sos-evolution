@@ -33,7 +33,7 @@ export default function CardStats({ stats, className }: CardStatsProps) {
             <div className="flex justify-between items-start relative z-10 w-full shrink-0">
                 <div className="flex items-center gap-2 text-indigo-300/90 pt-0">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span className="text-[10px] uppercase tracking-wider font-bold leading-none">Afinidad con Arcano</span>
+                    <span className="text-[10px] uppercase tracking-wider font-bold leading-none">Afinidad Arcana</span>
                 </div>
             </div>
 
@@ -45,6 +45,9 @@ export default function CardStats({ stats, className }: CardStatsProps) {
             {/* Título (Nombre de la carta): Pegado arriba */}
             <div className="w-full text-center relative z-10 shrink-0 mt-0">
                 <div className="text-2xl font-serif font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
+                    <span className="text-indigo-400/50 mr-2 text-xl font-sans italic">
+                        {cardIndex !== -1 ? cardIndex : "???"}
+                    </span>
                     {stats?.card_name || "???"}
                 </div>
             </div>
