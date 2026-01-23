@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2 } from "lucide-react";
+import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getLifePathNumber, getZodiacSign, getLifePathDetails, LifePathDetails } from "@/lib/soul-math";
+import { getLifePathNumber, getZodiacSign, getNumerologyDetails, LifePathDetails } from "@/lib/soul-math";
 import MagicModal from "@/components/ui/MagicModal";
 import type { Profile } from "@/types";
 
@@ -212,7 +212,13 @@ export default function UserProfile({ user }: UserProfileProps) {
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                         <CalendarIcon className="w-3 h-3" />
-                                        {birthDate || "Fecha desconocida"} {birthTime && `@ ${birthTime}`}
+                                        {birthDate || "Fecha desconocida"}
+                                        {birthTime && (
+                                            <span className="flex items-center gap-1 ml-2">
+                                                <Clock className="w-3 h-3" />
+                                                {birthTime.split(':').slice(0, 2).join(':')}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                         <MapPin className="w-3 h-3" />

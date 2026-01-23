@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
-import { getLifePathNumber, getZodiacSign, getLifePathDetails } from "@/lib/soul-math";
+import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
         zodiacSign = getZodiacSign(d, m);
         lifePathNum = getLifePathNumber(profile.birth_date);
         if (lifePathNum > 0) {
-            const details = getLifePathDetails(lifePathNum);
+            const details = getNumerologyDetails(lifePathNum, 'camino');
             lifePathWord = details.powerWord;
         }
     }

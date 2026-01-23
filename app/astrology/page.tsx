@@ -1,11 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AnimatedSection from "@/components/landing/AnimatedSection";
-import { ArrowLeft, Star, Disc, MapPin } from "lucide-react";
+import { ArrowLeft, Star, Disc, MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { getWesternChartData, getMockChartData, WesternChartData } from "@/lib/astrology-api";
+
+import AstrologyWheel from "@/components/astrology/AstrologyWheel";
+
+import PlanetIcon from "@/components/astrology/PlanetIcon";
 
 export default async function AstrologyPage() {
     const supabase = await createClient();
@@ -67,17 +71,19 @@ export default async function AstrologyPage() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10">
                         <div className="flex items-center gap-4">
                             <Link href="/dashboard">
-                                <Button variant="ghost" className="text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800/50">
+                                <Button variant="ghost" className="text-slate-400 hover:text-white p-2 h-12 w-12 rounded-2xl glass">
                                     <ArrowLeft className="w-6 h-6" />
                                 </Button>
                             </Link>
                             <div>
+                                <h2 className="text-xs font-bold text-indigo-400 uppercase tracking-[0.3em] mb-1">Astrología Natal</h2>
                                 <h1 className="text-3xl font-serif text-white">Carta Astral para <span className="text-indigo-400">{profile?.full_name || "Ti"}</span></h1>
-                                <p className="text-slate-400 text-sm flex items-center gap-2">
+                                <p className="text-slate-400 text-sm flex items-center gap-2 mt-1">
                                     <MapPin className="w-3 h-3" />
                                     {profile?.birth_place || "Ubicación desconocida"}
                                     <span className="opacity-30">|</span>
-                                    {profile?.birth_date} {profile?.birth_time}
+                                    <Calendar className="w-3 h-3" />
+                                    {profile?.birth_date} {profile?.birth_time ? profile.birth_time.split(':').slice(0, 2).join(':') : ""}
                                 </p>
                             </div>
                         </div>
@@ -114,7 +120,13 @@ export default async function AstrologyPage() {
                 </AnimatedSection>
 
                 {chartData ? (
-                    <div className="space-y-8">
+                    <div className="space-y-12">
+                        {/* CHART VISUALIZATION */}
+                        <AnimatedSection delay={0.1}>
+                            <div className="flex justify-center py-8">
+                                <AstrologyWheel planets={chartData.planets} houses={chartData.houses} size={400} />
+                            </div>
+                        </AnimatedSection>
                         {/* PLANETS SECTION */}
                         <AnimatedSection delay={0.2}>
                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
@@ -126,16 +138,8 @@ export default async function AstrologyPage() {
                                     <GlowingBorderCard key={planet.name} glowColor="purple" className="h-full">
                                         <div className="p-4 flex items-center justify-between h-full">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center border border-white/10 text-lg">
-                                                    {/* Planet icons mapping */}
-                                                    <span>
-                                                        {{
-                                                            "Sun": "☀️", "Moon": "🌙", "Mercury": "☿️",
-                                                            "Venus": "♀️", "Mars": "♂️", "Jupiter": "♃",
-                                                            "Saturn": "♄", "Uranus": "♅", "Neptune": "♆",
-                                                            "Pluto": "♇"
-                                                        }[planet.name] || "🪐"}
-                                                    </span>
+                                                <div className="w-14 h-14 rounded-full bg-slate-900/50 flex items-center justify-center border border-white/10 shadow-lg shadow-indigo-500/5 transition-transform hover:scale-105">
+                                                    <PlanetIcon name={planet.name} size={36} />
                                                 </div>
                                                 <div>
                                                     <div className="font-bold text-white">{planet.name}</div>

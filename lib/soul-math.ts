@@ -1,3 +1,28 @@
+// Map de valores de las letras (Numerología Pitagórica)
+const letterValues: Record<string, number> = {
+    a: 1, j: 1, s: 1,
+    b: 2, k: 2, t: 2,
+    c: 3, l: 3, u: 3,
+    d: 4, m: 4, v: 4,
+    e: 5, n: 5, w: 5, ñ: 5,
+    f: 6, o: 6, x: 6,
+    g: 7, p: 7, y: 7,
+    h: 8, q: 8, z: 8,
+    i: 9, r: 9
+};
+
+// Reduce un número a un solo dígito o número maestro (11, 22, 33)
+export function reduceNumber(num: number): number {
+    let result = num;
+    while (result > 9 && result !== 11 && result !== 22 && result !== 33) {
+        result = result
+            .toString()
+            .split("")
+            .reduce((acc, curr) => acc + parseInt(curr), 0);
+    }
+    return result;
+}
+
 // Calcula el Signo Zodiacal
 export function getZodiacSign(day: number, month: number): string {
     const zodiacSigns = [
@@ -16,7 +41,6 @@ export function getZodiacSign(day: number, month: number): string {
         { sign: "Capricornio", endDay: 31 },
     ];
 
-    // Ajuste de índice (Enero = 0)
     const index = month - 1;
     if (day <= zodiacSigns[index].endDay) {
         return zodiacSigns[index].sign;
@@ -29,19 +53,49 @@ export function getZodiacSign(day: number, month: number): string {
 export function getLifePathNumber(dateString: string): number {
     const date = new Date(dateString.includes("T") ? dateString : dateString + "T00:00:00");
     if (isNaN(date.getTime())) return 0;
-    // Obtenemos día, mes y año como números
-    // Ojo: getMonth() devuelve 0-11, sumamos 1.
-    let sum = date.getUTCDate() + (date.getUTCMonth() + 1) + date.getUTCFullYear();
 
-    // Reducir hasta que sea un solo dígito o número maestro (11, 22, 33)
-    while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
-        sum = sum
-            .toString()
-            .split("")
-            .reduce((acc, curr) => acc + parseInt(curr), 0);
+    // Sumar día, mes y año por separado (método tradicional)
+    const day = reduceNumber(date.getUTCDate());
+    const month = reduceNumber(date.getUTCMonth() + 1);
+    const year = reduceNumber(date.getUTCFullYear());
+
+    return reduceNumber(day + month + year);
+}
+
+// Calcula el Número de Destino (Expression Number) - Nombre completo
+export function getExpressionNumber(fullName: string): number {
+    const cleanName = fullName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+    let sum = 0;
+    for (const char of cleanName) {
+        sum += letterValues[char] || 0;
     }
+    return reduceNumber(sum);
+}
 
-    return sum;
+// Calcula el Número del Deseo del Alma (Soul Urge) - Solo Vocales
+export function getSoulUrgeNumber(fullName: string): number {
+    const vowels = "aeiou";
+    const cleanName = fullName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+    let sum = 0;
+    for (const char of cleanName) {
+        if (vowels.includes(char)) {
+            sum += letterValues[char] || 0;
+        }
+    }
+    return reduceNumber(sum);
+}
+
+// Calcula el Número de Personalidad - Solo Consonantes
+export function getPersonalityNumber(fullName: string): number {
+    const vowels = "aeiou";
+    const cleanName = fullName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+    let sum = 0;
+    for (const char of cleanName) {
+        if (!vowels.includes(char)) {
+            sum += letterValues[char] || 0;
+        }
+    }
+    return reduceNumber(sum);
 }
 
 // Interfaz para los detalles del Camino de Vida
@@ -53,90 +107,90 @@ export interface LifePathDetails {
     quote: string;
 }
 
-// Obtiene los detalles completos del Camino de Vida
-export function getLifePathDetails(number: number): LifePathDetails {
+// Obtiene los detalles completos de cualquier número numerológico
+export function getNumerologyDetails(number: number, type: 'camino' | 'destino' | 'alma' | 'personalidad'): LifePathDetails {
     const details: Record<number, Omit<LifePathDetails, "number">> = {
         1: {
-            title: "Liderazgo",
+            title: "Liderazgo e Iniciativa",
             powerWord: "INICIADOR",
-            essence: "Independencia, acción, identidad, creación.",
-            quote: "Vine a abrir caminos."
+            essence: "Independencia, ambición, originalidad y autosuficiencia.",
+            quote: "Yo soy la causa de mi propio destino."
         },
         2: {
-            title: "Cooperación",
-            powerWord: "ARMONÍA",
-            essence: "Sensibilidad, vínculo, diplomacia, empatía.",
-            quote: "Vine a unir."
+            title: "Armonía y Cooperación",
+            powerWord: "COOPERACIÓN",
+            essence: "Dualidad, diplomacia, sensibilidad y trabajo en equipo.",
+            quote: "En la unión reside la verdadera fuerza."
         },
         3: {
-            title: "Expresión",
+            title: "Expresión y Creatividad",
             powerWord: "CREATIVIDAD",
-            essence: "Comunicación, arte, alegría, palabra.",
-            quote: "Vine a expresar."
+            essence: "Comunicación, optimismo, alegría y autoexpresión artística.",
+            quote: "La vida es un lienzo para mi expresión."
         },
         4: {
-            title: "Construcción",
+            title: "Estabilidad y Construcción",
             powerWord: "ESTRUCTURA",
-            essence: "Orden, disciplina, constancia, bases sólidas.",
-            quote: "Vine a sostener."
+            essence: "Orden, disciplina, trabajo duro y bases sólidas.",
+            quote: "Construyo sobre cimientos de verdad."
         },
         5: {
-            title: "Libertad",
-            powerWord: "EXPANSIÓN",
-            essence: "Cambio, aventura, movimiento, experiencia.",
-            quote: "Vine a experimentar."
+            title: "Libertad y Cambio",
+            powerWord: "AVENTURA",
+            essence: "Versatilidad, adaptabilidad, curiosidad y búsqueda de libertad.",
+            quote: "El cambio es la única constante."
         },
         6: {
-            title: "Responsabilidad",
-            powerWord: "AMOR",
-            essence: "Cuidado, servicio, familia, equilibrio emocional.",
-            quote: "Vine a cuidar."
+            title: "Responsabilidad y Servicio",
+            powerWord: "ARMONÍA",
+            essence: "Amor, hogar, familia, equilibrio y cuidado de otros.",
+            quote: "Sirvo al mundo a través del amor."
         },
         7: {
-            title: "Sabiduría",
+            title: "Sabiduría e Introspección",
             powerWord: "CONSCIENCIA",
-            essence: "Introspección, espiritualidad, verdad interior.",
-            quote: "Vine a comprender."
+            essence: "Análisis mental, espiritualidad, búsqueda de la verdad y soledad creadora.",
+            quote: "Busco la verdad más allá de la superficie."
         },
         8: {
-            title: "Poder",
-            powerWord: "MANIFESTACIÓN",
-            essence: "Éxito material, liderazgo práctico, abundancia.",
-            quote: "Vine a materializar."
+            title: "Poder y Manifestación",
+            powerWord: "LOGRO",
+            essence: "Autoridad, éxito material, justicia kármica y ambición pragmática.",
+            quote: "Lo que siembro, cosecho con poder."
         },
         9: {
-            title: "Trascendencia",
+            title: "Idealismo y Humanidad",
             powerWord: "COMPASIÓN",
-            essence: "Cierre de ciclos, humanidad, altruismo.",
-            quote: "Vine a servir al todo."
+            essence: "Universalidad, cierre de ciclos, altruismo y sabiduría global.",
+            quote: "Mi corazón late por la humanidad entera."
         },
         11: {
-            title: "Iluminación",
-            powerWord: "INSPIRACIÓN",
-            essence: "Intuición elevada, visión, canal espiritual.",
-            quote: "Vine a iluminar."
+            title: "Mensajero Espiritual",
+            powerWord: "ILUMINACIÓN",
+            essence: "Intuición profunda, visión profética e inspiración colectiva.",
+            quote: "Soy un canal de luz para el mundo."
         },
         22: {
             title: "Maestro Constructor",
-            powerWord: "CREACIÓN",
-            essence: "Materializar grandes visiones para el colectivo.",
-            quote: "Vine a construir para muchos."
+            powerWord: "MANIFESTACIÓN",
+            essence: "Capacidad de materializar grandes visiones para el bien común.",
+            quote: "Mis sueños se convierten en realidades tangibles."
         },
         33: {
-            title: "Maestro Sanador",
-            powerWord: "SANACIÓN",
-            essence: "Amor incondicional, guía espiritual, servicio.",
-            quote: "Vine a elevar."
+            title: "Maestro Guía",
+            powerWord: "AMOR UNIVERSAL",
+            essence: "Sanación a través del amor incondicional y guía espiritual elevada.",
+            quote: "Elevo al mundo con la pureza de mi espíritu."
         }
     };
 
     return {
         number,
         ...(details[number] || {
-            title: "Desconocido",
-            powerWord: "MISTERIO",
-            essence: "Un camino aún por descubrir.",
-            quote: "El universo tiene secretos para ti."
+            title: "Misterio",
+            powerWord: "INCÓGNITA",
+            essence: "Un sendero que requiere auto-descubrimiento profundo.",
+            quote: "El universo aún está escribiendo este capítulo."
         })
     };
 }
