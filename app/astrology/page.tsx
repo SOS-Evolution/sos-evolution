@@ -1,15 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AnimatedSection from "@/components/landing/AnimatedSection";
-import { ArrowLeft, Star, Disc, MapPin, Calendar } from "lucide-react";
+import { ArrowLeft, Star, Disc, MapPin, Calendar, Compass } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { getWesternChartData, getMockChartData, WesternChartData } from "@/lib/astrology-api";
 
 import AstrologyWheel from "@/components/astrology/AstrologyWheel";
-
 import PlanetIcon from "@/components/astrology/PlanetIcon";
+import ZodiacIcon from "@/components/astrology/ZodiacIcon";
 
 export default async function AstrologyPage() {
     const supabase = await createClient();
@@ -162,18 +162,35 @@ export default async function AstrologyPage() {
                             </div>
                         </AnimatedSection>
 
-                        {/* HOUSES SECTION (Simple List for now) */}
+                        {/* HOUSES SECTION */}
                         <AnimatedSection delay={0.3}>
-                            <h2 className="text-xl font-bold text-white mb-4 mt-8 flex items-center gap-2">
-                                <Star className="w-5 h-5 text-indigo-500" />
-                                Casas
+                            <h2 className="text-xl font-bold text-white mb-6 mt-12 flex items-center gap-2">
+                                <Compass className="w-5 h-5 text-indigo-500" />
+                                Casas Astrológicas
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                                 {chartData.houses.map((house) => (
-                                    <div key={house.house} className="bg-slate-900/50 border border-white/5 rounded-xl p-3 text-center hover:bg-slate-800/50 transition-colors">
-                                        <div className="text-xs text-slate-500 uppercase mb-1">Casa {house.house}</div>
-                                        <div className="font-serif text-indigo-200">{house.sign}</div>
-                                    </div>
+                                    <GlowingBorderCard key={house.house} glowColor="indigo" className="h-full group">
+                                        <div className="p-3 flex flex-col items-center text-center space-y-2">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                                Casa {house.house}
+                                            </span>
+
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <ZodiacIcon name={house.sign} size={28} className="relative z-10 transition-transform group-hover:scale-110" />
+                                            </div>
+
+                                            <div>
+                                                <div className="font-serif text-sm text-white group-hover:text-indigo-300 transition-colors">
+                                                    {house.sign}
+                                                </div>
+                                                <div className="text-[9px] text-slate-500 font-mono mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                    Cúspide: {house.fullDegree.toFixed(1)}°
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </GlowingBorderCard>
                                 ))}
                             </div>
                         </AnimatedSection>

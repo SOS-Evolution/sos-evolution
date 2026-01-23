@@ -206,7 +206,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                <div className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-purple-300 tracking-tight leading-none">
+                                <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
                                     {fullName || "Viajero Sin Nombre"}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
