@@ -43,13 +43,13 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
 
     return (
         <Card className="bg-gradient-to-br from-indigo-950 to-purple-950 border-purple-500/20 p-4 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Coins className="w-16 h-16 text-yellow-500" />
             </div>
 
             <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-1 text-purple-300">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Coins className="w-3.5 h-3.5" />
                     <span className="text-[10px] uppercase tracking-wider font-bold">Saldo Místico</span>
                 </div>
 

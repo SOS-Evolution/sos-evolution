@@ -70,7 +70,7 @@ export default async function DashboardPage() {
 
                                 <Link href="/missions" className="block group h-full">
                                     <Card className="h-full bg-gradient-to-br from-amber-950/80 to-slate-900 border-yellow-500/20 p-4 relative overflow-hidden group transition-all hover:border-yellow-500/40">
-                                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
+                                        <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
                                             <Trophy className="w-16 h-16 text-yellow-500" />
                                         </div>
 

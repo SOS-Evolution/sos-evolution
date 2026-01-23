@@ -91,24 +91,37 @@ export default function UserProfile({ user }: UserProfileProps) {
 
     return (
         <>
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden">
+            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group">
                 {/* Fondo Decorativo */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none"></div>
+                <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
+                    <User className="w-16 h-16 text-purple-500" />
+                </div>
+
+                {!isEditing && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                        className="absolute top-2 right-2 z-20 text-slate-500 hover:text-white h-7 text-xs hover:bg-white/5"
+                    >
+                        <Edit2 className="w-3 h-3 mr-1" /> Editar
+                    </Button>
+                )}
 
                 <div className="flex flex-col md:flex-row gap-4 items-start relative z-10">
 
                     {/* COLUMNA 1: Datos Personales */}
                     <div className="flex-1 w-full space-y-2">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-[10px] font-serif text-purple-300 flex items-center gap-1.5 uppercase tracking-[0.2em]">
-                                <User className="w-3.5 h-3.5" />
-                                Identidad del Alma
-                            </h2>
-                            {!isEditing && (
-                                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-slate-500 hover:text-white h-7 text-xs">
-                                    <Edit2 className="w-3 h-3 mr-1" /> Editar
-                                </Button>
-                            )}
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex items-center">
+                                <h2 className="text-[10px] font-serif text-purple-300 flex items-center gap-1.5 uppercase tracking-[0.2em]">
+                                    <User className="w-3.5 h-3.5" />
+                                    Identidad del Alma
+                                </h2>
+                                {!isEditing && (
+                                    <div className="h-7" /> // Placeholder to maintain spacing if needed, though absolute won't occupy space
+                                )}
+                            </div>
                         </div>
 
                         {isEditing ? (
