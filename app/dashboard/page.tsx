@@ -4,7 +4,7 @@ import UserProfile from "@/components/dashboard/UserProfile";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
 import CardStats from "@/components/dashboard/CardStats";
-import { ArrowRight, Layers, Trophy, Star, Hash, BookOpen } from "lucide-react";
+import { ArrowRight, Layers, Trophy, Star, Hash, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -136,7 +136,10 @@ export default async function DashboardPage() {
                                             </div>
 
                                             {/* Sector Derecho: Contenido */}
-                                            <div className="flex-1 p-6 flex flex-col justify-center">
+                                            <div className="flex-1 p-6 pr-10 flex flex-col justify-center relative">
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400/50 group-hover:text-indigo-300 group-hover:translate-x-1 transition-all duration-300">
+                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                                                </div>
                                                 <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-2">
                                                     Astrología
                                                 </h3>
@@ -168,7 +171,10 @@ export default async function DashboardPage() {
                                             </div>
 
                                             {/* Sector Derecho: Contenido */}
-                                            <div className="flex-1 p-6 flex flex-col justify-center">
+                                            <div className="flex-1 p-6 pr-10 flex flex-col justify-center relative">
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-pink-400/50 group-hover:text-pink-300 group-hover:translate-x-1 transition-all duration-300">
+                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                                                </div>
                                                 <h3 className="text-xs font-bold text-pink-300 uppercase tracking-widest mb-2">
                                                     Numerología
                                                 </h3>
