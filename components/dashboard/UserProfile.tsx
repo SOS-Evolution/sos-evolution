@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails, LifePathDetails } from "@/lib/soul-math";
 import MagicModal from "@/components/ui/MagicModal";
 import type { Profile } from "@/types";
 
 interface UserProfileProps {
     user: any; // Mantenemos el usuario de auth como prop inicial
+    className?: string;
 }
 
-export default function UserProfile({ user }: UserProfileProps) {
+export default function UserProfile({ user, className }: UserProfileProps) {
     const router = useRouter();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -91,7 +93,7 @@ export default function UserProfile({ user }: UserProfileProps) {
 
     return (
         <>
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group">
+            <Card className={cn("bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group", className)}>
                 {/* Fondo Decorativo */}
                 <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
                     <User className="w-16 h-16 text-purple-500" />

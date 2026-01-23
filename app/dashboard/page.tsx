@@ -64,7 +64,7 @@ export default async function DashboardPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                         {/* COLUMNA IZQUIERDA (2/3): Saldo + Misiones + Identidad */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-2 flex flex-col gap-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <CreditsDisplay />
 
@@ -90,12 +90,12 @@ export default async function DashboardPage() {
                                     </Card>
                                 </Link>
                             </div>
-                            <UserProfile user={user} />
+                            <UserProfile user={user} className="flex-1" />
                         </div>
 
-                        {/* COLUMNA DERECHA (1/3): Carta Recurrente (Altura Completa) */}
+                        {/* COLUMNA DERECHA (1/3): Afinididad de Arcano (Altura Completa) */}
                         <div className="lg:col-span-1">
-                            <CardStats stats={stats} className="h-full flex-col justify-center text-center gap-4" />
+                            <CardStats stats={stats} className="h-full" />
                         </div>
 
                     </div>

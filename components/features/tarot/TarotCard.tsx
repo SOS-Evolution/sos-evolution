@@ -11,7 +11,18 @@ interface TarotCardProps {
     onClick: () => void;
 }
 
+const DECK = [
+    "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
+    "El Hierofante", "Los Enamorados", "El Carro", "La Fuerza", "El Ermitaño",
+    "La Rueda de la Fortuna", "La Justicia", "El Colgado", "La Muerte",
+    "La Templanza", "El Diablo", "La Torre", "La Estrella", "La Luna",
+    "El Sol", "El Juicio", "El Mundo"
+];
+
 export function TarotCard({ cardName, imageUrl, isRevealed, onClick }: TarotCardProps) {
+    // Intentar resolver la imagen si no se proporciona una
+    const resolvedImageUrl = imageUrl || (cardName ? `/assets/tarot/arcano-${DECK.indexOf(cardName)}.jpg` : null);
+
     return (
         <div className="relative w-64 h-96 perspective-1000 cursor-pointer" onClick={onClick}>
             <motion.div
@@ -34,16 +45,24 @@ export function TarotCard({ cardName, imageUrl, isRevealed, onClick }: TarotCard
                     className="absolute w-full h-full backface-hidden rounded-xl shadow-2xl bg-slate-100 overflow-hidden border-4 border-gold-500"
                     style={{ transform: "rotateY(180deg)" }}
                 >
-                    {imageUrl ? (
-                        // Aquí iría la imagen real
-                        <img src={imageUrl} alt={cardName} className="w-full h-full object-cover" />
-                    ) : (
-                        // Placeholder mientras no hay imagen
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-slate-200 p-4 text-center">
-                            <h3 className="text-xl font-bold text-slate-800 font-serif">{cardName || "El Misterio"}</h3>
-                            <p className="text-xs text-slate-500 mt-2">Arcano Mayor</p>
-                        </div>
-                    )}
+                    {resolvedImageUrl && (DECK.includes(cardName || "")) ? (
+                        <img
+                            src={resolvedImageUrl}
+                            alt={cardName}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                                // Si falla la carga, ocultamos la imagen para mostrar el placeholder
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement!.querySelector('.placeholder')?.classList.remove('hidden');
+                            }}
+                        />
+                    ) : null}
+
+                    {/* Placeholder mientras no hay imagen o si falla la carga */}
+                    <div className={`placeholder ${resolvedImageUrl && (DECK.includes(cardName || "")) ? 'hidden' : ''} w-full h-full flex flex-col items-center justify-center bg-slate-200 p-4 text-center`}>
+                        <h3 className="text-xl font-bold text-slate-800 font-serif">{cardName || "El Misterio"}</h3>
+                        <p className="text-xs text-slate-500 mt-2">Arcano Mayor</p>
+                    </div>
                 </div>
             </motion.div>
         </div>
