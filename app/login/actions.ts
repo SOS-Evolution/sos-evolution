@@ -76,6 +76,22 @@ export async function signup(formData: FormData) {
     redirect("/login?message=check_email");
 }
 
+export async function resetPassword(formData: FormData) {
+    const supabase = await createClient();
+    const email = formData.get("email") as string;
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/auth/callback?next=/dashboard/profile/reset-password`,
+    });
+
+    if (error) {
+        return redirect("/login?error=No se pudo enviar el correo de recuperación");
+    }
+
+    return redirect("/login?message=check_email");
+}
+
 export async function logout() {
     const supabase = await createClient();
 

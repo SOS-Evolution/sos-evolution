@@ -2,23 +2,70 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { login, signup, signInWithOAuth } from "./actions";
-import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, ArrowRight, LockKeyhole } from "lucide-react";
+import { login, signup, signInWithOAuth, resetPassword } from "./actions";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useState, Suspense, useEffect } from "react";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 
 function LoginForm() {
     const searchParams = useSearchParams();
-    const errorMsg = searchParams.get("error");
-    const message = searchParams.get("message");
+    const router = useRouter();
+    const initialError = searchParams.get("error");
+    const initialMessage = searchParams.get("message");
 
     const [isSignUp, setIsSignUp] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(initialError);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-    const handleSubmit = () => {
-        setLoading(true);
+    // Actualizar error si viene de URL (ej: redirección desde server)
+    useEffect(() => {
+        if (initialError) setErrorMsg(initialError);
+    }, [initialError]);
+
+    // Mostrar mensaje de éxito si viene de URL
+    useEffect(() => {
+        if (initialMessage === "check_email") {
+            setSuccessMsg("¡Correo enviado! Revisa tu bandeja de entrada.");
+            setErrorMsg(null);
+        }
+    }, [initialMessage]);
+
+    const toggleMode = () => {
+        setIsSignUp(!isSignUp);
+        setErrorMsg(null);
+        setSuccessMsg(null);
+    };
+
+    const toggleForgotPassword = () => {
+        setIsForgotPassword(!isForgotPassword);
+        setErrorMsg(null);
+        setSuccessMsg(null);
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        if (isSignUp) {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const password = formData.get("password") as string;
+            const confirmPassword = formData.get("confirmPassword") as string;
+
+            if (password !== confirmPassword) {
+                setErrorMsg("Las contraseñas no coinciden.");
+                return;
+            }
+
+            setLoading(true);
+            await signup(formData);
+            setLoading(false);
+        } else if (isForgotPassword) {
+            setLoading(true);
+        } else {
+            setLoading(true);
+        }
     };
 
     const handleSocialLogin = async (provider: 'google' | 'facebook') => {
@@ -28,116 +75,62 @@ function LoginForm() {
 
     return (
         <div className="w-full max-w-md animate-fade-in-up">
-            <GlowingBorderCard glowColor={isSignUp ? "indigo" : "purple"}>
+            <GlowingBorderCard glowColor={isSignUp ? "indigo" : isForgotPassword ? "blue" : "purple"}>
                 <div className="p-8 md:p-10">
 
                     {/* HEADER */}
                     <div className="text-center mb-8">
-                        <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br mb-6 border transition-all duration-500 ${isSignUp ? 'from-indigo-500/20 to-blue-500/20 border-indigo-500/20' : 'from-purple-500/20 to-pink-500/20 border-purple-500/20'}`}>
-                            <Sparkles className={`w-8 h-8 animate-pulse ${isSignUp ? 'text-indigo-400' : 'text-purple-400'}`} />
+                        <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br mb-6 border transition-all duration-500 ${isSignUp ? 'from-indigo-500/20 to-blue-500/20 border-indigo-500/20' :
+                            isForgotPassword ? 'from-blue-500/20 to-cyan-500/20 border-blue-500/20' :
+                                'from-purple-500/20 to-pink-500/20 border-purple-500/20'
+                            }`}>
+                            <Sparkles className={`w-8 h-8 animate-pulse ${isSignUp ? 'text-indigo-400' :
+                                isForgotPassword ? 'text-blue-400' :
+                                    'text-purple-400'
+                                }`} />
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-wide mb-3 transition-all">
-                            {isSignUp ? "Únete al Cosmos" : "Bienvenido de Nuevo"}
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-wide mb-3 transition-all uppercase">
+                            {isSignUp ? "Únete al Cosmos" : isForgotPassword ? "Recuperar Acceso" : "¡Bienvenido!"}
                         </h1>
 
                         <p className="text-slate-400 text-sm">
                             {isSignUp
                                 ? "Comienza tu viaje de autodescubrimiento hoy mismo."
-                                : "Ingresa tus datos para continuar con tu evolución."}
+                                : isForgotPassword
+                                    ? "Te enviaremos un enlace mágico para restaurar tu contraseña."
+                                    : "Ingresa tus datos para continuar con tu evolución."}
                         </p>
                     </div>
 
                     {/* MENSAJES DE ESTADO */}
-                    {message === "check_email" && (
+                    {successMsg && (
                         <div className="bg-green-500/10 border border-green-500/20 text-green-200 p-4 rounded-xl text-sm text-center mb-6 flex flex-col items-center animate-in fade-in zoom-in duration-300">
                             <Mail className="w-6 h-6 mb-2 text-green-400" />
-                            <p className="font-semibold">¡Portal abierto!</p>
-                            <p className="text-xs opacity-80 mt-1">Revisa tu correo para confirmar tu identidad espiritual.</p>
+                            <p className="font-semibold">{successMsg}</p>
                         </div>
                     )}
 
                     {errorMsg && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-4 rounded-xl text-sm text-center mb-6 flex items-center justify-center gap-2 animate-shake">
-                            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                            {errorMsg}
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-4 rounded-xl text-sm text-center mb-6 flex flex-col items-center justify-center gap-2 animate-shake">
+                            <div className="flex items-center gap-2">
+                                <LockKeyhole className="w-4 h-4 text-red-500 animate-pulse" />
+                                {errorMsg}
+                            </div>
+                            {!isForgotPassword && !isSignUp && (
+                                <button
+                                    onClick={toggleForgotPassword}
+                                    className="text-sm text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-4 mt-1 transition-colors"
+                                >
+                                    ¿Olvidaste tu contraseña?
+                                </button>
+                            )}
                         </div>
                     )}
 
-                    {/* FORMULARIO */}
-                    {message !== "check_email" && (
-                        <div className="space-y-6">
-                            <form className="space-y-5" onSubmit={handleSubmit}>
-
-                                {/* Email */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-slate-400 ml-1">Correo Electrónico</label>
-                                    <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
-                                        <Input
-                                            name="email"
-                                            type="email"
-                                            placeholder="tu@esencia.com"
-                                            className="pl-12 h-14 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl transition-all"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Password */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-slate-400 ml-1">Contraseña</label>
-                                    <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
-                                        <Input
-                                            name="password"
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="••••••••"
-                                            className="pl-12 pr-12 h-14 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl transition-all"
-                                            required
-                                            minLength={6}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors focus:outline-none"
-                                        >
-                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Submit */}
-                                <Button
-                                    formAction={isSignUp ? signup : login}
-                                    className={`w-full text-white h-14 rounded-xl font-medium shadow-lg transition-all hover:scale-[1.02] text-base ${isSignUp
-                                        ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 shadow-indigo-900/30'
-                                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-900/30'
-                                        }`}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <Loader2 className="animate-spin" />
-                                    ) : (
-                                        <span className="flex items-center gap-2">
-                                            {isSignUp ? "Crear mi Cuenta" : "Iniciar Sesión"}
-                                            <ArrowRight className="w-4 h-4" />
-                                        </span>
-                                    )}
-                                </Button>
-                            </form>
-
-                            {/* DIVIDER */}
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <span className="w-full border-t border-white/5"></span>
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-[#0f172a] px-2 text-slate-500">O también puedes</span>
-                                </div>
-                            </div>
-
-                            {/* SOCIAL LOGIN */}
+                    {!isForgotPassword && !successMsg && (
+                        /* SOCIAL LOGIN - DOS COLUMNAS */
+                        <div className="space-y-4 mb-8">
                             <div className="grid grid-cols-2 gap-4">
                                 <Button
                                     type="button"
@@ -167,27 +160,166 @@ function LoginForm() {
                                     Facebook
                                 </Button>
                             </div>
+
+                            {/* DIVIDER */}
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <span className="w-full border-t border-white/5"></span>
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-[#0f172a] px-2 text-slate-500">O usa tu correo</span>
+                                </div>
+                            </div>
                         </div>
                     )}
 
-                    {/* TOGGLE */}
-                    <div className="mt-8 pt-6 border-t border-white/5 text-center space-y-4">
-                        <p className="text-slate-500 text-sm">
-                            {isSignUp ? "¿Ya eres parte de nuestra comunidad?" : "¿Aún no has iniciado tu viaje?"}
-                        </p>
+                    {/* FORMULARIO */}
+                    {successMsg ? (
                         <Button
-                            type="button"
-                            variant="link"
-                            onClick={() => setIsSignUp(!isSignUp)}
-                            className={`w-full h-12 rounded-xl font-semibold transition-all border ${isSignUp
-                                ? 'text-purple-400 hover:text-purple-300 border-purple-500/20 hover:bg-purple-500/5'
-                                : 'bg-indigo-600/10 text-indigo-400 hover:text-indigo-300 border-indigo-500/30 hover:bg-indigo-500/20'
-                                }`}
+                            onClick={() => {
+                                setSuccessMsg(null);
+                                setIsForgotPassword(false);
+                            }}
+                            className="w-full bg-white/10 hover:bg-white/20 text-white"
                         >
-                            {isSignUp ? "Inicia Sesión aquí" : "Registrarme Ahora Gratis"}
+                            Volver al inicio
                         </Button>
-                    </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <form className="space-y-5" onSubmit={isSignUp ? handleSubmit : undefined} action={isForgotPassword ? resetPassword : isSignUp ? undefined : login}>
 
+                                {/* Email */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-slate-400 ml-1">Correo Electrónico</label>
+                                    <div className="relative group">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                                        <Input
+                                            name="email"
+                                            type="email"
+                                            placeholder="tu@esencia.com"
+                                            className="pl-12 h-14 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl transition-all"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Password y Confirm Password - Ocultos en modo Forgot Password */}
+                                {!isForgotPassword && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-xs font-medium text-slate-400 ml-1">Contraseña</label>
+                                                {!isSignUp && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={toggleForgotPassword}
+                                                        className="text-sm text-purple-400 hover:text-purple-300 hover:underline transition-colors font-medium"
+                                                    >
+                                                        ¿Olvidaste tu contraseña?
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="relative group">
+                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                                                <Input
+                                                    name="password"
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="••••••••"
+                                                    className="pl-12 pr-12 h-14 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl transition-all"
+                                                    required
+                                                    minLength={6}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors focus:outline-none"
+                                                >
+                                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {isSignUp && (
+                                            <div className="space-y-2 animate-fade-in-up">
+                                                <label className="text-xs font-medium text-slate-400 ml-1">Confirmar Contraseña</label>
+                                                <div className="relative group">
+                                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                                                    <Input
+                                                        name="confirmPassword"
+                                                        type={showPassword ? "text" : "password"}
+                                                        placeholder="••••••••"
+                                                        className="pl-12 pr-12 h-14 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl transition-all"
+                                                        required
+                                                        minLength={6}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* Submit Actions */}
+                                {isForgotPassword ? (
+                                    <div className="flex gap-3">
+                                        <Button
+                                            type="button"
+                                            onClick={toggleForgotPassword}
+                                            className="flex-1 bg-slate-800 hover:bg-slate-700 text-white h-12 rounded-xl"
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white h-12 rounded-xl shadow-lg shadow-blue-900/30"
+                                            disabled={loading}
+                                        >
+                                            {loading ? <Loader2 className="animate-spin" /> : "Enviar Enlace Mágico"}
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        type="submit"
+                                        className={`w-full text-white h-14 rounded-xl font-medium shadow-lg transition-all hover:scale-[1.02] text-base ${isSignUp
+                                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 shadow-indigo-900/30'
+                                            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-900/30'
+                                            }`}
+                                        disabled={loading}
+                                    >
+                                        {loading ? (
+                                            <Loader2 className="animate-spin" />
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                {isSignUp ? "Crear mi Cuenta" : "Iniciar Sesión"}
+                                                <ArrowRight className="w-4 h-4" />
+                                            </span>
+                                        )}
+                                    </Button>
+                                )}
+                            </form>
+
+                            {/* TOGGLE MODO */}
+                            {!isForgotPassword && (
+                                <div className="mt-8 pt-6 border-t border-white/5 text-center space-y-4">
+                                    <p className="text-slate-500 text-sm">
+                                        {isSignUp ? "¿Ya eres parte de nuestra comunidad?" : "¿Aún no has iniciado tu viaje?"}
+                                    </p>
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        onClick={toggleMode}
+                                        className={`w-full h-12 rounded-xl font-semibold transition-all border ${isSignUp
+                                            ? 'text-purple-400 hover:text-purple-300 border-purple-500/20 hover:bg-purple-500/5'
+                                            : 'bg-indigo-600/10 text-indigo-400 hover:text-indigo-300 border-indigo-500/30 hover:bg-indigo-500/20'
+                                            }`}
+                                    >
+                                        {isSignUp ? "Inicia Sesión aquí" : "Registrarme Ahora Gratis"}
+                                    </Button>
+                                </div>
+                            )}
+
+                        </div>
+                    )}
                 </div>
             </GlowingBorderCard>
         </div>
