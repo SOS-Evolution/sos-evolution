@@ -3,6 +3,27 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { Provider } from "@supabase/supabase-js";
+
+export async function signInWithOAuth(provider: Provider) {
+    const supabase = await createClient();
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: `${origin}/auth/callback`,
+        },
+    });
+
+    if (error) {
+        return redirect("/login?error=Error al conectar con " + provider);
+    }
+
+    if (data.url) {
+        return redirect(data.url);
+    }
+}
 
 export async function login(formData: FormData) {
     const supabase = await createClient();
