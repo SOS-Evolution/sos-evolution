@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, ArrowRight, LockKeyhole } from "lucide-react";
+import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, ArrowRight, LockKeyhole, RotateCcwKey } from "lucide-react";
 import { login, signup, signInWithOAuth, resetPassword } from "./actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
@@ -79,7 +79,7 @@ function LoginForm() {
                 <div className="p-8 md:p-10">
 
                     {/* HEADER */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-6">
                         <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br mb-6 border transition-all duration-500 ${isSignUp ? 'from-indigo-500/20 to-blue-500/20 border-indigo-500/20' :
                             isForgotPassword ? 'from-blue-500/20 to-cyan-500/20 border-blue-500/20' :
                                 'from-purple-500/20 to-pink-500/20 border-purple-500/20'
@@ -120,8 +120,9 @@ function LoginForm() {
                             {!isForgotPassword && !isSignUp && (
                                 <button
                                     onClick={toggleForgotPassword}
-                                    className="text-sm text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-4 mt-1 transition-colors"
+                                    className="text-sm text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-4 mt-1 transition-colors flex items-center gap-1.5"
                                 >
+                                    <RotateCcwKey className="w-3.5 h-3.5" />
                                     ¿Olvidaste tu contraseña?
                                 </button>
                             )}
@@ -130,7 +131,7 @@ function LoginForm() {
 
                     {!isForgotPassword && !successMsg && (
                         /* SOCIAL LOGIN - DOS COLUMNAS */
-                        <div className="space-y-4 mb-8">
+                        <div className="space-y-6 mb-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <Button
                                     type="button"
