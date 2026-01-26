@@ -22,11 +22,10 @@ export async function adjustUserCredits(formData: FormData) {
 
     if (error) {
         console.error("Error adjusting credits:", error);
-        return { error: "No se pudo ajustar el saldo" };
+        return;
     }
 
     revalidatePath(`/admin/users/${userId}`);
-    return { success: true };
 }
 
 export async function updateUserRole(userId: string, newRole: 'admin' | 'user') {
