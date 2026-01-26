@@ -22,17 +22,15 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
     const userId = params.id;
     const supabase = await createClient();
 
-    // 1. Obtener perfil completo
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select(`
-            *,
-            auth_user:id (email)
-        `)
-        .eq("id", userId)
-        .single();
+    // 1. Obtener perfil completo via RPC (para incluir email de forma segura)
+    const { data: profile, error } = await supabase.rpc('get_user_detail_admin', {
+        p_user_id: userId
+    });
 
-    if (!profile) notFound();
+    if (error || !profile) {
+        console.error("Error loading user detail:", error);
+        notFound();
+    }
 
     // 2. Obtener balance
     const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: userId });
@@ -87,7 +85,7 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                             )}
                         </div>
                         <h2 className="text-xl font-bold text-white mb-1 font-serif tracking-wide">{profile.full_name || "Místico sin nombre"}</h2>
-                        <p className="text-slate-500 text-sm mb-4">{(profile as any).auth_user?.email}</p>
+                        <p className="text-slate-500 text-sm mb-4">{profile.email}</p>
 
                         <div className="w-full pt-4 border-t border-slate-800/50 space-y-3 text-left">
                             <div className="flex items-center gap-3 text-sm">

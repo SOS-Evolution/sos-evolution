@@ -99,6 +99,75 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION public.get_admin_stats() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_users_list_admin(INTEGER, INTEGER, TEXT) TO authenticated;
 
+-- 5. Security & RLS Updates
+-- Permitir que admins vean todos los perfiles
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'profiles' AND policyname = 'Admins can view all profiles'
+    ) THEN
+        CREATE POLICY "Admins can view all profiles"
+            ON public.profiles FOR SELECT
+            USING (public.is_admin());
+    END IF;
+
+    -- Permitir que admins vean todos los créditos
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'user_credits' AND policyname = 'Admins can view all credits'
+    ) THEN
+        CREATE POLICY "Admins can view all credits"
+            ON public.user_credits FOR SELECT
+            USING (public.is_admin());
+    END IF;
+
+    -- Permitir que admins vean todas las lecturas
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'lecturas' AND policyname = 'Admins can view all readings'
+    ) THEN
+        CREATE POLICY "Admins can view all readings"
+            ON public.lecturas FOR SELECT
+            USING (public.is_admin());
+    END IF;
+END $$;
+
+-- 6. Function to get single user detail for Admin
+CREATE OR REPLACE FUNCTION public.get_user_detail_admin(p_user_id UUID)
+RETURNS JSONB AS $$
+DECLARE
+    result JSONB;
+BEGIN
+    -- Validar que sea admin
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Access denied';
+    END IF;
+
+    SELECT jsonb_build_object(
+        'id', p.id,
+        'full_name', p.full_name,
+        'email', u.email,
+        'role', p.role,
+        'birth_date', p.birth_date,
+        'birth_place', p.birth_place,
+        'life_path_number', p.life_path_number,
+        'zodiac_sign', p.zodiac_sign,
+        'avatar_url', p.avatar_url,
+        'created_at', p.created_at,
+        'updated_at', p.updated_at
+    ) INTO result
+    FROM public.profiles p
+    JOIN auth.users u ON p.id = u.id
+    WHERE p.id = p_user_id;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.get_user_detail_admin(UUID) TO authenticated;
+
 COMMENT ON FUNCTION public.is_admin IS 'Checks if the current user has the admin role';
 COMMENT ON FUNCTION public.get_admin_stats IS 'Returns aggregated system stats for the admin dashboard';
 COMMENT ON FUNCTION public.get_users_list_admin IS 'Returns a paginated list of users with their stats';
+COMMENT ON FUNCTION public.get_user_detail_admin IS 'Returns full user details for the admin view';
