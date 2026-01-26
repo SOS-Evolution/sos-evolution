@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, Lightbulb, TrendingUp, Layers, ArrowRight, ArrowLeft } from "lucide-react";
+import { BookOpen, Lightbulb, TrendingUp, Layers, ArrowRight, ArrowLeft, Star } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
