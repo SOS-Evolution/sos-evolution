@@ -10,7 +10,10 @@ export async function adjustUserCredits(formData: FormData) {
     const amount = parseInt(formData.get("amount") as string);
     const description = formData.get("description") as string;
 
-    if (!userId || isNaN(amount)) return { error: "Datos inválidos" };
+    if (!userId || isNaN(amount)) {
+        console.error("Invalid input data for credit adjustment");
+        return;
+    }
 
     // Usamos la funcion RPC add_credits que es SECURITY DEFINER
     const { error } = await supabase.rpc('add_credits', {
