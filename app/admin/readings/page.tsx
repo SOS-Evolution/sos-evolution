@@ -10,10 +10,10 @@ export default async function AdminReadingsPage() {
     });
 
     if (error) {
-        console.error("Error fetching readings:", error);
         return (
-            <div className="p-4 rounded-lg bg-red-900/20 border border-red-900/50 text-red-200">
-                Error al cargar el historial de lecturas.
+            <div className="p-4 rounded-lg bg-red-900/20 border border-red-500/20 text-red-200">
+                <p className="font-bold">Error al cargar el historial de lecturas:</p>
+                <p className="text-xs font-mono mt-1 opacity-80">{error.message} (Código: {error.code})</p>
             </div>
         );
     }

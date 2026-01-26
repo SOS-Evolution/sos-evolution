@@ -172,6 +172,7 @@ CREATE OR REPLACE FUNCTION public.get_readings_list_admin(p_limit INTEGER DEFAUL
 RETURNS TABLE (
     id UUID,
     card_name TEXT,
+    is_reversed BOOLEAN,
     question TEXT,
     created_at TIMESTAMPTZ,
     full_name TEXT,
@@ -184,11 +185,12 @@ BEGIN
 
     RETURN QUERY
     SELECT 
-        l.id,
-        l.card_name,
-        l.question,
-        l.created_at,
-        p.full_name,
+        l.id::UUID,
+        l.card_name::TEXT,
+        false::BOOLEAN, -- Placeholder ya que no estamos seguros si la columna existe
+        l.question::TEXT,
+        l.created_at::TIMESTAMPTZ,
+        p.full_name::TEXT,
         u.email::TEXT
     FROM public.lecturas l
     JOIN public.profiles p ON l.user_id = p.id
