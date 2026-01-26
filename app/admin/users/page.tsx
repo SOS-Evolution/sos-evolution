@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Eye, Shield, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
-export default async function AdminUsersPage({
-    searchParams,
-}: {
-    searchParams?: {
+export default async function AdminUsersPage(props: {
+    searchParams: Promise<{
         query?: string;
         page?: string;
-    };
+    }>;
 }) {
+    const searchParams = await props.searchParams;
     const query = searchParams?.query || "";
     const currentPage = Number(searchParams?.page) || 1;
     const itemsPerPage = 10;
