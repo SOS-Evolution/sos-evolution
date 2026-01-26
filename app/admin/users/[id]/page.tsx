@@ -28,8 +28,17 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
     });
 
     if (error || !profile) {
-        console.error("Error loading user detail:", error);
-        notFound();
+        return (
+            <div className="p-8 rounded-2xl bg-red-900/10 border border-red-500/20 text-red-200">
+                <h2 className="text-xl font-bold mb-2">Error al cargar usuario</h2>
+                <p className="font-mono text-sm bg-black/40 p-3 rounded">
+                    {error ? `Código: ${error.code} - Mensaje: ${error.message}` : "El perfil no existe en la base de datos."}
+                </p>
+                <Button asChild className="mt-4" variant="outline">
+                    <Link href="/admin/users">Volver a la lista</Link>
+                </Button>
+            </div>
+        );
     }
 
     // 2. Obtener balance
