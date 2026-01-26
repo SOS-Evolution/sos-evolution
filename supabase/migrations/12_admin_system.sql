@@ -167,7 +167,75 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION public.get_user_detail_admin(UUID) TO authenticated;
 
+-- 7. Global Logs for Admin (Readings & Transactions)
+CREATE OR REPLACE FUNCTION public.get_readings_list_admin(p_limit INTEGER DEFAULT 50)
+RETURNS TABLE (
+    id UUID,
+    card_name TEXT,
+    question TEXT,
+    created_at TIMESTAMPTZ,
+    full_name TEXT,
+    email TEXT
+) AS $$
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Access denied';
+    END IF;
+
+    RETURN QUERY
+    SELECT 
+        l.id,
+        l.card_name,
+        l.question,
+        l.created_at,
+        p.full_name,
+        u.email::TEXT
+    FROM public.lecturas l
+    JOIN public.profiles p ON l.user_id = p.id
+    JOIN auth.users u ON p.id = u.id
+    ORDER BY l.created_at DESC
+    LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.get_transactions_list_admin(p_limit INTEGER DEFAULT 50)
+RETURNS TABLE (
+    id UUID,
+    amount INTEGER,
+    source TEXT,
+    description TEXT,
+    created_at TIMESTAMPTZ,
+    full_name TEXT,
+    email TEXT
+) AS $$
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Access denied';
+    END IF;
+
+    RETURN QUERY
+    SELECT 
+        uc.id,
+        uc.amount,
+        uc.source,
+        uc.description,
+        uc.created_at,
+        p.full_name,
+        u.email::TEXT
+    FROM public.user_credits uc
+    JOIN public.profiles p ON uc.user_id = p.id
+    JOIN auth.users u ON p.id = u.id
+    ORDER BY uc.created_at DESC
+    LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.get_readings_list_admin(INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_transactions_list_admin(INTEGER) TO authenticated;
+
 COMMENT ON FUNCTION public.is_admin IS 'Checks if the current user has the admin role';
 COMMENT ON FUNCTION public.get_admin_stats IS 'Returns aggregated system stats for the admin dashboard';
 COMMENT ON FUNCTION public.get_users_list_admin IS 'Returns a paginated list of users with their stats';
 COMMENT ON FUNCTION public.get_user_detail_admin IS 'Returns full user details for the admin view';
+COMMENT ON FUNCTION public.get_readings_list_admin IS 'Returns global readings history with user info';
+COMMENT ON FUNCTION public.get_transactions_list_admin IS 'Returns global credits transactions with user info';

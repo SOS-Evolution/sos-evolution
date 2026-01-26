@@ -4,18 +4,19 @@ import { CreditCard, History } from "lucide-react";
 export default async function AdminTransactionsPage() {
     const supabase = await createClient();
 
-    // Obtener últimas 50 transacciones globales
-    const { data: transactions, error } = await supabase
-        .from('user_credits')
-        .select(`
-        *,
-        profiles (
-            full_name,
-            email
-        )
-    `)
-        .order('created_at', { ascending: false })
-        .limit(50);
+    // Obtener últimas 50 transacciones vía RPC
+    const { data: transactions, error } = await supabase.rpc('get_transactions_list_admin', {
+        p_limit: 50
+    });
+
+    if (error) {
+        console.error("Error fetching transactions:", error);
+        return (
+            <div className="p-4 rounded-lg bg-red-900/20 border border-red-900/50 text-red-200">
+                Error al cargar el flujo de créditos.
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 animate-fade-in-up">
@@ -43,14 +44,14 @@ export default async function AdminTransactionsPage() {
                                 <tr key={tx.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors">
                                     <td className="p-4">
                                         <div className="flex flex-col">
-                                            <span className="text-slate-200 font-medium">{tx.profiles?.full_name || "Místico Desconocido"}</span>
-                                            <span className="text-xs text-slate-500">{tx.profiles?.email}</span>
+                                            <span className="text-slate-200 font-medium">{tx.full_name || "Místico Desconocido"}</span>
+                                            <span className="text-xs text-slate-500">{tx.email}</span>
                                         </div>
                                     </td>
                                     <td className="p-4 uppercase text-xs tracking-wider text-slate-300">
                                         <span className={`px-2 py-0.5 rounded ${tx.source === 'purchase' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
-                                                tx.source === 'reading' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                    'bg-slate-700/30 text-slate-400'
+                                            tx.source === 'reading' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                                'bg-slate-700/30 text-slate-400'
                                             }`}>
                                             {tx.source}
                                         </span>

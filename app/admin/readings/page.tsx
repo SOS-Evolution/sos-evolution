@@ -4,18 +4,19 @@ import { ScrollText, Sparkles } from "lucide-react";
 export default async function AdminReadingsPage() {
     const supabase = await createClient();
 
-    // Obtener últimas 50 lecturas
-    const { data: readings, error } = await supabase
-        .from('lecturas')
-        .select(`
-        *,
-        profiles (
-            full_name,
-            email
-        )
-    `)
-        .order('created_at', { ascending: false })
-        .limit(50);
+    // Obtener últimas 50 lecturas vía RPC
+    const { data: readings, error } = await supabase.rpc('get_readings_list_admin', {
+        p_limit: 50
+    });
+
+    if (error) {
+        console.error("Error fetching readings:", error);
+        return (
+            <div className="p-4 rounded-lg bg-red-900/20 border border-red-900/50 text-red-200">
+                Error al cargar el historial de lecturas.
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 animate-fade-in-up">
@@ -43,8 +44,8 @@ export default async function AdminReadingsPage() {
                                 <tr key={read.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors">
                                     <td className="p-4">
                                         <div className="flex flex-col">
-                                            <span className="text-slate-200 font-medium">{read.profiles?.full_name || "Místico"}</span>
-                                            <span className="text-xs text-slate-500">{read.profiles?.email}</span>
+                                            <span className="text-slate-200 font-medium">{read.full_name || "Místico"}</span>
+                                            <span className="text-xs text-slate-500">{read.email}</span>
                                         </div>
                                     </td>
                                     <td className="p-4">
