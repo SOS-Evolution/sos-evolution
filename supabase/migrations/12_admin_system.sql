@@ -168,9 +168,13 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION public.get_user_detail_admin(UUID) TO authenticated;
 
 -- 7. Global Logs for Admin (Readings & Transactions)
+-- 1. Borramos la función anterior para limpiar la estructura
+DROP FUNCTION IF EXISTS public.get_readings_list_admin(INTEGER);
+
+-- 2. Creamos la versión corregida con el mapa de datos exacto
 CREATE OR REPLACE FUNCTION public.get_readings_list_admin(p_limit INTEGER DEFAULT 50)
 RETURNS TABLE (
-    id UUID,
+    id BIGINT,
     card_name TEXT,
     is_reversed BOOLEAN,
     question TEXT,
@@ -185,9 +189,9 @@ BEGIN
 
     RETURN QUERY
     SELECT 
-        l.id::UUID,
+        l.id,
         l.card_name::TEXT,
-        false::BOOLEAN, -- Placeholder ya que no estamos seguros si la columna existe
+        false::BOOLEAN, -- Enviamos falso por defecto (compatibilidad)
         l.question::TEXT,
         l.created_at::TIMESTAMPTZ,
         p.full_name::TEXT,
