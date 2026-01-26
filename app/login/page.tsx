@@ -134,7 +134,13 @@ function LoginForm() {
                     {successMsg && (
                         <div className="bg-green-500/10 border border-green-500/20 text-green-200 p-4 rounded-xl text-sm text-center mb-6 flex flex-col items-center animate-in fade-in zoom-in duration-300">
                             <Mail className="w-6 h-6 mb-2 text-green-400" />
-                            <p className="font-semibold font-serif">{successMsg}</p>
+                            <div className="font-semibold font-serif space-y-1">
+                                <p className="text-base">¡Correo enviado!</p>
+                                {searchParams.get("email") && (
+                                    <p className="text-indigo-300 break-all text-xs opacity-90">a {searchParams.get("email")}</p>
+                                )}
+                                <p className="pt-1">Revisa tu bandeja de entrada.</p>
+                            </div>
                         </div>
                     )}
 

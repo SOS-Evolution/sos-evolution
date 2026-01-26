@@ -73,7 +73,7 @@ export async function signup(formData: FormData) {
     }
 
     // CAMBIO PARA EL PUNTO 2: No redirigimos al dashboard, sino a un mensaje de éxito
-    redirect("/login?message=check_email");
+    redirect(`/login?message=check_email&email=${encodeURIComponent(email)}`);
 }
 
 export async function resetPassword(formData: FormData) {
@@ -89,7 +89,7 @@ export async function resetPassword(formData: FormData) {
         return redirect("/login?error=No se pudo enviar el correo de recuperación");
     }
 
-    return redirect("/login?message=check_email");
+    return redirect(`/login?message=check_email&email=${encodeURIComponent(email)}`);
 }
 
 export async function logout() {
