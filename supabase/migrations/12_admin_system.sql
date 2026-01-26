@@ -239,9 +239,48 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION public.get_readings_list_admin(INTEGER) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_transactions_list_admin(INTEGER) TO authenticated;
 
+-- 8. Recent Activity Feed for Dashboard
+CREATE OR REPLACE FUNCTION public.get_recent_activity_admin()
+RETURNS JSONB AS $$
+DECLARE
+    result JSONB;
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Access denied';
+    END IF;
+
+    SELECT jsonb_agg(events) INTO result
+    FROM (
+        (SELECT 
+            'reading' as type, 
+            p.full_name, 
+            l.card_name as detail, 
+            l.created_at 
+         FROM public.lecturas l
+         JOIN public.profiles p ON l.user_id = p.id
+         ORDER BY l.created_at DESC LIMIT 5)
+        UNION ALL
+        (SELECT 
+            'user' as type, 
+            full_name, 
+            'Se unió a la evolución' as detail, 
+            created_at 
+         FROM public.profiles 
+         ORDER BY created_at DESC LIMIT 5)
+        ORDER BY created_at DESC
+        LIMIT 8
+    ) events;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.get_recent_activity_admin() TO authenticated;
+
 COMMENT ON FUNCTION public.is_admin IS 'Checks if the current user has the admin role';
 COMMENT ON FUNCTION public.get_admin_stats IS 'Returns aggregated system stats for the admin dashboard';
 COMMENT ON FUNCTION public.get_users_list_admin IS 'Returns a paginated list of users with their stats';
 COMMENT ON FUNCTION public.get_user_detail_admin IS 'Returns full user details for the admin view';
 COMMENT ON FUNCTION public.get_readings_list_admin IS 'Returns global readings history with user info';
 COMMENT ON FUNCTION public.get_transactions_list_admin IS 'Returns global credits transactions with user info';
+COMMENT ON FUNCTION public.get_recent_activity_admin IS 'Returns the latest 8 events (readings/new users) for the dashboard';
