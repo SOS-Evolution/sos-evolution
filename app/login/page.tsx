@@ -13,6 +13,7 @@ function LoginForm() {
     const router = useRouter();
     const initialError = searchParams.get("error");
     const initialMessage = searchParams.get("message");
+    const nextUrl = searchParams.get("next");
 
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -97,7 +98,7 @@ function LoginForm() {
 
     const handleSocialLogin = async (provider: 'google' | 'facebook') => {
         setLoading(true);
-        await signInWithOAuth(provider);
+        await signInWithOAuth(provider, nextUrl);
     };
 
     return (
@@ -118,7 +119,11 @@ function LoginForm() {
                         </div>
 
                         <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-wide mb-3 transition-all uppercase">
-                            {isSignUp ? "Únete al Cosmos" : isForgotPassword ? "Recuperar Acceso" : "¡Bienvenido!"}
+                            {isSignUp
+                                ? "Únete al Cosmos"
+                                : isForgotPassword
+                                    ? "Recuperar Acceso"
+                                    : nextUrl?.includes("admin") ? "Acceso Admin" : "¡Bienvenido!"}
                         </h1>
 
                         <p className="text-slate-400 text-sm font-sans">
@@ -221,6 +226,7 @@ function LoginForm() {
                     ) : (
                         <div className="space-y-6">
                             <form className="space-y-5" noValidate onSubmit={handleSubmit}>
+                                <input type="hidden" name="next" value={nextUrl || ""} />
 
                                 {/* Email */}
                                 <div className="space-y-1 relative pb-2">

@@ -5,14 +5,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Provider } from "@supabase/supabase-js";
 
-export async function signInWithOAuth(provider: Provider) {
+export async function signInWithOAuth(provider: Provider, next: string | null = null) {
     const supabase = await createClient();
     const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    // Si hay next, lo adjuntamos al callback
+    const redirectTo = next
+        ? `${origin}/auth/callback?next=${next}`
+        : `${origin}/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-            redirectTo: `${origin}/auth/callback`,
+            redirectTo,
         },
     });
 
@@ -43,9 +48,10 @@ export async function login(formData: FormData) {
         return redirect("/login?error=Credenciales invalidas");
     }
 
-    // 3. Si funciona, revalidamos la caché y vamos al inicio
+    // 3. Si funciona, revalidamos la caché y vamos al inicio (o donde deba ir)
+    const next = formData.get("next") as string;
     revalidatePath("/", "layout");
-    redirect("/dashboard");
+    redirect(next || "/dashboard");
 }
 
 export async function signup(formData: FormData) {
