@@ -40,6 +40,11 @@ const sidebarItems = [
             { title: "Planificación", href: "/admin/docs/ideas" },
         ]
     },
+    {
+        title: "Ajustes",
+        href: "/admin/settings",
+        icon: Settings,
+    },
 ];
 
 export function AdminSidebar() {

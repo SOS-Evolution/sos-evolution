@@ -5,6 +5,9 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import ParticlesBackground from "@/components/landing/ParticlesBackground";
+import { ConfigProvider } from "@/components/providers/ConfigProvider";
+import { getSystemSettings } from "./admin/settings/actions";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,16 +40,22 @@ export default async function RootLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // 2. Cargamos configuraciones globales (marco de tarot, etc)
+  const settings = await getSystemSettings();
+
   return (
     <html lang="es">
       <body className={`${inter.className} bg-slate-950`}>
-        <ParticlesBackground />
+        <ConfigProvider initialSettings={settings}>
+          <Toaster position="top-right" richColors />
+          <ParticlesBackground />
 
-        {/* 2. Aquí va la Barra Global */}
-        <Navbar user={user} />
+          {/* 2. Aquí va la Barra Global */}
+          <Navbar user={user} />
 
-        {/* El contenido de cada página se renderiza aquí abajo */}
-        {children}
+          {/* El contenido de cada página se renderiza aquí abajo */}
+          {children}
+        </ConfigProvider>
       </body>
     </html>
   );

@@ -1,6 +1,10 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import { Sparkles, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useConfig } from "@/components/providers/ConfigProvider";
+import { GoldenClassicFrame, MysticSilverFrame, CelestialFrame, GoldenOrnateFrame } from "@/components/features/tarot/frames";
 
 interface CardStatsProps {
     stats: {
@@ -18,9 +22,26 @@ const DECK = [
     "El Sol", "El Juicio", "El Mundo"
 ];
 
+const ROMAN_NUMERALS = [
+    "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+    "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"
+];
+
 export default function CardStats({ stats, className }: CardStatsProps) {
+    const { tarotFrame } = useConfig();
     const cardIndex = stats ? DECK.indexOf(stats.card_name) : -1;
     const imageUrl = cardIndex !== -1 ? `/assets/tarot/arcano-${cardIndex}.jpg` : null;
+
+    const renderFrame = () => {
+        const frameClass = "absolute inset-0 z-20 pointer-events-none w-full h-full";
+        switch (tarotFrame) {
+            case "mystic": return <MysticSilverFrame className={frameClass} />;
+            case "classic": return <GoldenClassicFrame className={frameClass} />;
+            case "ornate": return <GoldenOrnateFrame className={frameClass} />;
+            case "celestial":
+            default: return <CelestialFrame className={frameClass} />;
+        }
+    };
 
     return (
         <Card className={cn(
@@ -42,31 +63,34 @@ export default function CardStats({ stats, className }: CardStatsProps) {
                 x{stats?.times_drawn || 0}
             </div>
 
-            {/* Título (Nombre de la carta): Pegado arriba */}
-            <div className="w-full text-center relative z-10 shrink-0 mt-0">
-                <div className="text-2xl font-serif font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
-                    <span className="text-indigo-400/50 mr-2 text-xl font-sans italic">
-                        {cardIndex !== -1 ? cardIndex : "???"}
+            {/* Título (Nombre de la carta): En la misma fila que el número */}
+            <div className="w-full relative z-10 shrink-0 mt-2 flex items-center justify-center gap-4">
+                <div className="w-9 h-9 min-w-[36px] rounded-full border border-indigo-500/30 flex items-center justify-center bg-indigo-500/5 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+                    <span className="text-indigo-300 font-serif font-bold text-xs">
+                        {cardIndex !== -1 ? ROMAN_NUMERALS[cardIndex] : "?"}
                     </span>
+                </div>
+                <div className="text-2xl font-serif font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
                     {stats?.card_name || "???"}
                 </div>
             </div>
 
             {/* Contenedor de Imagen */}
-            {/* flex-1 permite ocupar espacio sobrante, pero la imagen dentro tendrá límite */}
-            <div className="flex-1 flex items-center justify-center relative min-h-0 w-full py-1">
+            <div className="flex-1 flex items-center justify-center relative min-h-0 w-full py-2">
                 {imageUrl ? (
-                    <div className="relative flex items-center justify-center h-full">
+                    <div className="relative flex items-center justify-center h-full aspect-[2/3] max-h-[210px]">
                         <div className="absolute inset-0 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all" />
-                        <img
-                            src={imageUrl}
-                            alt={stats?.card_name}
-                            // CORRECCIÓN AQUÍ:
-                            // 1. Quitamos h-full para que no fuerce el estiramiento infinito.
-                            // 2. Definimos max-h-[210px]. Esto es +50px que el original, 
-                            //    pero pone un techo para que la tarjeta no crezca más allá de eso.
-                            className="max-h-[210px] w-auto object-contain rounded-xl shadow-2xl border border-white/10 transition-all duration-500 group-hover:scale-[1.02]"
-                        />
+
+                        {/* El Marco Global */}
+                        {renderFrame()}
+
+                        <div className="relative w-full h-full z-10 p-[4px]">
+                            <img
+                                src={imageUrl}
+                                alt={stats?.card_name}
+                                className="w-full h-full object-cover rounded-[10px] shadow-2xl transition-all duration-500 group-hover:scale-[1.02]"
+                            />
+                        </div>
                     </div>
                 ) : (
                     <div className="w-full h-full border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center opacity-30">
