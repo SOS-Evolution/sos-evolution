@@ -71,7 +71,7 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                                 duration: 0.85,
                                 repeat: 2,
                                 repeatType: "mirror" as const,
-                                ease: [0.43, 0.13, 0.23, 0.96],
+                                ease: "easeOut",
                                 times: [0, 0.25, 0.5, 0.75, 1]
                             }
                         },
@@ -93,7 +93,7 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                     return (
                         <motion.div
                             key={originalIndex}
-                            variants={variants}
+                            variants={variants as any}
                             animate={isShuffling ? "shuffle" : "fan"}
                             initial={{ scale: 0, opacity: 0 }}
                             whileInView={{ opacity: 1, scale: 1 }}
