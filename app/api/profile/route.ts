@@ -83,8 +83,13 @@ export async function PUT(req: Request) {
             .single();
 
         if (error) {
-            console.error('Error updating profile:', error);
-            return NextResponse.json({ error: 'Error al actualizar perfil' }, { status: 500 });
+            console.error('Error updating profile:', JSON.stringify(error, null, 2));
+            // Devolvemos el mensaje de error específico si es posible para depurar
+            return NextResponse.json({
+                error: 'Error al actualizar perfil',
+                details: error.message,
+                hint: 'Asegúrate de haber ejecutado las migraciones de base de datos.'
+            }, { status: 500 });
         }
 
         // Verificar si se debe completar la misión de perfil

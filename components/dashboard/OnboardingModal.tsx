@@ -16,6 +16,8 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
+    const [error, setError] = useState<string | null>(null);
+
     // Datos del perfil
     const [displayName, setDisplayName] = useState("");
     const [fullName, setFullName] = useState("");
@@ -31,7 +33,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
     const handleSave = async () => {
         if (!isStep2Complete) return;
-
+        setError(null);
         setLoading(true);
         try {
             const res = await fetch('/api/profile', {
@@ -49,16 +51,18 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
                 })
             });
 
-            const updatedProfile = await res.json();
+            const data = await res.json();
 
-            if (updatedProfile.error) {
-                throw new Error(updatedProfile.error);
+            if (!res.ok || data.error) {
+                const errorMsg = data.details || data.error || "Error desconocido";
+                const hint = data.hint ? `\n\nTip: ${data.hint}` : "";
+                throw new Error(`${errorMsg}${hint}`);
             }
 
-            onComplete(updatedProfile);
-        } catch (error) {
-            console.error("Error guardando perfil:", error);
-            alert("Hubo un error al guardar tu perfil. Intenta de nuevo.");
+            onComplete(data);
+        } catch (err: any) {
+            console.error("Error guardando perfil:", err);
+            setError(err.message || "Hubo un error al sincronizar con el cosmos. Intenta de nuevo.");
         } finally {
             setLoading(false);
         }
@@ -103,7 +107,33 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
             <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" />
 
             <div className="relative w-full max-w-2xl animate-in fade-in zoom-in duration-300">
-                <Card className="bg-slate-900/90 backdrop-blur-xl border-purple-500/30 shadow-2xl shadow-purple-500/10 overflow-hidden">
+                <Card className="bg-slate-900/90 backdrop-blur-xl border-purple-500/30 shadow-2xl shadow-purple-500/10 overflow-hidden relative">
+                    {/* Error Message UI */}
+                    {error && (
+                        <div className="absolute inset-0 z-[110] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+                            <div className="bg-slate-900 border border-red-500/30 p-8 rounded-3xl shadow-2xl max-w-sm text-center space-y-4">
+                                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-500/20">
+                                    <Info className="w-8 h-8 text-red-400" />
+                                </div>
+                                <h3 className="text-xl font-serif text-white">Interferencia Mística</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">
+                                    {error}
+                                </p>
+                                <div className="pt-2">
+                                    <Button
+                                        onClick={() => setError(null)}
+                                        className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/5"
+                                    >
+                                        Volver a Intentar
+                                    </Button>
+                                </div>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-2">
+                                    Tip: Verifica tu conexión o reintenta en unos momentos.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="p-8">
 
                         {/* STEP 1: BIENVENIDA */}

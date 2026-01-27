@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2, Clock } from "lucide-react";
+import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2, Clock, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails, LifePathDetails } from "@/lib/soul-math";
@@ -34,6 +34,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
 
     const [selectedDetails, setSelectedDetails] = useState<LifePathDetails | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     // Cargar perfil real desde nuestra tabla
     useEffect(() => {
@@ -62,6 +63,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     const lifePath = birthDate ? getLifePathNumber(birthDate) : "---";
 
     const handleSave = async () => {
+        setError(null);
         setLoading(true);
         try {
             const res = await fetch('/api/profile', {
@@ -79,18 +81,20 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                 })
             });
 
-            const updatedProfile = await res.json();
+            const data = await res.json();
 
-            if (updatedProfile.error) {
-                throw new Error(updatedProfile.error);
+            if (!res.ok || data.error) {
+                const errorMsg = data.details || data.error || "Error desconocido";
+                const hint = data.hint ? `\n\nTip: ${data.hint}` : "";
+                throw new Error(`${errorMsg}${hint}`);
             }
 
-            setProfile(updatedProfile);
+            setProfile(data);
             setIsEditing(false);
             router.refresh();
-        } catch (error) {
-            console.error("Error guardando:", error);
-            alert("Hubo un error al guardar. Intenta de nuevo.");
+        } catch (err: any) {
+            console.error("Error guardando:", err);
+            setError(err.message || "Hubo un error al guardar. Intenta de nuevo.");
         } finally {
             setLoading(false);
         }
@@ -101,6 +105,28 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     return (
         <>
             <Card className={cn("bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group", className)}>
+                {/* Error Message UI */}
+                {error && (
+                    <div className="absolute inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+                        <div className="bg-slate-900 border border-red-500/30 p-6 rounded-2xl shadow-2xl max-w-[280px] text-center space-y-3">
+                            <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
+                                <Info className="w-6 h-6 text-red-400" />
+                            </div>
+                            <h3 className="text-lg font-serif text-white">Interferencia</h3>
+                            <p className="text-[11px] text-slate-400 leading-relaxed whitespace-pre-wrap">
+                                {error}
+                            </p>
+                            <Button
+                                onClick={() => setError(null)}
+                                size="sm"
+                                className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/5 h-8 text-xs"
+                            >
+                                Reintentar
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Fondo Decorativo */}
                 <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
                     <User className="w-16 h-16 text-purple-500" />
@@ -173,6 +199,27 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                                             onChange={(e) => setBirthTime(e.target.value)}
                                             className="bg-slate-800/50 border-slate-700 text-white font-mono"
                                         />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs text-slate-400 ml-1">Sexo de Nacimiento</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {["masculino", "femenino", "intersexual"].map((opt) => (
+                                            <button
+                                                key={opt}
+                                                type="button"
+                                                onClick={() => setGender(opt)}
+                                                className={cn(
+                                                    "py-1.5 px-2 rounded-lg border text-[10px] transition-all duration-200 text-center font-bold uppercase",
+                                                    gender === opt
+                                                        ? "bg-purple-500/20 border-purple-500 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.1)]"
+                                                        : "bg-slate-800/30 border-slate-700 text-slate-500 hover:border-slate-600"
+                                                )}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
