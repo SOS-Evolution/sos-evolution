@@ -99,7 +99,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                     </Card>
                                 </Link>
                             </div>
-                            <UserProfile user={user} className="flex-1" />
+                            <UserProfile user={user} profile={profile} className="flex-1" />
                         </div>
 
                         {/* COLUMNA DERECHA (1/3): Afinididad de Arcano (Altura Completa) */}

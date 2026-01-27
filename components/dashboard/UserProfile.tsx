@@ -13,14 +13,30 @@ import type { Profile } from "@/types";
 
 interface UserProfileProps {
     user: any; // Mantenemos el usuario de auth como prop inicial
+    profile?: Profile | null; // Añadimos perfil opcional desde el padre
     className?: string;
 }
 
-export default function UserProfile({ user, className }: UserProfileProps) {
+export default function UserProfile({ user, profile: externalProfile, className }: UserProfileProps) {
     const router = useRouter();
-    const [profile, setProfile] = useState<Profile | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(externalProfile || null);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Sincronizar con perfil externo si cambia (ej. post-onboarding)
+    useEffect(() => {
+        if (externalProfile) {
+            setProfile(externalProfile);
+            setFullName(externalProfile.full_name || "");
+            setDisplayName(externalProfile.display_name || "");
+            setBirthDate(externalProfile.birth_date || "");
+            setBirthPlace(externalProfile.birth_place || "");
+            setBirthTime(externalProfile.birth_time || "12:00");
+            setGender(externalProfile.gender || "");
+            setLatitude(externalProfile.latitude || "");
+            setLongitude(externalProfile.longitude || "");
+        }
+    }, [externalProfile]);
 
     // Estados del formulario
     const [fullName, setFullName] = useState("");
@@ -36,27 +52,29 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     const [selectedDetails, setSelectedDetails] = useState<LifePathDetails | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Cargar perfil real desde nuestra tabla
+    // Cargar perfil real desde nuestra tabla si no viene de props
     useEffect(() => {
-        fetch('/api/profile')
-            .then(res => res.json())
-            .then(data => {
-                if (data && !data.error) {
-                    setProfile(data);
-                    setFullName(data.full_name || "");
-                    setDisplayName(data.display_name || "");
-                    setBirthDate(data.birth_date || "");
-                    setBirthPlace(data.birth_place || "");
-                    setBirthTime(data.birth_time || "12:00");
-                    setGender(data.gender || "");
-                    setLatitude(data.latitude || "");
-                    setLongitude(data.longitude || "");
+        if (!externalProfile) {
+            fetch('/api/profile')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && !data.error) {
+                        setProfile(data);
+                        setFullName(data.full_name || "");
+                        setDisplayName(data.display_name || "");
+                        setBirthDate(data.birth_date || "");
+                        setBirthPlace(data.birth_place || "");
+                        setBirthTime(data.birth_time || "12:00");
+                        setGender(data.gender || "");
+                        setLatitude(data.latitude || "");
+                        setLongitude(data.longitude || "");
 
-                    if (!data.full_name) setIsEditing(true);
-                }
-            })
-            .catch(err => console.error("Error loading profile:", err));
-    }, []);
+                        if (!data.full_name) setIsEditing(true);
+                    }
+                })
+                .catch(err => console.error("Error loading profile:", err));
+        }
+    }, [externalProfile]);
 
     // Cálculos en tiempo real
     const zodiac = birthDate ? getZodiacSign(new Date(birthDate).getDate(), new Date(birthDate).getMonth() + 1) : "---";
@@ -298,7 +316,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                         ) : (
                             <div className="space-y-3">
                                 <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                                    {(profile as any)?.display_name || fullName || "Viajero Sin Nombre"}
+                                    {profile?.display_name || profile?.full_name || user.user_metadata?.full_name || "Viajero Sin Nombre"}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
