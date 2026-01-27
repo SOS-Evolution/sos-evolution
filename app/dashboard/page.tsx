@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
+import OnboardingModal from "@/components/dashboard/OnboardingModal";
+import { useState, useEffect } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -49,8 +51,42 @@ export default async function DashboardPage() {
         }
     }
 
+    return <DashboardClient profile={profile} stats={stats} user={user} />;
+}
+
+// Sub-componente para manejar estados de cliente (el overlay y modal)
+function DashboardClient({ profile: initialProfile, stats, user }: { profile: any, stats: any, user: any }) {
+    const [profile, setProfile] = useState(initialProfile);
+
+    // Verificamos si el perfil está completo
+    const isComplete = profile?.full_name && profile?.birth_date && profile?.gender;
+
+    // Cálculos Astrológicos dinámicos
+    let zodiacSign = "---";
+    let lifePathNum = 0;
+    let lifePathWord = "---";
+
+    if (profile?.birth_date) {
+        const [y, m, d] = profile.birth_date.split('-').map(Number);
+        zodiacSign = getZodiacSign(d, m);
+        lifePathNum = getLifePathNumber(profile.birth_date);
+        if (lifePathNum > 0) {
+            const details = getNumerologyDetails(lifePathNum, 'camino');
+            lifePathWord = details.powerWord;
+        }
+    }
+
     return (
         <div className="min-h-screen text-slate-100 pb-20 relative overflow-hidden">
+            {/* Overlay de Bloqueo si no está completo */}
+            {!isComplete && (
+                <div className="fixed inset-0 z-[90] bg-slate-950/40 backdrop-blur-[2px]" />
+            )}
+
+            {!isComplete && (
+                <OnboardingModal onComplete={(updatedProfile) => setProfile(updatedProfile)} />
+            )}
+
             {/* Fondo animado */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-900/10 rounded-full blur-[100px] animate-pulse" />

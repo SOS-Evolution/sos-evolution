@@ -19,6 +19,7 @@ export interface Profile {
   birth_time: string | null;
   latitude: number | null;
   longitude: number | null;
+  gender: string | null;
   life_path_number: number | null;
   zodiac_sign: string | null;
   avatar_url: string | null;
@@ -34,6 +35,7 @@ export interface ProfileUpdate {
   birth_time?: string;
   latitude?: number;
   longitude?: number;
+  gender?: string;
   life_path_number?: number;
   zodiac_sign?: string;
   avatar_url?: string;

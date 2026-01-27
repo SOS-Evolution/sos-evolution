@@ -27,6 +27,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     const [birthDate, setBirthDate] = useState("");
     const [birthPlace, setBirthPlace] = useState("");
     const [birthTime, setBirthTime] = useState("");
+    const [gender, setGender] = useState("");
     const [latitude, setLatitude] = useState<number | "">("");
     const [longitude, setLongitude] = useState<number | "">("");
 
@@ -43,6 +44,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                     setBirthDate(data.birth_date || "");
                     setBirthPlace(data.birth_place || "");
                     setBirthTime(data.birth_time || "12:00");
+                    setGender(data.gender || "");
                     setLatitude(data.latitude || "");
                     setLongitude(data.longitude || "");
 
@@ -67,6 +69,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                     birth_date: birthDate,
                     birth_place: birthPlace,
                     birth_time: birthTime,
+                    gender: gender,
                     latitude: latitude === "" ? 0 : latitude,
                     longitude: longitude === "" ? 0 : longitude
                 })
@@ -240,6 +243,12 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                                         {birthPlace || "Lugar desconocido"}
                                         {latitude && longitude && <span className="text-[10px] opacity-50">({latitude.toFixed(2)}, {longitude.toFixed(2)})</span>}
                                     </div>
+                                    {gender && (
+                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full capitalize">
+                                            <User className="w-3 h-3" />
+                                            {gender}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

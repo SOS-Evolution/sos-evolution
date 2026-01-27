@@ -72,6 +72,7 @@ export async function PUT(req: Request) {
         if (body.birth_time) updates.birth_time = body.birth_time;
         if (body.latitude !== undefined) updates.latitude = body.latitude;
         if (body.longitude !== undefined) updates.longitude = body.longitude;
+        if (body.gender !== undefined) updates.gender = body.gender;
 
         const { data: profile, error } = await supabase
             .from('profiles')
