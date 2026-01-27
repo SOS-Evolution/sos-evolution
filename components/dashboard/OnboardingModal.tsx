@@ -10,24 +10,26 @@ import { Profile } from "@/types";
 
 interface OnboardingModalProps {
     onComplete: (profile: Profile) => void;
+    onClose?: () => void;
+    initialData?: Profile | null;
 }
 
-export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
+export default function OnboardingModal({ onComplete, onClose, initialData }: OnboardingModalProps) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
 
     // Datos del perfil
-    const [displayName, setDisplayName] = useState("");
-    const [fullName, setFullName] = useState("");
-    const [birthDate, setBirthDate] = useState("");
-    const [birthPlace, setBirthPlace] = useState("");
-    const [birthTime, setBirthTime] = useState("12:00");
-    const [gender, setGender] = useState<string>("");
-    const [latitude, setLatitude] = useState<number | "">("");
-    const [longitude, setLongitude] = useState<number | "">("");
-    const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
+    const [displayName, setDisplayName] = useState(initialData?.display_name || "");
+    const [fullName, setFullName] = useState(initialData?.full_name || "");
+    const [birthDate, setBirthDate] = useState(initialData?.birth_date || "");
+    const [birthPlace, setBirthPlace] = useState(initialData?.birth_place || "");
+    const [birthTime, setBirthTime] = useState(initialData?.birth_time || "12:00");
+    const [gender, setGender] = useState<string>(initialData?.gender || "");
+    const [latitude, setLatitude] = useState<number | "">(initialData?.latitude || "");
+    const [longitude, setLongitude] = useState<number | "">(initialData?.longitude || "");
+    const [isLocationConfirmed, setIsLocationConfirmed] = useState(!!initialData?.latitude);
 
     const isStep2Complete = fullName && birthDate && birthPlace && gender && birthTime;
 
@@ -108,6 +110,19 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
             <div className="relative w-full max-w-2xl animate-in fade-in zoom-in duration-300">
                 <Card className="bg-slate-900/90 backdrop-blur-xl border-purple-500/30 shadow-2xl shadow-purple-500/10 overflow-hidden relative">
+
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 z-[120] text-slate-500 hover:text-white p-2 hover:bg-white/5 rounded-full transition-colors"
+                        >
+                            <span className="sr-only">Cerrar</span>
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    )}
+
                     {/* Error Message UI */}
                     {error && (
                         <div className="absolute inset-0 z-[110] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">

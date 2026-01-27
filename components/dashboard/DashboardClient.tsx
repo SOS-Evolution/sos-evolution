@@ -30,9 +30,13 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
     const [profile, setProfile] = useState(initialProfile);
+    const [isEditingManual, setIsEditingManual] = useState(false);
 
     // Verificamos si el perfil está completo
     const isComplete = profile?.full_name && profile?.birth_date && profile?.gender;
+
+    // Mostrar modal si no está completo O si el usuario hizo clic en editar
+    const showModal = !isComplete || isEditingManual;
 
     // Cálculos Astrológicos dinámicos
     let zodiacSign = "---";
@@ -56,8 +60,15 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 <div className="fixed inset-0 z-[90] bg-slate-950/40 backdrop-blur-[2px]" />
             )}
 
-            {!isComplete && (
-                <OnboardingModal onComplete={(updatedProfile) => setProfile(updatedProfile)} />
+            {showModal && (
+                <OnboardingModal
+                    initialData={profile}
+                    onComplete={(updatedProfile) => {
+                        setProfile(updatedProfile);
+                        setIsEditingManual(false);
+                    }}
+                    onClose={isComplete ? () => setIsEditingManual(false) : undefined}
+                />
             )}
 
             {/* Fondo animado */}
@@ -99,7 +110,12 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                     </Card>
                                 </Link>
                             </div>
-                            <UserProfile user={user} profile={profile} className="flex-1" />
+                            <UserProfile
+                                user={user}
+                                profile={profile}
+                                onEdit={() => setIsEditingManual(true)}
+                                className="flex-1"
+                            />
                         </div>
 
                         {/* COLUMNA DERECHA (1/3): Afinididad de Arcano (Altura Completa) */}
