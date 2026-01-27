@@ -25,6 +25,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
     const [gender, setGender] = useState<string>("");
     const [latitude, setLatitude] = useState<number | "">("");
     const [longitude, setLongitude] = useState<number | "">("");
+    const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
 
     const isStep2Complete = fullName && birthDate && birthPlace && gender && birthTime;
 
@@ -67,12 +68,21 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
         if (!birthPlace) return;
         setLoading(true);
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&limit=1`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&addressdetails=1&limit=1`);
             const data = await res.json();
             if (data && data[0]) {
                 setLatitude(parseFloat(data[0].lat));
                 setLongitude(parseFloat(data[0].lon));
-                alert("Lugar confirmado con éxito.");
+
+                // Formatear como "Ciudad, País" simplificado
+                const addr = data[0].address;
+                const city = addr.city || addr.town || addr.village || addr.suburb || "";
+                const country = addr.country || "";
+
+                if (city && country) {
+                    setBirthPlace(`${city}, ${country}`);
+                }
+                setIsLocationConfirmed(true);
             }
         } catch (e) {
             console.error(e);
@@ -241,19 +251,29 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
                                             <MapPin className="ml-3 w-4 h-4 text-slate-500" />
                                             <Input
                                                 value={birthPlace}
-                                                onChange={(e) => setBirthPlace(e.target.value)}
+                                                onChange={(e) => {
+                                                    setBirthPlace(e.target.value);
+                                                    setIsLocationConfirmed(false);
+                                                }}
                                                 placeholder="Ciudad, País"
                                                 className="bg-transparent border-none text-white h-12 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-600"
                                             />
-                                            <Button
-                                                variant="secondary"
-                                                size="sm"
-                                                className="bg-purple-600/20 hover:bg-purple-600 text-purple-100 border-none h-8 px-4 font-bold text-[10px] uppercase tracking-wider"
-                                                onClick={handleAutoDetect}
-                                                disabled={!birthPlace || loading}
-                                            >
-                                                Confirmar
-                                            </Button>
+                                            {isLocationConfirmed ? (
+                                                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg animate-in zoom-in duration-300 mr-1">
+                                                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                                                    <span className="text-[10px] text-emerald-300 font-bold uppercase tracking-tighter">Confirmado</span>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="bg-purple-600/20 hover:bg-purple-600 text-purple-100 border-none h-8 px-4 font-bold text-[10px] uppercase tracking-wider"
+                                                    onClick={handleAutoDetect}
+                                                    disabled={!birthPlace || loading}
+                                                >
+                                                    Confirmar
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
 

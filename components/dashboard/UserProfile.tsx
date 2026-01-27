@@ -31,6 +31,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
     const [gender, setGender] = useState("");
     const [latitude, setLatitude] = useState<number | "">("");
     const [longitude, setLongitude] = useState<number | "">("");
+    const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
 
     const [selectedDetails, setSelectedDetails] = useState<LifePathDetails | null>(null);
 
@@ -184,12 +185,20 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                                                 if (!birthPlace) return;
                                                 setLoading(true);
                                                 try {
-                                                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&limit=1`);
+                                                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&addressdetails=1&limit=1`);
                                                     const data = await res.json();
                                                     if (data && data[0]) {
                                                         setLatitude(parseFloat(data[0].lat));
                                                         setLongitude(parseFloat(data[0].lon));
-                                                        alert("Coordenadas detectadas!");
+
+                                                        const addr = data[0].address;
+                                                        const city = addr.city || addr.town || addr.village || addr.suburb || "";
+                                                        const country = addr.country || "";
+
+                                                        if (city && country) {
+                                                            setBirthPlace(`${city}, ${country}`);
+                                                        }
+                                                        setIsLocationConfirmed(true);
                                                     }
                                                 } catch (e) {
                                                     console.error("Geocoding error", e);
@@ -199,12 +208,15 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                                             }}
                                             className="text-[10px] text-purple-400 hover:text-purple-300 underline"
                                         >
-                                            Auto-Detectar Coordenadas
+                                            {isLocationConfirmed ? "✓ Lugar Confirmado" : "Auto-Detectar Coordenadas"}
                                         </button>
                                     </label>
                                     <Input
                                         value={birthPlace}
-                                        onChange={(e) => setBirthPlace(e.target.value)}
+                                        onChange={(e) => {
+                                            setBirthPlace(e.target.value);
+                                            setIsLocationConfirmed(false);
+                                        }}
                                         placeholder="Ej: Santiago, Chile"
                                         className="bg-slate-800/50 border-slate-700 text-white"
                                     />
