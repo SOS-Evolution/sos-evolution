@@ -112,7 +112,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                             <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
                                 <Info className="w-6 h-6 text-red-400" />
                             </div>
-                            <h3 className="text-lg font-serif text-white">Interferencia</h3>
+                            <h3 className="text-lg font-serif text-white">Error</h3>
                             <p className="text-[11px] text-slate-400 leading-relaxed whitespace-pre-wrap">
                                 {error}
                             </p>

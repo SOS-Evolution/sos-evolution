@@ -115,7 +115,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
                                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-500/20">
                                     <Info className="w-8 h-8 text-red-400" />
                                 </div>
-                                <h3 className="text-xl font-serif text-white">Interferencia Mística</h3>
+                                <h3 className="text-xl font-serif text-white">Error</h3>
                                 <p className="text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">
                                     {error}
                                 </p>
