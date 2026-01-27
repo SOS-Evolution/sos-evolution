@@ -14,6 +14,7 @@ export interface ReadingData {
 export interface Profile {
   id: string;
   full_name: string | null;
+  display_name: string | null;
   birth_date: string | null; // ISO date string
   birth_place: string | null;
   birth_time: string | null;
@@ -30,6 +31,7 @@ export interface Profile {
 
 export interface ProfileUpdate {
   full_name?: string;
+  display_name?: string;
   birth_date?: string;
   birth_place?: string;
   birth_time?: string;

@@ -24,6 +24,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
 
     // Estados del formulario
     const [fullName, setFullName] = useState("");
+    const [displayName, setDisplayName] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [birthPlace, setBirthPlace] = useState("");
     const [birthTime, setBirthTime] = useState("");
@@ -41,6 +42,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                 if (data && !data.error) {
                     setProfile(data);
                     setFullName(data.full_name || "");
+                    setDisplayName(data.display_name || "");
                     setBirthDate(data.birth_date || "");
                     setBirthPlace(data.birth_place || "");
                     setBirthTime(data.birth_time || "12:00");
@@ -66,6 +68,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     full_name: fullName,
+                    display_name: displayName,
                     birth_date: birthDate,
                     birth_place: birthPlace,
                     birth_time: birthTime,
@@ -131,14 +134,25 @@ export default function UserProfile({ user, className }: UserProfileProps) {
 
                         {isEditing ? (
                             <div className="space-y-4 animate-fade-in">
-                                <div className="space-y-1">
-                                    <label className="text-xs text-slate-400 ml-1">Nombre Completo</label>
-                                    <Input
-                                        value={fullName}
-                                        onChange={(e) => setFullName(e.target.value)}
-                                        placeholder="Tu nombre mágico"
-                                        className="bg-slate-800/50 border-slate-700 text-white"
-                                    />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-slate-400 ml-1">Nombre Público</label>
+                                        <Input
+                                            value={displayName}
+                                            onChange={(e) => setDisplayName(e.target.value)}
+                                            placeholder="Tu apodo"
+                                            className="bg-slate-800/50 border-slate-700 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-slate-400 ml-1">Nombre Completo</label>
+                                        <Input
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            placeholder="Tu nombre mágico"
+                                            className="bg-slate-800/50 border-slate-700 text-white"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
@@ -225,7 +239,7 @@ export default function UserProfile({ user, className }: UserProfileProps) {
                         ) : (
                             <div className="space-y-3">
                                 <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                                    {fullName || "Viajero Sin Nombre"}
+                                    {(profile as any)?.display_name || fullName || "Viajero Sin Nombre"}
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">

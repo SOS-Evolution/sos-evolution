@@ -69,6 +69,7 @@ export async function PUT(req: Request) {
         }
 
         // Ensure new fields are included in updates if provided
+        if (body.display_name) updates.display_name = body.display_name;
         if (body.birth_time) updates.birth_time = body.birth_time;
         if (body.latitude !== undefined) updates.latitude = body.latitude;
         if (body.longitude !== undefined) updates.longitude = body.longitude;
