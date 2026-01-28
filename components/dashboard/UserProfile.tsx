@@ -95,7 +95,7 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
 
                         <div className="space-y-3">
                             <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                                {profile?.full_name || profile?.display_name || user.user_metadata?.full_name || "Viajero Sin Nombre"}
+                                {profile?.display_name || profile?.full_name || user.user_metadata?.full_name || "Viajero Sin Nombre"}
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">

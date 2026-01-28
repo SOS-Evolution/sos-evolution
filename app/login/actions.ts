@@ -4,34 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Provider } from "@supabase/supabase-js";
-import { headers } from "next/headers";
-
-/**
- * Detecta el origen (protocolo + host) de la petición de forma dinámica.
- * Esto evita redirecciones incorrectas a producción desde localhost.
- */
-async function getOrigin() {
-    const headerList = await headers();
-    const host = headerList.get("host"); // ej: localhost:3000 o sos-evolution.com
-    const proto = headerList.get("x-forwarded-proto"); // ej: https (en proxies como Vercel)
-
-    // Si no hay host (Raro en una request), fallback al env o localhost
-    if (!host) return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-    // Detectar si es local para forzar http si no hay x-forwarded-proto
-    const isLocal = host.includes("localhost") ||
-        host.includes("127.0.0.1") ||
-        host.startsWith("192.168.") ||
-        host.startsWith("10.") ||
-        host.startsWith("172.");
-
-    const protocol = proto || (isLocal ? "http" : "https");
-    return `${protocol}://${host}`;
-}
 
 export async function signInWithOAuth(provider: Provider, next: string | null = null) {
     const supabase = await createClient();
-    const origin = await getOrigin();
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     // Si hay next, lo adjuntamos al callback
     const redirectTo = next
@@ -84,7 +60,10 @@ export async function signup(formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const origin = await getOrigin();
+    // Obtenemos la URL base automáticamente (localhost o vercel)
+    // OJO: En Vercel a veces es necesario definir NEXT_PUBLIC_SITE_URL en variables de entorno
+    // Si da problemas, puedes poner tu dominio "hardcoded" temporalmente.
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const { error } = await supabase.auth.signUp({
         email,
@@ -106,7 +85,7 @@ export async function signup(formData: FormData) {
 export async function resetPassword(formData: FormData) {
     const supabase = await createClient();
     const email = formData.get("email") as string;
-    const origin = await getOrigin();
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/auth/callback?next=/dashboard/profile/reset-password`,
