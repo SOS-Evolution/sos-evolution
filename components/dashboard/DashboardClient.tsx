@@ -63,6 +63,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
             {showModal && (
                 <OnboardingModal
                     initialData={profile}
+                    isEdit={isEditingManual}
                     onComplete={(updatedProfile) => {
                         setProfile(updatedProfile);
                         setIsEditingManual(false);

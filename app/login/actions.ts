@@ -4,10 +4,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Provider } from "@supabase/supabase-js";
+import { headers } from "next/headers";
 
 export async function signInWithOAuth(provider: Provider, next: string | null = null) {
     const supabase = await createClient();
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    // Detectamos el origen dinámicamente desde las headers
+    const headerList = await headers();
+    const host = headerList.get("host");
+    const protocol = host?.includes("localhost") ? "http" : "https";
+    const origin = `${protocol}://${host}`;
 
     // Si hay next, lo adjuntamos al callback
     const redirectTo = next
@@ -60,10 +66,11 @@ export async function signup(formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    // Obtenemos la URL base automáticamente (localhost o vercel)
-    // OJO: En Vercel a veces es necesario definir NEXT_PUBLIC_SITE_URL en variables de entorno
-    // Si da problemas, puedes poner tu dominio "hardcoded" temporalmente.
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    // Obtenemos la URL base dinámicamente
+    const headerList = await headers();
+    const host = headerList.get("host");
+    const protocol = host?.includes("localhost") ? "http" : "https";
+    const origin = `${protocol}://${host}`;
 
     const { error } = await supabase.auth.signUp({
         email,
@@ -85,7 +92,10 @@ export async function signup(formData: FormData) {
 export async function resetPassword(formData: FormData) {
     const supabase = await createClient();
     const email = formData.get("email") as string;
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const headerList = await headers();
+    const host = headerList.get("host");
+    const protocol = host?.includes("localhost") ? "http" : "https";
+    const origin = `${protocol}://${host}`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/auth/callback?next=/dashboard/profile/reset-password`,

@@ -12,9 +12,10 @@ interface OnboardingModalProps {
     onComplete: (profile: Profile) => void;
     onClose?: () => void;
     initialData?: Profile | null;
+    isEdit?: boolean;
 }
 
-export default function OnboardingModal({ onComplete, onClose, initialData }: OnboardingModalProps) {
+export default function OnboardingModal({ onComplete, onClose, initialData, isEdit }: OnboardingModalProps) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -152,7 +153,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData }: On
                     <div className="p-8">
 
                         {/* STEP 1: BIENVENIDA */}
-                        {step === 1 && (
+                        {step === 1 && !isEdit && (
                             <div className="space-y-8 animate-in slide-in-from-right duration-500">
                                 <div className="flex flex-col items-center text-center">
                                     <div className="p-4 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
@@ -207,14 +208,18 @@ export default function OnboardingModal({ onComplete, onClose, initialData }: On
                             </div>
                         )}
 
-                        {/* STEP 2: DATOS TÉCNICOS */}
-                        {step === 2 && (
+                        {/* STEP 2: DATOS TÉCNICOS (O Pantalla Única de Edición) */}
+                        {(step === 2 || isEdit) && (
                             <div className="space-y-6 animate-in slide-in-from-right duration-500">
                                 <div className="flex flex-col items-center text-center">
-                                    <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 mb-4">
-                                        <Sparkles className="w-8 h-8 text-purple-400" />
-                                    </div>
-                                    <h2 className="text-3xl font-serif text-white mb-2">Identidad del Alma</h2>
+                                    {!isEdit && (
+                                        <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 mb-4">
+                                            <Sparkles className="w-8 h-8 text-purple-400" />
+                                        </div>
+                                    )}
+                                    <h2 className={cn("font-serif text-white mb-2", isEdit ? "text-2xl" : "text-3xl")}>
+                                        {isEdit ? "Editar Identidad" : "Identidad del Alma"}
+                                    </h2>
                                     <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl flex items-start gap-3 max-w-lg mb-4 text-left">
                                         <Info className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
                                         <p className="text-xs text-purple-100/80 leading-relaxed">
@@ -225,6 +230,24 @@ export default function OnboardingModal({ onComplete, onClose, initialData }: On
                                 </div>
 
                                 <div className="grid gap-5">
+                                    {/* Campo de Nombre Preferido (Solo en Edición o como parte del flujo integrado) */}
+                                    {isEdit && (
+                                        <div className="space-y-2 animate-in fade-in duration-500">
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">¿Cómo quieres que te llamemos?</label>
+                                            <div className="relative">
+                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                <Input
+                                                    value={displayName}
+                                                    onChange={(e) => setDisplayName(e.target.value)}
+                                                    placeholder="Tu apodo o nombre preferido"
+                                                    className="bg-slate-800/50 border-slate-700 pl-10 text-white h-12"
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-slate-500 italic mt-1 font-light ml-1">
+                                                Este nombre es solo para saludarte y no influye en las interpretaciones técnicas.
+                                            </p>
+                                        </div>
+                                    )}
                                     {/* Nombre Completo */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Nombre Completo (Nombres y Apellidos)</label>
@@ -332,14 +355,21 @@ export default function OnboardingModal({ onComplete, onClose, initialData }: On
                                             disabled={loading || !isStep2Complete}
                                             className="w-full bg-purple-600 hover:bg-purple-700 text-white h-14 text-lg font-serif shadow-lg shadow-purple-900/20"
                                         >
-                                            {loading ? "Sincronizando..." : <><Save className="w-5 h-5 mr-2" /> Completar Mi Identidad</>}
+                                            {loading ? "Sincronizando..." : (
+                                                <>
+                                                    <Save className="w-5 h-5 mr-2" />
+                                                    {isEdit ? "Guardar Cambios" : "Completar Mi Identidad"}
+                                                </>
+                                            )}
                                         </Button>
-                                        <button
-                                            onClick={() => setStep(1)}
-                                            className="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-300 transition-colors py-2"
-                                        >
-                                            Volver al inicio
-                                        </button>
+                                        {!isEdit && (
+                                            <button
+                                                onClick={() => setStep(1)}
+                                                className="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-300 transition-colors py-2"
+                                            >
+                                                Volver al inicio
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
