@@ -26,11 +26,18 @@ const ZODIAC_SIGNS = [
     { name: "Piscis", symbol: "♓", color: "#6366f1" },
 ];
 
+import { useState, useEffect } from "react";
+
 export default function AstrologyWheel({ planets, houses, size = 500 }: AstrologyWheelProps) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
     const radius = size / 2;
     const center = radius;
     const innerRadius = radius * 0.75;
     const midRadius = radius * 0.88;
+
+    if (!mounted) return <div style={{ width: size, height: size }} />;
 
     return (
         <div className="relative flex items-center justify-center select-none" style={{ width: size, height: size }}>
@@ -54,8 +61,8 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                     const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
                         const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
                         return {
-                            x: centerX + (radius * Math.cos(angleInRadians)),
-                            y: centerY + (radius * Math.sin(angleInRadians))
+                            x: Number((centerX + (radius * Math.cos(angleInRadians))).toFixed(3)),
+                            y: Number((centerY + (radius * Math.sin(angleInRadians))).toFixed(3))
                         };
                     };
 
@@ -101,13 +108,13 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                     const angle = planet.fullDegree;
                     const angleInRadians = (angle - 90) * Math.PI / 180.0;
                     const pRadius = innerRadius - 20;
-                    const x = center + (pRadius * Math.cos(angleInRadians));
-                    const y = center + (pRadius * Math.sin(angleInRadians));
+                    const x = Number((center + (pRadius * Math.cos(angleInRadians))).toFixed(3));
+                    const y = Number((center + (pRadius * Math.sin(angleInRadians))).toFixed(3));
                     const pColor = PLANET_COLORS[planet.name] || "#ffffff";
 
                     return (
                         <motion.g
-                            key={planet.name}
+                            key={`${planet.name}-${idx}`}
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ delay: 0.2 + (idx * 0.05), type: "spring" }}
@@ -140,10 +147,10 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                 {houses.map((house) => {
                     const angle = house.fullDegree;
                     const angleInRadians = (angle - 90) * Math.PI / 180.0;
-                    const x1 = center + (innerRadius * Math.cos(angleInRadians));
-                    const y1 = center + (innerRadius * Math.sin(angleInRadians));
-                    const x2 = center + ((innerRadius - 60) * Math.cos(angleInRadians));
-                    const y2 = center + ((innerRadius - 60) * Math.sin(angleInRadians));
+                    const x1 = Number((center + (innerRadius * Math.cos(angleInRadians))).toFixed(3));
+                    const y1 = Number((center + (innerRadius * Math.sin(angleInRadians))).toFixed(3));
+                    const x2 = Number((center + ((innerRadius - 60) * Math.cos(angleInRadians))).toFixed(3));
+                    const y2 = Number((center + ((innerRadius - 60) * Math.sin(angleInRadians))).toFixed(3));
 
                     return (
                         <line

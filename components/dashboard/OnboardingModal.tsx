@@ -105,7 +105,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex justify-center p-4 overflow-y-auto items-start sm:items-center py-8">
             {/* Overlay más transparente */}
             <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" />
 
@@ -150,7 +150,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                         </div>
                     )}
 
-                    <div className="p-8">
+                    <div className="p-5 sm:p-8">
 
                         {/* STEP 1: BIENVENIDA */}
                         {step === 1 && !isEdit && (
@@ -263,7 +263,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     </div>
 
                                     {/* Fecha y Hora */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Fecha de Nacimiento</label>
                                             <div className="relative">
@@ -293,14 +293,14 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     {/* Sexo */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Sexo de Nacimiento</label>
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                             {genderOptions.map((opt) => (
                                                 <button
                                                     key={opt.value}
                                                     type="button"
                                                     onClick={() => setGender(opt.value)}
                                                     className={cn(
-                                                        "p-3 rounded-xl border text-sm transition-all duration-200 text-center font-bold",
+                                                        "p-2.5 rounded-xl border text-sm transition-all duration-200 text-center font-bold truncate",
                                                         gender === opt.value
                                                             ? "bg-purple-500/20 border-purple-500 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
                                                             : "bg-slate-800/30 border-slate-700 text-slate-400 hover:border-slate-600"

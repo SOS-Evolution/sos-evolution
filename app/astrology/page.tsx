@@ -42,15 +42,20 @@ export default async function AstrologyPage() {
         const lat = profile.latitude || 0;
         const lng = profile.longitude || 0;
 
-        // Try Real API
-        // chartData = await getWesternChartData({ 
-        //     year: y, month: m, date: d, 
-        //     hours: hour, minutes: minute, 
-        //     latitude: lat, longitude: lng, timezone: 0 
-        // });
+        const details = {
+            year: y, month: m, date: d,
+            hours: hour, minutes: minute,
+            latitude: lat, longitude: lng,
+            timezone: profile.timezone || 0
+        };
 
-        // For MVP/Demo reliability:
-        chartData = getMockChartData();
+        // Try Real API
+        chartData = await getWesternChartData(details);
+
+        // Fallback for Demo if API fails or no key
+        if (!chartData || chartData.planets.length === 0) {
+            chartData = getMockChartData(details);
+        }
     }
 
     // Fallback if no data yet
@@ -65,6 +70,23 @@ export default async function AstrologyPage() {
             </div>
 
             <main className="max-w-5xl mx-auto p-6 relative z-10">
+                {/* Debug Info (Solo será visible durante el arreglo) */}
+                <div className="hidden">
+                    <pre className="text-[10px] text-slate-500 overflow-auto max-h-60 glass p-4 mb-8 border border-white/10 rounded-xl">
+                        {JSON.stringify({
+                            planetsCount: chartData?.planets?.length,
+                            housesCount: chartData?.houses?.length,
+                            firstPlanet: chartData?.planets?.[0],
+                            profileData: {
+                                birthDate: profile?.birth_date,
+                                birthTime: profile?.birth_time,
+                                latitude: profile?.latitude,
+                                longitude: profile?.longitude,
+                                timezone: profile?.timezone
+                            }
+                        }, null, 2)}
+                    </pre>
+                </div>
 
                 {/* Header */}
                 <AnimatedSection>
@@ -111,7 +133,7 @@ export default async function AstrologyPage() {
                                 <div className="text-center px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
                                     <div className="text-xs text-slate-500 uppercase tracking-wider">Asc</div>
                                     <div className="font-serif text-xl text-indigo-400">
-                                        {chartData.houses[0]?.sign || "--"}
+                                        {chartData.planets.find(p => p.name === "Ascendant")?.sign || "--"}
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +157,7 @@ export default async function AstrologyPage() {
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {chartData.planets.map((planet, i) => (
-                                    <GlowingBorderCard key={planet.name} glowColor="purple" className="h-full">
+                                    <GlowingBorderCard key={`${planet.name}-${i}`} glowColor="purple" className="h-full">
                                         <div className="p-4 flex items-center justify-between h-full">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-14 h-14 rounded-full bg-slate-900/50 flex items-center justify-center border border-white/10 shadow-lg shadow-indigo-500/5 transition-transform hover:scale-105">
@@ -153,7 +175,7 @@ export default async function AstrologyPage() {
                                                     {planet.sign}
                                                 </div>
                                                 <div className="text-xs text-slate-500">
-                                                    {planet.normDegree.toFixed(2)}°
+                                                    {(planet.normDegree ?? 0).toFixed(2)}°
                                                 </div>
                                             </div>
                                         </div>

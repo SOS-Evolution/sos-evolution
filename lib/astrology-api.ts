@@ -64,29 +64,68 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.FREE_ASTRO_API_KEY || '' // Optional if public tier
+                'x-api-key': process.env.FREE_ASTRO_API_KEY || ''
             },
             body: JSON.stringify(payload)
         });
 
         if (!planetsRes.ok) {
             console.error("API Error (Planets):", await planetsRes.text());
-            return null; // or throw
+            return null;
         }
+
 
         const planetsData = await planetsRes.json();
 
-        // Normalize response (assuming specific structure, will adjust if needed)
-        // If the API returns a different structure, we map it here.
-        // For now, mapping a generic structure or keeping it flexible.
+        // Zodiac sign mapping (0-11 index to names)
+        const zodiacs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
 
-        // Note: Startups often mock this first if docs are scarce. 
-        // I will implement a robust mock fallback if the fetch fails 
-        // so the UI can be built and reviewed even if API connectivity is tricky.
+        // Extract planets from the unusual structure
+        // The API returns output as an array where the first element is an object with numeric keys
+        const planetsObject = planetsData?.output?.[0] || {};
+        const planets: PlanetPosition[] = [];
+
+        // Iterate through numeric keys (0-12 are planets, 13 is ayanamsa)
+        for (let i = 0; i <= 12; i++) {
+            const planetData = planetsObject[i.toString()];
+            if (planetData && planetData.name && planetData.name !== 'ayanamsa') {
+                planets.push({
+                    name: planetData.name,
+                    fullDegree: planetData.fullDegree || 0,
+                    normDegree: planetData.normDegree || 0,
+                    speed: planetData.speed || 0,
+                    isRetro: planetData.isRetro === "true" || planetData.isRetro === true,
+                    sign: zodiacs[planetData.current_sign] || "---",
+                    signLord: planetData.sign_lord,
+                    house: planetData.house_number || 0
+                });
+            }
+        }
+
+        // Calculate houses locally using Equal House system (each house = 30°)
+        // The Ascendant marks the cusp of the 1st house
+        const ascendant = planets.find(p => p.name === "Ascendant");
+        const houses: HouseCusp[] = [];
+
+        if (ascendant) {
+            const ascDegree = ascendant.fullDegree;
+
+            for (let i = 0; i < 12; i++) {
+                const houseDegree = (ascDegree + (i * 30)) % 360;
+                const signIndex = Math.floor(houseDegree / 30);
+
+                houses.push({
+                    house: i + 1,
+                    fullDegree: houseDegree,
+                    normDegree: houseDegree % 30,
+                    sign: zodiacs[signIndex] || "---"
+                });
+            }
+        }
 
         return {
-            planets: Array.isArray(planetsData.output) ? planetsData.output : [],
-            houses: [] // Add house fetching if separate
+            planets,
+            houses
         };
 
     } catch (error) {
@@ -95,23 +134,40 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
     }
 }
 
+import { getZodiacSign } from "./soul-math";
+
 // Helper to get dummy data for dev/visual testing if API fails
-export function getMockChartData(): WesternChartData {
+export function getMockChartData(details?: BirthDetails): WesternChartData {
+    const sunSign = details ? getZodiacSign(details.date, details.month) : "Aries";
+
+    // Un cálculo muy aproximado del ascendente basado en la hora (cada 2 horas cambia el signo)
+    // El sol sale en el ascendente al amanecer (aprox 6am)
+    const zodiacs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+    const sunIndex = zodiacs.indexOf(sunSign);
+    const hour = details?.hours ?? 12;
+    // Offset aproximado: a las 6am el Asc e sunIndex, a las 12pm es +3 signos, etc.
+    const ascOffset = Math.floor((hour + 18) % 24 / 2); // Ajuste rústico
+    const ascIndex = (sunIndex + ascOffset) % 12;
+    const ascSign = zodiacs[ascIndex];
+
     return {
         planets: [
-            { name: "Sun", fullDegree: 15, normDegree: 15, speed: 1, isRetro: false, sign: "Aries", house: 1 },
+            { name: "Sun", fullDegree: 15, normDegree: 15, speed: 1, isRetro: false, sign: sunSign, house: 1 },
             { name: "Moon", fullDegree: 45, normDegree: 15, speed: 13, isRetro: false, sign: "Taurus", house: 2 },
-            { name: "Mercury", fullDegree: 10, normDegree: 10, speed: 1.5, isRetro: true, sign: "Aries", house: 1 },
-            { name: "Venus", fullDegree: 125, normDegree: 5, speed: 1.2, isRetro: false, sign: "Leo", house: 5 },
+            { name: "Mercury", fullDegree: 10, normDegree: 10, speed: 1.5, isRetro: true, sign: sunSign, house: 1 },
+            { name: "Venus", fullDegree: 125, normDegree: 5, speed: 1.2, isRetro: false, sign: sunSign, house: 1 },
             { name: "Mars", fullDegree: 200, normDegree: 20, speed: 0.5, isRetro: false, sign: "Libra", house: 7 },
             { name: "Jupiter", fullDegree: 280, normDegree: 10, speed: 0.1, isRetro: false, sign: "Capricorn", house: 10 },
             { name: "Saturn", fullDegree: 310, normDegree: 10, speed: 0.05, isRetro: true, sign: "Aquarius", house: 11 },
         ],
-        houses: Array.from({ length: 12 }, (_, i) => ({
-            house: i + 1,
-            fullDegree: i * 30,
-            normDegree: 0,
-            sign: ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"][i]
-        }))
+        houses: Array.from({ length: 12 }, (_, i) => {
+            const hIndex = (ascIndex + i) % 12;
+            return {
+                house: i + 1,
+                fullDegree: i * 30,
+                normDegree: 0,
+                sign: zodiacs[hIndex]
+            };
+        })
     };
 }
