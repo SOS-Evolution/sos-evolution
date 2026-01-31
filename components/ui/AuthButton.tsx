@@ -61,12 +61,13 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
             <DropdownMenuContent align="end" className="w-56 bg-black/90 backdrop-blur-xl border-white/10">
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none text-white">Mi Cuenta</p>
                         {fullName && (
-                            <p className="text-sm font-medium leading-none text-white truncate">
+                            <p className="text-xs leading-none text-slate-300 truncate font-normal">
                                 {fullName}
                             </p>
                         )}
-                        <p className={fullName ? "text-xs leading-none text-slate-400 truncate mt-0.5" : "text-sm font-medium leading-none text-white truncate"}>
+                        <p className="text-xs leading-none text-slate-500 truncate">
                             {user.email}
                         </p>
                     </div>
