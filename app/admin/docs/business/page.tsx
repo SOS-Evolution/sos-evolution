@@ -209,7 +209,66 @@ export default function BusinessDocsPage() {
                     </Card>
 
                 </div>
-            </div>
-        </div>
-    );
-}
+                {/* 4. Estrategia de Precios */}
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
+                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                    Precios Objetivo (Tier List)
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                    {/* Pack Pequeño */}
+                    <Card className="p-4 bg-slate-900 border-slate-800 flex flex-col items-center text-center group hover:border-slate-600 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center mb-3 group-hover:bg-slate-700 transition-colors">
+                            <span className="text-lg">🥉</span>
+                        </div>
+                        <h4 className="text-slate-300 font-medium text-sm mb-1">Pack Aprendiz</h4>
+                        <div className="text-2xl font-bold text-white mb-1">$4.99</div>
+                        <p className="text-xs text-slate-500 mb-3">500 Créditos</p>
+                        <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
+                            Ideal para 2-3 tiradas específicas.
+                        </p>
+                    </Card>
+
+                    {/* Pack Medio */}
+                    <Card className="p-4 bg-slate-900 border-slate-800 flex flex-col items-center text-center relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+                        <div className="absolute top-0 right-0 bg-emerald-500 text-[10px] text-black font-bold px-2 py-0.5 rounded-bl-lg">
+                            POPULAR
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-emerald-900/30 flex items-center justify-center mb-3 group-hover:bg-emerald-900/50 transition-colors">
+                            <span className="text-lg">🥈</span>
+                        </div>
+                        <h4 className="text-emerald-400 font-medium text-sm mb-1">Pack Místico</h4>
+                        <div className="text-2xl font-bold text-white mb-1">$14.99</div>
+                        <p className="text-xs text-slate-500 mb-3">1,800 Créditos</p>
+                        <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
+                            +20% Bonus. Para usuarios recurrentes.
+                        </p>
+                    </Card>
+
+                    {/* Pack Grande */}
+                    <Card className="p-4 bg-slate-900 border-slate-800 flex flex-col items-center text-center group hover:border-amber-500/50 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-amber-900/30 flex items-center justify-center mb-3 group-hover:bg-amber-900/50 transition-colors">
+                            <span className="text-lg">🥇</span>
+                        </div>
+                        <h4 className="text-amber-400 font-medium text-sm mb-1">Pack Oráculo</h4>
+                        <div className="text-2xl font-bold text-white mb-1">$39.99</div>
+                        <p className="text-xs text-slate-500 mb-3">5,000 Créditos</p>
+                        <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
+                            +40% Bonus. Power users.
+                        </p>
+                    </Card>
+
+                    {/* Suscripción */}
+                    <Card className="p-4 bg-gradient-to-b from-purple-900/20 to-slate-900 border-purple-500/30 flex flex-col items-center text-center group hover:border-purple-500/60 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                            <span className="text-lg">👑</span>
+                        </div>
+                        <h4 className="text-purple-300 font-medium text-sm mb-1">Pase Eclipses</h4>
+                        <div className="text-2xl font-bold text-white mb-1">$11.11</div>
+                        <p className="text-xs text-slate-500 mb-3">/ Temporada</p>
+                        <p className="text-[10px] text-slate-400 border-t border-purple-500/20 pt-2 w-full">
+                            Skins + Créditos Extra + AI Profunda.
+                        </p>
+                    </Card>
+
+                </div>
