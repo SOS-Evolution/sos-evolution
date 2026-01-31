@@ -272,3 +272,7 @@ export default function BusinessDocsPage() {
                     </Card>
 
                 </div>
+            </div>
+        </div>
+    );
+}
