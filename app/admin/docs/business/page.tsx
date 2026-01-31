@@ -303,25 +303,52 @@ export default function BusinessDocsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800">
+                            {/* Tarot Literals */}
                             <tr className="hover:bg-slate-800/30 transition-colors">
-                                <td className="px-6 py-4 text-white font-medium">Lectura Normal</td>
+                                <td className="px-6 py-4 text-white font-medium">Lectura Básica</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">10</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Esencia Instantánea. Una sola carta para obtener claridad inmediata sobre una energía específica (sin IA).</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Lectura Diaria (Daily)</td>
                                 <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">50</td>
-                                <td className="px-6 py-4 text-slate-400">Tirada clásica de Tarot (3-5 cartas).</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Tu Brújula del Día. Guía matutina de 1 carta para sintonizar con tu energía diaria (Límitada a 1/día).</td>
                             </tr>
                             <tr className="hover:bg-slate-800/30 transition-colors">
-                                <td className="px-6 py-4 text-white font-medium">Astrología</td>
-                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">300</td>
-                                <td className="px-6 py-4 text-slate-400">Carta Astral completa o Sinastría de pareja.</td>
-                            </tr>
-                            <tr className="hover:bg-slate-800/30 transition-colors">
-                                <td className="px-6 py-4 text-white font-medium">Numerología</td>
+                                <td className="px-6 py-4 text-white font-medium">Lectura Mensual</td>
                                 <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
-                                <td className="px-6 py-4 text-slate-400">Análisis detallado de nombre y fecha de nacimiento.</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Ciclo de 30 Días. Análisis proyectivo sobre metas y desafíos del mes entrante.</td>
                             </tr>
                             <tr className="hover:bg-slate-800/30 transition-colors">
-                                <td className="px-6 py-4 text-white font-medium">Análisis Profundo IA</td>
-                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">150</td>
-                                <td className="px-6 py-4 text-slate-400">Interpretación avanzada basada en contexto histórico.</td>
+                                <td className="px-6 py-4 text-white font-medium">Lectura Clásica</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Evolución Pasado-Presente-Futuro. El esquema tradicional de 3 cartas para entender trayectorias.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Herradura (Horseshoe)</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Mapa de 7 cartas en "V" que explora influencias, consejos y el desenlace más probable.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Lectura Profunda (Cruz Celta)</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">160</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Inmersión Total. 10 cartas para decodificar situaciones complejas, bloqueos y resultados a largo plazo.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Tirada Zodiacal</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">250</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Rueda de la Vida (12 cartas). Panorámica general cubriendo todas las áreas (amor, trabajo, salud).</td>
+                            </tr>
+                            {/* Special Categories */}
+                            <tr className="hover:bg-slate-800/30 transition-colors border-t border-slate-700/50">
+                                <td className="px-6 py-4 text-emerald-300 font-bold">Universo Astrología</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">300</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs italic">Cálculo de Carta Astral completa y Sinastría avanzada.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-emerald-300 font-bold">Universo Numerología</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs italic">Análisis detallado de vibración personal y misión de vida.</td>
                             </tr>
                         </tbody>
                     </table>
