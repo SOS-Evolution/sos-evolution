@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Coins, Calendar } from "lucide-react";
+import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Coins, Calendar, Zap, Gift, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -286,6 +286,105 @@ export default function BusinessDocsPage() {
                         </p>
                     </Card>
 
+                </div>
+
+                {/* 5. Consumo de Créditos */}
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
+                    <Zap className="w-5 h-5 text-amber-500" />
+                    Consumo por Función (Economy)
+                </h3>
+                <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs uppercase bg-slate-800/50 text-slate-400">
+                            <tr>
+                                <th className="px-6 py-4 font-bold">Función</th>
+                                <th className="px-6 py-4 font-bold text-center">Créditos</th>
+                                <th className="px-6 py-4 font-bold">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800">
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Lectura Normal</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">50</td>
+                                <td className="px-6 py-4 text-slate-400">Tirada clásica de Tarot (3-5 cartas).</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Astrología</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">300</td>
+                                <td className="px-6 py-4 text-slate-400">Carta Astral completa o Sinastría de pareja.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Numerología</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
+                                <td className="px-6 py-4 text-slate-400">Análisis detallado de nombre y fecha de nacimiento.</td>
+                            </tr>
+                            <tr className="hover:bg-slate-800/30 transition-colors">
+                                <td className="px-6 py-4 text-white font-medium">Análisis Profundo IA</td>
+                                <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">150</td>
+                                <td className="px-6 py-4 text-slate-400">Interpretación avanzada basada en contexto histórico.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </Card>
+
+                {/* 6. Sistema de Misiones */}
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
+                    <Gift className="w-5 h-5 text-purple-400" />
+                    Sistema de Recompensas (Misiones)
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex justify-between items-center group hover:border-purple-500/30 transition-colors">
+                            <div className="flex gap-4 items-center">
+                                <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                    <Star className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm">Bienvenida</p>
+                                    <p className="text-xs text-slate-500">Por completar el registro inicial.</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-none font-mono">+100</Badge>
+                        </div>
+                        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex justify-between items-center group hover:border-purple-500/30 transition-colors">
+                            <div className="flex gap-4 items-center">
+                                <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                    <HeartHandshake className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm">Invitar Amigo</p>
+                                    <p className="text-xs text-slate-500">Por cada nuevo usuario referido.</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-none font-mono">+200</Badge>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex justify-between items-center group hover:border-purple-500/30 transition-colors">
+                            <div className="flex gap-4 items-center">
+                                <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                    <Repeat className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm">Compartir Social</p>
+                                    <p className="text-xs text-slate-500">Publicar resultados en redes (Diario).</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-none font-mono">+50</Badge>
+                        </div>
+                        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex justify-between items-center group hover:border-purple-500/30 transition-colors">
+                            <div className="flex gap-4 items-center">
+                                <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                    <Calendar className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm">Racha Diaria</p>
+                                    <p className="text-xs text-slate-500">Conexión consecutiva de 7 días.</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-none font-mono">+150</Badge>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
