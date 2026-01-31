@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
 
-export default function Navbar({ user, role }: { user: any, role?: string }) {
+export default function Navbar({ user, role, profile }: { user: any, role?: string, profile?: any }) {
     const pathname = usePathname();
 
     const isActive = (path: string) =>
@@ -86,7 +86,7 @@ export default function Navbar({ user, role }: { user: any, role?: string }) {
                 {/* --- USUARIO / SALDOS --- */}
                 <div className="flex items-center gap-4">
                     {user && <CreditsDisplay minimal />}
-                    <AuthButton user={user} />
+                    <AuthButton user={user} profile={profile} />
                 </div>
 
             </div>

@@ -14,7 +14,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function AuthButton({ user }: { user: any }) {
+export default function AuthButton({ user, profile }: { user: any, profile?: any }) {
     const [loading, setLoading] = useState(false);
 
     const handleLogout = async () => {
@@ -38,6 +38,10 @@ export default function AuthButton({ user }: { user: any }) {
         );
     }
 
+    // Lógica para mostrar nombre: Alias > Nombre Completo > Email (parte antes del @)
+    const displayName = profile?.display_name || profile?.full_name?.split(' ')[0] || user.email?.split('@')[0];
+    const fullName = profile?.full_name;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -48,8 +52,8 @@ export default function AuthButton({ user }: { user: any }) {
                     <div className="bg-purple-500/10 p-1 rounded-full group-hover:bg-purple-500/20 transition-colors">
                         <User className="w-3.5 h-3.5 text-purple-400" />
                     </div>
-                    <span className="text-xs font-medium max-w-[120px] truncate hidden md:block">
-                        {user.email}
+                    <span className="text-xs font-medium max-w-[120px] truncate hidden md:block capitalize">
+                        {displayName}
                     </span>
                     <ChevronDown className="w-3 h-3 text-slate-500 group-hover:text-slate-300 transition-colors" />
                 </Button>
@@ -57,8 +61,12 @@ export default function AuthButton({ user }: { user: any }) {
             <DropdownMenuContent align="end" className="w-56 bg-black/90 backdrop-blur-xl border-white/10">
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none text-white">Mi Cuenta</p>
-                        <p className="text-xs leading-none text-slate-400 truncate">
+                        {fullName && (
+                            <p className="text-sm font-medium leading-none text-white truncate">
+                                {fullName}
+                            </p>
+                        )}
+                        <p className={fullName ? "text-xs leading-none text-slate-400 truncate mt-0.5" : "text-sm font-medium leading-none text-white truncate"}>
                             {user.email}
                         </p>
                     </div>

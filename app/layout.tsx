@@ -40,16 +40,18 @@ export default async function RootLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 1.1 Obtenemos el perfil para saber el rol
-  let role = 'client';
+  // 1.1 Obtenemos el perfil completo
+  let profile = null;
   if (user) {
-    const { data: profile } = await supabase
+    const { data } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, full_name, display_name')
       .eq('id', user.id)
       .single();
-    role = profile?.role || 'client';
+    profile = data;
   }
+
+  const role = profile?.role || 'client';
 
   // 2. Cargamos configuraciones globales (marco de tarot, etc)
   const settings = await getSystemSettings();
@@ -62,7 +64,7 @@ export default async function RootLayout({
           <ParticlesBackground />
 
           {/* 2. Aquí va la Barra Global */}
-          <Navbar user={user} role={role} />
+          <Navbar user={user} role={role} profile={profile} />
 
           {/* El contenido de cada página se renderiza aquí abajo */}
           {children}

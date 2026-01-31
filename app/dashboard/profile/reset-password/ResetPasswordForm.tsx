@@ -21,11 +21,13 @@ export default function ResetPasswordForm() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [clientError, setClientError] = useState<string | null>(null);
 
-    const handleSubmit = async (formData: FormData) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         setClientError(null);
 
-        if (password !== confirmPassword) {
-            setClientError("Las contraseñas no coinciden.");
+        // Validación personalizada para evitar popups del navegador
+        if (!password || !confirmPassword) {
+            setClientError("Por favor completa todos los campos.");
             return;
         }
 
@@ -34,7 +36,13 @@ export default function ResetPasswordForm() {
             return;
         }
 
+        if (password !== confirmPassword) {
+            setClientError("Las contraseñas no coinciden.");
+            return;
+        }
+
         setLoading(true);
+        const formData = new FormData(event.currentTarget);
         // Server Action
         await updatePassword(formData);
         setLoading(false);
@@ -75,25 +83,32 @@ export default function ResetPasswordForm() {
                         </div>
                     )}
 
-                    {/* Form */}
-                    <form action={handleSubmit} className="space-y-6">
+                    {/* Form con noValidate para desactivar mensajes del navegador */}
+                    <form onSubmit={handleSubmit} noValidate className="space-y-6">
                         {/* Password Field */}
                         <div className="space-y-2">
                             <label htmlFor="password" className="text-xs font-serif font-medium text-slate-400 ml-1 tracking-wider uppercase">
                                 Nueva Contraseña
                             </label>
                             <div className="relative group/input">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within/input:text-purple-400 transition-colors" />
+                                <Lock className={cn(
+                                    "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors",
+                                    password.length > 0 && password.length < 6 ? "text-red-400" :
+                                        "text-slate-500 group-focus-within/input:text-purple-400"
+                                )} />
                                 <Input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    required
                                     placeholder="••••••••"
-                                    className="pl-12 pr-12 h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-600 rounded-xl focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
-                                    minLength={6}
+                                    className={cn(
+                                        "pl-12 pr-12 h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-600 rounded-xl transition-all",
+                                        password.length > 0 && password.length < 6
+                                            ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                                            : "focus:border-purple-500/50 focus:ring-purple-500/20"
+                                    )}
                                 />
                                 <button
                                     type="button"
@@ -103,6 +118,11 @@ export default function ResetPasswordForm() {
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
+                            {password.length > 0 && password.length < 6 && (
+                                <p className="text-[11px] text-red-400 font-medium ml-1 animate-in fade-in slide-in-from-top-1">
+                                    Mínimo 6 caracteres ({password.length}/6)
+                                </p>
+                            )}
                         </div>
 
                         {/* Confirm Password Field */}
@@ -123,15 +143,13 @@ export default function ResetPasswordForm() {
                                     type={showConfirmPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    required
                                     placeholder="••••••••"
                                     className={cn(
-                                        "pl-12 pr-12 h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-600 rounded-xl focus:ring-purple-500/20 transition-all",
+                                        "pl-12 pr-12 h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-600 rounded-xl transition-all",
                                         confirmPassword && password !== confirmPassword
-                                            ? "border-red-500/50 focus:border-red-500"
-                                            : "focus:border-purple-500/50"
+                                            ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                                            : "focus:border-purple-500/50 focus:ring-purple-500/20"
                                     )}
-                                    minLength={6}
                                 />
                                 <button
                                     type="button"
@@ -151,8 +169,8 @@ export default function ResetPasswordForm() {
 
                         <Button
                             type="submit"
-                            disabled={loading || (confirmPassword !== "" && password !== confirmPassword)}
-                            className="w-full h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl shadow-lg shadow-purple-900/20 font-medium tracking-wide transition-all hover:scale-[1.02]"
+                            disabled={loading || (password.length > 0 && password.length < 6) || (confirmPassword !== "" && password !== confirmPassword)}
+                            className="w-full h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl shadow-lg shadow-purple-900/20 font-medium tracking-wide transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <RefreshCw className="w-5 h-5 animate-spin" />
