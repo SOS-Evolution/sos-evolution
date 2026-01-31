@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button } from "./button";
 import { LogIn, LogOut, User, KeyRound, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -17,10 +18,14 @@ import {
 export default function AuthButton({ user, profile }: { user: any, profile?: any }) {
     const [loading, setLoading] = useState(false);
 
+    const router = useRouter();  // Asegúrate de que esto esté dentro del componente
+
     const handleLogout = async () => {
         setLoading(true);
         try {
             await logout();
+            router.push("/");
+            router.refresh();
         } catch (error) {
             console.error("Error al salir:", error);
             setLoading(false);

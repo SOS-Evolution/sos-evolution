@@ -41,11 +41,11 @@ export default function BusinessDocsPage() {
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Target className="w-24 h-24" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">1. Modelo Freemium (Acquisition)</h4>
+                        <h4 className="text-lg font-bold text-white mb-2">1. Freemium & Gamificación</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
-                            <li>• Lectura semanal gratuita.</li>
-                            <li>• Perfil numerológico básico.</li>
-                            <li>• Desbloqueo mediante mecánicas de gamificación (Viral Loops).</li>
+                            <li>• <span className="text-emerald-400 font-medium">Ganar Créditos:</span> Invitar usuarios, compartir en RRSS (Earned Media).</li>
+                            <li>• Lectura diaria/semanal gratuita.</li>
+                            <li>• Acceso básico al mapa del alma.</li>
                         </ul>
                     </Card>
 
@@ -53,12 +53,12 @@ export default function BusinessDocsPage() {
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <DollarSign className="w-24 h-24" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">2. Microtransacciones</h4>
+                        <h4 className="text-lg font-bold text-white mb-2">2. Pack de Créditos</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
-                            <li>• Tiradas específicas (Amor, Trabajo).</li>
-                            <li>• Lecturas "Guía Maestro/Dragón".</li>
+                            <li>• Compra de moneda virtual con dinero real.</li>
+                            <li>• <span className="text-amber-400 text-xs uppercase bg-amber-400/10 px-1 rounded">Requiere Pasarela de Pago</span></li>
+                            <li>• Desbloqueo de tiradas específicas.</li>
                             <li>• Visualización de destino (Imagen IA).</li>
-                            <li>• Moneda virtual (Créditos).</li>
                         </ul>
                     </Card>
 
@@ -66,11 +66,12 @@ export default function BusinessDocsPage() {
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Repeat className="w-24 h-24" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">3. Suscripción (~$10/mo)</h4>
+                        <h4 className="text-lg font-bold text-white mb-2">3. Pase de Temporada (30 días)</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
-                            <li>• Tiradas ilimitadas (uso razonable).</li>
-                            <li>• Estadísticas avanzadas y patrones.</li>
-                            <li>• Dashboard evolutivo completo.</li>
+                            <li>• <span className="text-purple-400 font-medium">Acceso Premium:</span> Beneficios exclusivos.</li>
+                            <li>• Pack de créditos + Skins de cartas únicos.</li>
+                            <li>• <strong>Profundización en tiradas</strong> (IA avanzada).</li>
+                            <li>• <span className="text-amber-400 text-xs uppercase bg-amber-400/10 px-1 rounded">Requiere Pasarela de Pago</span></li>
                         </ul>
                     </Card>
                 </div>
@@ -135,6 +136,78 @@ export default function BusinessDocsPage() {
                             </ul>
                         </Card>
                     </div>
+                </div>
+                {/* 3. Infraestructura y Pagos */}
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
+                    <DollarSign className="w-5 h-5 text-amber-400" />
+                    Infraestructura de Pagos & Confianza
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+
+                    {/* Estrategia Tecnológica */}
+                    <Card className="p-6 bg-slate-900 border-slate-800">
+                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-blue-400" />
+                            Estrategia Técnica & Fiscal
+                        </h4>
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                <h5 className="text-blue-200 font-medium mb-1">Base de Datos</h5>
+                                <p className="text-sm text-slate-400">
+                                    Implementar tablas robustas de <code className="text-blue-300">Transactions</code> (historial) y <code className="text-blue-300">User_Wallet</code> (créditos) para auditoría.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <h5 className="text-white text-sm font-bold mb-1">Opción A (Recomendada)</h5>
+                                    <p className="text-xs text-slate-400">
+                                        <strong>Lemon Squeezy</strong>: Resuelve Impuestos, Tarjetas y PayPal en una sola integración. Ideal para productos digitales globales.
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
+                                    <h5 className="text-white text-sm font-bold mb-1">Opción B (Control)</h5>
+                                    <p className="text-xs text-slate-400">
+                                        <strong>Stripe + PayPal Std</strong>: Menor comisión pero requiere doble integración y gestión manual de impuestos.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Psicología de Venta */}
+                    <Card className="p-6 bg-slate-900 border-slate-800">
+                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <HeartHandshake className="w-5 h-5 text-pink-400" />
+                            Psicología de Venta
+                        </h4>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4">
+                                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                                    <span className="text-amber-500 font-bold">1</span>
+                                </div>
+                                <div>
+                                    <h5 className="text-white font-medium">Pase "No Recurrente"</h5>
+                                    <p className="text-sm text-slate-400">
+                                        Vender el Pase como <strong>Producto de Temporada</strong> (ej: "Temporada de Eclipses") en lugar de suscripción automática. Elimina el miedo a "olvidar cancelar" y aumenta conversión.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4">
+                                <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center shrink-0">
+                                    <span className="text-yellow-500 font-bold">2</span>
+                                </div>
+                                <div>
+                                    <h5 className="text-white font-medium">Factor Confianza (PayPal)</h5>
+                                    <p className="text-sm text-slate-400">
+                                        En el nicho esotérico, el botón amarillo de <strong>PayPal</strong> es crítico. Reduce la fricción y el recelo de compartir datos bancarios en sitios nuevos.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
                 </div>
             </div>
         </div>

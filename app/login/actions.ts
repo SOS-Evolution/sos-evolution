@@ -104,7 +104,6 @@ export async function logout() {
     // 1. El servidor cierra la sesión y borra la cookie
     await supabase.auth.signOut();
 
-    // 2. Redirigimos a la raíz
-    // (No necesitas revalidatePath porque redirect ya fuerza una nueva navegación)
-    redirect("/");
+    // 2. Retornamos éxito para que el cliente redirija
+    return { success: true };
 }
