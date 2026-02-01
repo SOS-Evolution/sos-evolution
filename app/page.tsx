@@ -31,25 +31,25 @@ export default async function Home() {
       <main className="relative z-10">
 
         {/* ===== HERO SECTION - IMPACTO MÁXIMO ===== */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative">
+        <section className="min-h-[85vh] md:min-h-[80vh] flex flex-col items-center justify-center px-6 py-8 md:py-0 text-center">
 
           {/* Badge de novedad */}
-          <div className="animate-fade-in-up mb-8">
+          <div className="animate-fade-in-up mb-4 md:mb-6">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-purple-300 border border-purple-500/20">
               <Moon className="w-4 h-4" />
-              Versión Beta — En Desarrollo
+              Beta Abierta - Pruebalo Gratis
             </span>
           </div>
 
           {/* Título Principal - Letras con efecto gradiente animado */}
-          <h1 className="animate-fade-in-up text-7xl md:text-9xl lg:text-[12rem] font-black tracking-tighter mb-4 drop-shadow-2xl">
+          <h1 className="animate-fade-in-up text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black tracking-tighter mb-3 md:mb-4 drop-shadow-2xl">
             <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-[length:200%_100%] bg-clip-text text-transparent animate-gradient-shift">
               S.O.S.
             </span>
           </h1>
 
           {/* Subtítulo con gradiente */}
-          <div className="animate-fade-in-up flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-xl md:text-3xl font-light mb-8" style={{ animationDelay: "0.2s" }}>
+          <div className="animate-fade-in-up flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 text-lg md:text-2xl lg:text-3xl font-light mb-4 md:mb-6" style={{ animationDelay: "0.2s" }}>
             <span className="text-gradient-purple font-mono tracking-tight font-bold">
               Soul Operating System
             </span>
@@ -60,7 +60,7 @@ export default async function Home() {
           </div>
 
           {/* Descripción */}
-          <p className="animate-fade-in-up text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12 font-light" style={{ animationDelay: "0.4s" }}>
+          <p className="animate-fade-in-up text-sm md:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6 md:mb-8 font-light" style={{ animationDelay: "0.4s" }}>
             Instala una nueva versión de tu consciencia. Una plataforma que fusiona
             <strong className="text-purple-300"> Inteligencia Artificial </strong>
             con la sabiduría ancestral del
@@ -69,11 +69,11 @@ export default async function Home() {
           </p>
 
           {/* CTAs - VERTICALES Y ANCHOS */}
-          <div className="animate-fade-in-up flex flex-col items-center gap-4 w-full max-w-sm mx-auto" style={{ animationDelay: "0.6s" }}>
+          <div className="animate-fade-in-up flex flex-col items-center gap-3 w-full max-w-sm mx-auto" style={{ animationDelay: "0.6s" }}>
             <Link href={user ? "/dashboard" : "/login"} className="w-full">
               <Button
                 size="lg"
-                className="w-full bg-white text-purple-950 hover:bg-purple-50 text-lg px-8 py-7 rounded-full font-bold animate-glow-pulse hover:scale-[1.02] transition-transform group"
+                className="w-full bg-white text-purple-950 hover:bg-purple-50 text-lg px-8 py-6 rounded-full font-bold animate-glow-pulse hover:scale-[1.02] transition-transform group"
               >
                 {user ? "ACCEDER AL SISTEMA" : "¡INICIA EL VIAJE!"}
                 <Sparkles className="ml-2 w-5 h-5 text-purple-600 group-hover:rotate-12 transition-transform animate-pulse" />
@@ -84,7 +84,7 @@ export default async function Home() {
               <Button
                 variant="ghost"
                 size="lg"
-                className="w-full text-slate-400 hover:text-white border border-transparent hover:border-white/10 hover:bg-white/5 px-8 py-6 rounded-full text-lg backdrop-blur-sm transition-all"
+                className="w-full text-slate-400 hover:text-white border border-transparent hover:border-white/10 hover:bg-white/5 px-8 py-5 rounded-full text-lg backdrop-blur-sm transition-all"
               >
                 ¿Cómo Funciona?
                 <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
@@ -92,9 +92,9 @@ export default async function Home() {
             </Link>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2">
+          {/* Scroll indicator - ahora en el flujo del documento para evitar solapamiento */}
+          <div className="animate-fade-in-up mt-6 md:mt-8" style={{ animationDelay: "0.8s" }}>
+            <div className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2 animate-bounce">
               <div className="w-1 h-2 bg-white/40 rounded-full animate-pulse" />
             </div>
           </div>
