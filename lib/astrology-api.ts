@@ -13,6 +13,8 @@ export interface BirthDetails {
     }
 }
 
+import { getZodiacSign } from "./soul-math";
+
 export interface PlanetPosition {
     name: string;
     fullDegree: number;
@@ -102,6 +104,14 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
             }
         }
 
+        // FORCE CORRECTION: Ensure Sun Sign matches local Tropical calculation
+        // The API sometimes returns incorrect signs for cusp dates
+        const correctSunSign = getZodiacSign(details.date, details.month);
+        const sunPlanet = planets.find(p => p.name === "Sun");
+        if (sunPlanet) {
+            sunPlanet.sign = correctSunSign;
+        }
+
         // Calculate houses locally using Equal House system (each house = 30°)
         // The Ascendant marks the cusp of the 1st house
         const ascendant = planets.find(p => p.name === "Ascendant");
@@ -134,7 +144,7 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
     }
 }
 
-import { getZodiacSign } from "./soul-math";
+// import { getZodiacSign } from "./soul-math";
 
 // Helper to get dummy data for dev/visual testing if API fails
 export function getMockChartData(details?: BirthDetails): WesternChartData {
