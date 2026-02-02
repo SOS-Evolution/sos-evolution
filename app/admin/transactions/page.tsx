@@ -13,7 +13,7 @@ export default async function AdminTransactionsPage() {
         console.error("Error fetching transactions:", error);
         return (
             <div className="p-4 rounded-lg bg-red-900/20 border border-red-900/50 text-red-200">
-                Error al cargar el flujo de créditos.
+                Error al cargar el flujo de Aura de Evolución.
             </div>
         );
     }
@@ -23,7 +23,7 @@ export default async function AdminTransactionsPage() {
             <div>
                 <h2 className="text-2xl font-bold text-white mb-1 tracking-tight flex items-center gap-2">
                     <CreditCard className="w-6 h-6 text-yellow-500" />
-                    Flujo de Créditos
+                    Flujo de Aura de Evolución
                 </h2>
                 <p className="text-slate-400 text-sm">Monitoreo de transacciones y economía del sistema.</p>
             </div>

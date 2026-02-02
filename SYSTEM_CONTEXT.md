@@ -26,7 +26,7 @@ Este documento sirve como referencia rápida para desarrolladores e Inteligencia
 ### C. Economía de Créditos
 - **Tablas**: `user_credits` (Patrón Ledger/Libro mayor).
 - **Funciones SQL**: `get_user_balance`, `spend_credits`, `add_credits`.
-- **Propósito**: Controlar el uso de recursos de IA.
+- **Propósito**: Controlar el uso de Aura de Evolución (recursos de IA).
 
 ### D. Sistema Administrativo
 - **Portal**: `/admin`.
@@ -44,7 +44,7 @@ Cuando trabajes en este proyecto, sigue estas reglas:
 - [x] Historial de Lecturas.
 - [ ] Implementación de nuevas "Misiones Evolutivas".
 - [ ] Conexión profunda con API de Cartas Natales avanzadas.
-- [ ] Sistema de compras de créditos (Webhooks).
+- [ ] Sistema de compras de Aura de Evolución y Amuleto del Alma (Webhooks).
 
 ---
 *Última actualización: 26 de Enero, 2026*

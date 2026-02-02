@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Users, Coins, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
+import { Users, Sparkle, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 
 async function getData() {
@@ -64,11 +64,11 @@ export default async function AdminDashboardPage() {
                 <GlowingBorderCard glowColor="yellow">
                     <div className="p-6 flex items-center justify-between">
                         <div>
-                            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Créditos en Circulación</p>
+                            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Aura de Evolución en Circulación</p>
                             <h3 className="text-3xl font-bold text-white">{stats.total_credits}</h3>
                         </div>
                         <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
-                            <Coins className="w-6 h-6 text-yellow-500" />
+                            <Sparkle className="w-6 h-6 text-yellow-500" />
                         </div>
                     </div>
                 </GlowingBorderCard>

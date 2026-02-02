@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Coins, Calendar, Zap, Gift, Star } from "lucide-react";
+import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Sparkle, Calendar, Zap, Gift, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -43,7 +43,7 @@ export default function BusinessDocsPage() {
                         </div>
                         <h4 className="text-lg font-bold text-white mb-2">1. Freemium & Gamificación</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
-                            <li>• <span className="text-emerald-400 font-medium">Ganar Créditos:</span> Invitar usuarios, compartir en RRSS (Earned Media).</li>
+                            <li>• <span className="text-emerald-400 font-medium">Ganar Aura de Evolución:</span> Invitar usuarios, compartir en RRSS (Earned Media).</li>
                             <li>• Lectura diaria/semanal gratuita.</li>
                             <li>• Acceso básico al mapa del alma.</li>
                         </ul>
@@ -53,7 +53,7 @@ export default function BusinessDocsPage() {
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <DollarSign className="w-24 h-24" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">2. Pack de Créditos</h4>
+                        <h4 className="text-lg font-bold text-white mb-2">2. Pack de Aura de Evolución</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
                             <li>• Compra de moneda virtual con dinero real.</li>
                             <li>• <span className="text-amber-400 text-xs uppercase bg-amber-400/10 px-1 rounded">Requiere Pasarela de Pago</span></li>
@@ -66,10 +66,10 @@ export default function BusinessDocsPage() {
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Repeat className="w-24 h-24" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">3. Pase de Temporada (30 días)</h4>
+                        <h4 className="text-lg font-bold text-white mb-2">3. Amuleto del Alma (30 días)</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
                             <li>• <span className="text-purple-400 font-medium">Acceso Premium:</span> Beneficios exclusivos.</li>
-                            <li>• Pack de créditos + Skins de cartas únicos.</li>
+                            <li>• Pack de Aura de Evolución + Skins de cartas únicos.</li>
                             <li>• <strong>Profundización en tiradas</strong> (IA avanzada).</li>
                             <li>• <span className="text-amber-400 text-xs uppercase bg-amber-400/10 px-1 rounded">Requiere Pasarela de Pago</span></li>
                         </ul>
@@ -154,7 +154,7 @@ export default function BusinessDocsPage() {
                             <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                                 <h5 className="text-blue-200 font-medium mb-1">Base de Datos</h5>
                                 <p className="text-sm text-slate-400">
-                                    Implementar tablas robustas de <code className="text-blue-300">Transactions</code> (historial) y <code className="text-blue-300">User_Wallet</code> (créditos) para auditoría.
+                                    Implementar tablas robustas de <code className="text-blue-300">Transactions</code> (historial) y <code className="text-blue-300">User_Wallet</code> (Aura de Evolución) para auditoría.
                                 </p>
                             </div>
 
@@ -221,11 +221,11 @@ export default function BusinessDocsPage() {
                         <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center mb-3 group-hover:bg-slate-700 transition-colors">
                             <span className="text-lg">🥉</span>
                         </div>
-                        <h4 className="text-slate-300 font-medium text-sm mb-1">Pack Aprendiz</h4>
+                        <h4 className="text-slate-300 font-medium text-sm mb-1">Pack Iniciado</h4>
                         <div className="text-2xl font-bold text-white mb-1">$4.99</div>
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                            <Coins className="w-3.5 h-3.5 text-amber-500/80" />
-                            <span>500 Créditos</span>
+                            <Sparkle className="w-3.5 h-3.5 text-amber-500/80" />
+                            <span>500 Aura</span>
                         </div>
                         <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
                             Ideal para 2-3 tiradas específicas.
@@ -240,11 +240,11 @@ export default function BusinessDocsPage() {
                         <div className="w-10 h-10 rounded-full bg-emerald-900/30 flex items-center justify-center mb-3 group-hover:bg-emerald-900/50 transition-colors">
                             <span className="text-lg">🥈</span>
                         </div>
-                        <h4 className="text-emerald-400 font-medium text-sm mb-1">Pack Místico</h4>
+                        <h4 className="text-emerald-400 font-medium text-sm mb-1">Pack Adepto</h4>
                         <div className="text-2xl font-bold text-white mb-1">$14.99</div>
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                            <Coins className="w-3.5 h-3.5 text-amber-500/80" />
-                            <span>1,800 Créditos</span>
+                            <Sparkle className="w-3.5 h-3.5 text-amber-500/80" />
+                            <span>1,800 Aura</span>
                         </div>
                         <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
                             +20% Bonus. Para usuarios recurrentes.
@@ -256,11 +256,11 @@ export default function BusinessDocsPage() {
                         <div className="w-10 h-10 rounded-full bg-amber-900/30 flex items-center justify-center mb-3 group-hover:bg-amber-900/50 transition-colors">
                             <span className="text-lg">🥇</span>
                         </div>
-                        <h4 className="text-amber-400 font-medium text-sm mb-1">Pack Oráculo</h4>
+                        <h4 className="text-amber-400 font-medium text-sm mb-1">Pack Maestro</h4>
                         <div className="text-2xl font-bold text-white mb-1">$39.99</div>
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                            <Coins className="w-3.5 h-3.5 text-amber-500" />
-                            <span>5,000 Créditos</span>
+                            <Sparkle className="w-3.5 h-3.5 text-amber-500" />
+                            <span>5,000 Aura</span>
                         </div>
                         <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-2 w-full">
                             +40% Bonus. Power users.
@@ -275,20 +275,20 @@ export default function BusinessDocsPage() {
                         <div className="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
                             <span className="text-lg">👑</span>
                         </div>
-                        <h4 className="text-purple-300 font-medium text-sm mb-1 uppercase tracking-tight">Pase Temporada</h4>
+                        <h4 className="text-purple-300 font-medium text-sm mb-1 uppercase tracking-tight">Amuleto del Alma</h4>
                         <div className="text-2xl font-bold text-white mb-1">$11.11</div>
                         <div className="flex items-center gap-1.5 text-[10px] text-slate-500 mb-3 uppercase font-medium">
                             <Calendar className="w-3 h-3 text-purple-400" />
                             <span>30 Días</span>
                         </div>
                         <p className="text-[10px] text-slate-400 border-t border-purple-500/20 pt-2 w-full">
-                            Skins + Créditos Extra + AI Profunda.
+                            Skins + Aura de Evolución Extra + AI Profunda.
                         </p>
                     </Card>
 
                 </div>
 
-                {/* 5. Consumo de Créditos */}
+                {/* 5. Consumo de Aura de Evolución */}
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
                     <Zap className="w-5 h-5 text-amber-500" />
                     Consumo por Función (Economy)
@@ -298,7 +298,7 @@ export default function BusinessDocsPage() {
                         <thead className="text-xs uppercase bg-slate-800/50 text-slate-400">
                             <tr>
                                 <th className="px-6 py-4 font-bold">Función</th>
-                                <th className="px-6 py-4 font-bold text-center">Créditos</th>
+                                <th className="px-6 py-4 font-bold text-center">Aura de Evolución</th>
                                 <th className="px-6 py-4 font-bold">Descripción</th>
                             </tr>
                         </thead>

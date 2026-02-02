@@ -35,7 +35,7 @@ export default async function MissionsPage() {
                                 <Sparkles className="w-8 h-8 text-yellow-500" />
                                 Misiones y Recompensas
                             </h1>
-                            <p className="text-slate-400 text-sm">Completa desafíos para ganar créditos y evolucionar.</p>
+                            <p className="text-slate-400 text-sm">Completa desafíos para ganar Aura de Evolución y evolucionar.</p>
                         </div>
                     </div>
                 </AnimatedSection>

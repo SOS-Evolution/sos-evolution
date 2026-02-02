@@ -2,7 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import {
     User,
-    Coins,
+    Sparkle,
     History,
     Calendar,
     MapPin,
@@ -116,14 +116,14 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                     {/* AJUSTE DE CRÉDITOS */}
                     <div className="rounded-2xl border border-yellow-900/20 bg-yellow-950/10 p-6">
                         <h3 className="text-sm font-bold text-yellow-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <ShieldAlert className="w-4 h-4" /> Gestión de Créditos
+                            <ShieldAlert className="w-4 h-4" /> Gestión de Aura de Evolución
                         </h3>
                         <form action={adjustUserCredits} className="space-y-4">
                             <input type="hidden" name="userId" value={userId} />
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs text-slate-500 ml-1">Monto (usar negativo para quitar)</label>
                                 <div className="relative">
-                                    <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-600" />
+                                    <Sparkle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-600" />
                                     <input
                                         type="number"
                                         name="amount"
@@ -157,9 +157,9 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                         <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
                             <div className="flex justify-between items-start mb-2">
                                 <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">Saldo Actual</span>
-                                <Coins className="w-4 h-4 text-yellow-500" />
+                                <Sparkle className="w-4 h-4 text-yellow-500" />
                             </div>
-                            <p className="text-3xl font-bold text-white">{balance || 0} <span className="text-xs text-slate-500 font-normal">créditos</span></p>
+                            <p className="text-3xl font-bold text-white">{balance || 0} <span className="text-xs text-slate-500 font-normal">Aura de Evolución</span></p>
                         </div>
                         <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
                             <div className="flex justify-between items-start mb-2">

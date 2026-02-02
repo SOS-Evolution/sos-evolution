@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         if (cost > 0) {
             const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
             if ((balance || 0) < cost) {
-                return NextResponse.json({ error: 'Créditos insuficientes para esta lectura.' }, { status: 402 });
+                return NextResponse.json({ error: 'Aura de Evolución insuficiente para esta lectura.' }, { status: 402 });
             }
         }
 

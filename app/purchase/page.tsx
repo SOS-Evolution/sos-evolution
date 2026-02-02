@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Calendar, ArrowLeft, Sparkles, Zap, CreditCard, Check } from "lucide-react";
+import { Sparkle, Calendar, ArrowLeft, Sparkles, Zap, CreditCard, Check } from "lucide-react";
 import Link from "next/link";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 
@@ -28,13 +28,13 @@ interface PricingTier {
 export default function PurchasePage() {
     const pricingTiers: PricingTier[] = [
         {
-            id: "aprendiz",
-            name: "Pack Aprendiz",
+            id: "iniciado",
+            name: "Pack Iniciado",
             price: "$4.99",
             credits: 500,
             emoji: "🥉",
             features: [
-                "500 Créditos místicos",
+                "Obtén 500 de Aura de Evolución",
                 "Ideal para 2-3 tiradas específicas",
                 "Acceso a todas las lecturas básicas",
                 "Validez permanente"
@@ -42,11 +42,11 @@ export default function PurchasePage() {
             gradient: "from-slate-900 via-slate-800 to-slate-900",
             borderColor: "border-slate-700",
             glowColor: "slate",
-            icon: <Coins className="w-4 h-4 text-amber-500/80" />
+            icon: <Sparkle className="w-4 h-4 text-amber-500/80" />
         },
         {
-            id: "mistico",
-            name: "Pack Místico",
+            id: "adepto",
+            name: "Pack Adepto",
             price: "$14.99",
             credits: 1800,
             emoji: "🥈",
@@ -55,7 +55,7 @@ export default function PurchasePage() {
                 color: "bg-emerald-500"
             },
             features: [
-                "1,800 Créditos místicos",
+                "Obtén 1.800 de Aura de Evolución",
                 "+20% Bonus incluido",
                 "Para usuarios recurrentes",
                 "Mejor relación calidad-precio",
@@ -67,13 +67,13 @@ export default function PurchasePage() {
             icon: <Sparkles className="w-4 h-4 text-emerald-400" />
         },
         {
-            id: "oraculo",
-            name: "Pack Oráculo",
+            id: "maestro",
+            name: "Pack Maestro",
             price: "$39.99",
             credits: 5000,
             emoji: "🥇",
             features: [
-                "5,000 Créditos místicos",
+                "Obtén 5.000 de Aura de Evolución",
                 "+40% Bonus incluido",
                 "Perfecto para power users",
                 "Lecturas zodiacales ilimitadas",
@@ -85,8 +85,8 @@ export default function PurchasePage() {
             icon: <Zap className="w-4 h-4 text-amber-400" />
         },
         {
-            id: "temporada",
-            name: "Pase Temporada",
+            id: "amuleto",
+            name: "Amuleto del Alma",
             price: "$11.11",
             duration: "30 días",
             emoji: "👑",
@@ -96,7 +96,7 @@ export default function PurchasePage() {
             },
             features: [
                 "Acceso premium 30 días",
-                "Pack de créditos incluido",
+                "Pack de Aura de Evolución incluido",
                 "Skins de cartas exclusivos",
                 "IA avanzada para profundización",
                 "Sin renovación automática"
@@ -128,7 +128,7 @@ export default function PurchasePage() {
                         </Link>
                         <div>
                             <h2 className="text-xs font-bold text-purple-400 uppercase tracking-[0.3em] mb-1">Tienda Mística</h2>
-                            <h1 className="text-4xl font-serif text-white">Paquetes de <span className="text-purple-400">Créditos</span></h1>
+                            <h1 className="text-4xl font-serif text-white">Paquetes de <span className="text-purple-400">Aura de Evolución</span></h1>
                             <p className="text-slate-400 text-sm mt-1">
                                 Elige el paquete perfecto para tu viaje espiritual
                             </p>
@@ -170,8 +170,8 @@ export default function PurchasePage() {
                                     </div>
                                     {tier.credits ? (
                                         <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
-                                            <Coins className={`w-4 h-4 text-${tier.glowColor}-400`} />
-                                            <span>{tier.credits.toLocaleString()} Créditos</span>
+                                            <Sparkle className={`w-4 h-4 text-${tier.glowColor}-400`} />
+                                            <span>{tier.credits.toLocaleString()} Aura</span>
                                         </div>
                                     ) : (
                                         <div className="flex items-center justify-center gap-2 text-sm text-purple-300">
@@ -236,7 +236,7 @@ export default function PurchasePage() {
                     <div className="mt-12 text-center">
                         <h3 className="text-lg font-bold text-white mb-4">¿Tienes preguntas?</h3>
                         <p className="text-slate-400 text-sm mb-6">
-                            Los créditos no caducan y puedes usarlos cuando quieras. El Pase de Temporada no se renueva automáticamente.
+                            El Aura de Evolución no caduca y puedes usarlo cuando quieras. El Amuleto del Alma no se renueva automáticamente.
                         </p>
                         <Link href="/dashboard">
                             <Button variant="ghost" className="text-purple-400 hover:text-purple-300">

@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-    ArrowRight,
-    Layers,
-    Trophy,
-    Star,
-    Hash,
-    BookOpen,
-    ChevronRight
-} from "lucide-react";
+import { Trophy, Sparkles, LogOut, Check, X, Shield, Star, BookOpen, Clock, Settings, User, Compass, History, HelpCircle, Palette, Sparkle, LayoutDashboard, ChevronRight, Hash, Layers, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -95,18 +87,20 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                             <Trophy className="w-16 h-16 text-yellow-500" />
                                         </div>
 
-                                        <div className="relative z-10 h-full flex flex-col justify-center">
+                                        <div className="relative z-10">
                                             <div className="flex items-center gap-2 mb-1 text-yellow-500/80">
                                                 <Trophy className="w-3.5 h-3.5" />
                                                 <span className="text-[10px] uppercase tracking-wider font-bold">Recompensas</span>
                                             </div>
 
-                                            <div className="text-2xl font-serif font-bold text-white group-hover:text-yellow-100 transition-colors">
+                                            <div className="text-3xl font-serif font-bold text-white group-hover:text-yellow-101 transition-colors">
                                                 Misiones
                                             </div>
-                                            <p className="text-xs text-yellow-100/60 max-w-[90%] leading-relaxed">
-                                                Gana créditos místicos.
-                                            </p>
+
+                                            <div className="mt-4 flex items-center gap-1.5 text-yellow-500/60 group-hover:text-yellow-500/80 transition-colors">
+                                                <Sparkles className="w-3.5 h-3.5" />
+                                                <span className="text-[10px] uppercase tracking-wider font-bold">Gana Aura de Evolución</span>
+                                            </div>
                                         </div>
                                     </Card>
                                 </Link>

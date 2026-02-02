@@ -40,7 +40,7 @@ export default async function AdminUsersPage(props: {
             <div className="flex items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Gestión de Usuarios</h2>
-                    <p className="text-slate-400 text-sm">Administra cuents, créditos y roles.</p>
+                    <p className="text-slate-400 text-sm">Administra cuents, Aura de Evolución y roles.</p>
                 </div>
                 <div className="w-full max-w-sm">
                     <AdminSearch placeholder="Buscar por nombre o email..." />
@@ -54,7 +54,7 @@ export default async function AdminUsersPage(props: {
                             <tr className="border-b border-slate-700 bg-slate-800/50 transition-colors hover:bg-slate-800/50 data-[state=selected]:bg-slate-800">
                                 <th className="h-12 px-4 align-middle font-medium text-slate-400">Usuario</th>
                                 <th className="h-12 px-4 align-middle font-medium text-slate-400">Rol</th>
-                                <th className="h-12 px-4 align-middle font-medium text-slate-400 text-right">Créditos</th>
+                                <th className="h-12 px-4 align-middle font-medium text-slate-400 text-right">Aura de Evolución</th>
                                 <th className="h-12 px-4 align-middle font-medium text-slate-400 text-center">Lecturas</th>
                                 <th className="h-12 px-4 align-middle font-medium text-slate-400">Registro</th>
                                 <th className="h-12 px-4 align-middle font-medium text-slate-400 text-right">Acciones</th>
