@@ -2,17 +2,40 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Check } from "lucide-react";
 
 interface TarotDeckProps {
     onSelectCard: (cardIndex: number) => void;
+    onSelectionComplete?: (selectedCards: number[]) => void;
     disabled?: boolean;
+    maxSelections?: number;  // 1 para básica, 3 para clásica
+    selectedCards?: number[];  // Cartas ya seleccionadas (controlado externamente)
+    animatingCards?: number[];  // Cartas que se están animando al centro
+    fadeOthers?: boolean;  // Si true, las cartas no seleccionadas hacen fade out
 }
 
 const DECK_SIZE = 22;
 
-export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckProps) {
+// Tamaño consistente de las cartas - usado en todo el flujo
+export const CARD_SIZE = {
+    mobile: { width: 90, height: 135 },
+    desktop: { width: 110, height: 165 }
+};
+
+export default function TarotDeck({
+    onSelectCard,
+    onSelectionComplete,
+    disabled = false,
+    maxSelections = 1,
+    selectedCards = [],
+    animatingCards = [],
+    fadeOthers = false
+}: TarotDeckProps) {
     const [isShuffling, setIsShuffling] = useState(true);
+    const [internalSelected, setInternalSelected] = useState<number[]>([]);
+
+    // Usar selección externa si se provee, sino usar interna
+    const currentSelected = selectedCards.length > 0 ? selectedCards : internalSelected;
 
     // Generar índices mezclados solo una vez al montar
     const shuffledIndices = useMemo(() => {
@@ -21,13 +44,68 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
             .sort(() => Math.random() - 0.5);
     }, []);
 
+    // Valores aleatorios para shuffle - memorizados para evitar recálculos
+    const shuffleValues = useMemo(() => {
+        return shuffledIndices.map(() => ({
+            x: (Math.random() - 0.5) * 120,
+            y: (Math.random() - 0.5) * 120,
+            rotate: (Math.random() - 0.5) * 180,
+            scale: 0.8 + Math.random() * 0.4
+        }));
+    }, [shuffledIndices]);
+
     // Duración de la animación de barajado
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsShuffling(false);
-        }, 2500); // 2.5 segundos de barajado
+        }, 2500);
         return () => clearTimeout(timer);
     }, []);
+
+    const handleCardClick = (cardIndex: number) => {
+        if (disabled || isShuffling) return;
+
+        // Verificar si ya está seleccionada
+        if (currentSelected.includes(cardIndex)) return;
+
+        // Verificar si ya se alcanzó el máximo
+        if (currentSelected.length >= maxSelections) return;
+
+        const newSelected = [...internalSelected, cardIndex];
+        setInternalSelected(newSelected);
+        onSelectCard(cardIndex);
+
+        // Si se completó la selección, notificar
+        if (newSelected.length >= maxSelections && onSelectionComplete) {
+            onSelectionComplete(newSelected);
+        }
+    };
+
+    const isCardSelected = (cardIndex: number) => currentSelected.includes(cardIndex);
+    const isCardAnimating = (cardIndex: number) => animatingCards.includes(cardIndex);
+
+    // Calcular título dinámico
+    const getTitle = () => {
+        if (isShuffling) {
+            return (
+                <span className="flex items-center gap-3">
+                    Barajando el <span className="text-gradient-purple">Destino</span>...
+                </span>
+            );
+        }
+        if (maxSelections === 1) {
+            return <>Elige una <span className="text-gradient-purple">Carta</span></>;
+        }
+        const remaining = maxSelections - currentSelected.length;
+        if (remaining === 0) {
+            return <span className="text-gradient-purple">Cartas Seleccionadas</span>;
+        }
+        return (
+            <>
+                Elige <span className="text-gradient-purple">{remaining}</span> {remaining === 1 ? 'carta' : 'cartas'} más
+            </>
+        );
+    };
 
     return (
         <div className="flex flex-col items-center gap-6 overflow-hidden py-10">
@@ -36,112 +114,150 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                 animate={{ opacity: 1, y: 0 }}
                 className="text-2xl md:text-3xl font-serif text-white text-center z-50"
             >
-                {isShuffling ? (
-                    <span className="flex items-center gap-3">
-                        Barajando el <span className="text-gradient-purple">Destino</span>...
-                    </span>
-                ) : (
-                    <>Elige una <span className="text-gradient-purple">Carta</span></>
-                )}
+                {getTitle()}
             </motion.h2>
 
             <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center">
-                {shuffledIndices.map((originalIndex, visualIndex) => {
-                    // Lógica del abanico con más espacio en la entrada de abajo
-                    const totalDegrees = 300; // Reducido de 325 para dejar espacio en la parte inferior
-                    const anglePerCard = totalDegrees / (DECK_SIZE - 1);
-                    const startRotation = -totalDegrees / 2;
-                    const finalRotation = startRotation + (anglePerCard * visualIndex);
+                <AnimatePresence>
+                    {shuffledIndices.map((originalIndex, visualIndex) => {
+                        const isSelected = isCardSelected(originalIndex);
+                        const isAnimating = isCardAnimating(originalIndex);
+                        const shuffleVal = shuffleValues[visualIndex];
 
-                    // Valores aleatorios únicos por carta para el shuffle
-                    const shuffleX = (Math.random() - 0.5) * 120;
-                    const shuffleY = (Math.random() - 0.5) * 120;
-                    const shuffleRotate = (Math.random() - 0.5) * 180;
-                    const shuffleScale = 0.8 + Math.random() * 0.4;
+                        // Si la carta está animando al centro, no renderizar aquí
+                        if (isAnimating) return null;
 
-                    // Variantes de animación mejoradas
-                    const variants = {
-                        shuffle: {
-                            x: [0, shuffleX, -shuffleX * 0.5, shuffleX * 0.7, 0],
-                            y: [0, shuffleY, -shuffleY * 0.6, shuffleY * 0.4, 0],
-                            rotate: [0, shuffleRotate, -shuffleRotate * 0.7, shuffleRotate * 0.5, 0],
-                            scale: [1, shuffleScale, 1.2, shuffleScale * 0.9, 1],
-                            zIndex: Math.floor(Math.random() * 50),
-                            transition: {
-                                duration: 0.85,
-                                repeat: 2,
-                                repeatType: "mirror" as const,
-                                ease: "easeOut",
-                                times: [0, 0.25, 0.5, 0.75, 1]
-                            }
-                        },
-                        fan: {
-                            x: 0,
-                            y: 0,
-                            rotate: finalRotation,
-                            scale: 1,
-                            zIndex: visualIndex,
-                            transition: {
-                                delay: visualIndex * 0.04,
-                                type: "spring",
-                                stiffness: 200,
-                                damping: 20
-                            }
-                        }
-                    };
+                        // Lógica del abanico
+                        const totalDegrees = 300;
+                        const anglePerCard = totalDegrees / (DECK_SIZE - 1);
+                        const startRotation = -totalDegrees / 2;
+                        const finalRotation = startRotation + (anglePerCard * visualIndex);
 
-                    return (
-                        <motion.div
-                            key={originalIndex}
-                            variants={variants as any}
-                            animate={isShuffling ? "shuffle" : "fan"}
-                            initial={{ scale: 0, opacity: 0 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            whileHover={
-                                !disabled && !isShuffling
-                                    ? {
-                                        scale: 1.2,
-                                        y: -40,
-                                        zIndex: 100,
-                                        transition: { duration: 0.2 }
-                                    }
-                                    : {}
+                        // Si fadeOthers está activo y la carta no está seleccionada, hacer fade
+                        const shouldFade = fadeOthers && !isSelected;
+
+                        const variants = {
+                            shuffle: {
+                                x: [0, shuffleVal.x, -shuffleVal.x * 0.5, shuffleVal.x * 0.7, 0],
+                                y: [0, shuffleVal.y, -shuffleVal.y * 0.6, shuffleVal.y * 0.4, 0],
+                                rotate: [0, shuffleVal.rotate, -shuffleVal.rotate * 0.7, shuffleVal.rotate * 0.5, 0],
+                                scale: [1, shuffleVal.scale, 1.2, shuffleVal.scale * 0.9, 1],
+                                opacity: 1,
+                                zIndex: Math.floor(Math.random() * 50),
+                                transition: {
+                                    duration: 0.85,
+                                    repeat: 2,
+                                    repeatType: "mirror" as const,
+                                    ease: "easeOut",
+                                    times: [0, 0.25, 0.5, 0.75, 1]
+                                }
+                            },
+                            fan: {
+                                x: 0,
+                                y: isSelected ? -30 : 0,
+                                rotate: finalRotation,
+                                scale: isSelected ? 1.1 : 1,
+                                opacity: shouldFade ? 0 : 1,
+                                zIndex: isSelected ? 100 : visualIndex,
+                                transition: {
+                                    delay: visualIndex * 0.04,
+                                    type: "spring",
+                                    stiffness: 200,
+                                    damping: 20
+                                }
+                            },
+                            exit: {
+                                opacity: 0,
+                                scale: 0.8,
+                                transition: { duration: 0.3 }
                             }
-                            whileTap={!disabled && !isShuffling ? { scale: 0.95 } : {}}
-                            onClick={() => !disabled && !isShuffling && onSelectCard(originalIndex)}
-                            className={`absolute cursor-pointer ${disabled || isShuffling ? "pointer-events-none" : ""}`}
-                            style={{
-                                transformOrigin: "center bottom",
-                            }}
-                        >
-                            <div
-                                className={`
-                                    relative
-                                    w-[90px] h-[135px] md:w-[110px] md:h-[165px]
-                                    ${!isShuffling ? "-mt-[220px] md:-mt-[260px]" : ""}
-                                    bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950
-                                    border-2 border-purple-500/50
-                                    rounded-xl shadow-2xl
-                                    flex flex-col items-center justify-center gap-1
-                                    transition-all duration-300
-                                    hover:border-purple-400 hover:shadow-purple-500/40
-                                    overflow-hidden
-                                `}
+                        };
+
+                        return (
+                            <motion.div
+                                key={originalIndex}
+                                layoutId={`tarot-card-${originalIndex}`}
+                                variants={variants as any}
+                                animate={isShuffling ? "shuffle" : "fan"}
+                                exit="exit"
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileInView={{ opacity: shouldFade ? 0 : 1, scale: 1 }}
+                                whileHover={
+                                    !disabled && !isShuffling && !isSelected && currentSelected.length < maxSelections
+                                        ? {
+                                            scale: 1.2,
+                                            y: -40,
+                                            zIndex: 100,
+                                            transition: { duration: 0.2 }
+                                        }
+                                        : {}
+                                }
+                                whileTap={!disabled && !isShuffling && !isSelected ? {
+                                    scale: 1.15,
+                                    y: -20,
+                                    transition: { duration: 0.15 }
+                                } : {}}
+                                onClick={() => handleCardClick(originalIndex)}
+                                className={`absolute cursor-pointer ${disabled || isShuffling || isSelected || currentSelected.length >= maxSelections ? "pointer-events-none" : ""}`}
+                                style={{
+                                    transformOrigin: "center bottom",
+                                    touchAction: "manipulation"
+                                }}
                             >
-                                {/* Brillo místico interno */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent" />
+                                <div
+                                    className={`
+                                        relative
+                                        w-[90px] h-[135px] md:w-[110px] md:h-[165px]
+                                        ${!isShuffling ? "-mt-[220px] md:-mt-[260px]" : ""}
+                                        bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950
+                                        border-2 
+                                        ${isSelected
+                                            ? "border-purple-400 shadow-purple-500/60"
+                                            : "border-purple-500/50 hover:border-purple-400 hover:shadow-purple-500/60"
+                                        }
+                                        rounded-xl shadow-2xl
+                                        flex flex-col items-center justify-center gap-1
+                                        transition-all duration-300
+                                        active:border-purple-300 active:shadow-purple-400/80
+                                        overflow-hidden
+                                    `}
+                                >
+                                    {/* Glow de selección */}
+                                    {isSelected && (
+                                        <motion.div
+                                            className="absolute inset-0 bg-purple-500/20 rounded-xl"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: [0.2, 0.4, 0.2] }}
+                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                        />
+                                    )}
 
-                                <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-500/70 relative z-10" />
-                                <span className="text-purple-400/70 text-[9px] md:text-[10px] font-bold tracking-[0.3em] relative z-10">
-                                    SOS
-                                </span>
+                                    {/* Brillo místico interno */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent" />
 
-                                {/* Patrón de fondo sutil */}
-                                <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
-                            </div>
-                        </motion.div>
-                    );
-                })}
+                                    {/* Badge de selección (para multi-selección) */}
+                                    {isSelected && maxSelections > 1 && (
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            className="absolute top-1 right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center z-20"
+                                        >
+                                            <Check className="w-3 h-3 text-white" />
+                                        </motion.div>
+                                    )}
+
+                                    <Sparkles className={`w-5 h-5 md:w-6 md:h-6 relative z-10 ${isSelected ? "text-purple-400" : "text-purple-500/70"}`} />
+                                    <span className={`text-[9px] md:text-[10px] font-bold tracking-[0.3em] relative z-10 ${isSelected ? "text-purple-300" : "text-purple-400/70"}`}>
+                                        SOS
+                                    </span>
+
+                                    {/* Patrón de fondo sutil */}
+                                    <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
             </div>
 
             <motion.p
@@ -150,7 +266,10 @@ export default function TarotDeck({ onSelectCard, disabled = false }: TarotDeckP
                 transition={{ delay: 1 }}
                 className="text-slate-500 text-sm text-center italic"
             >
-                La sincronicidad guiará tu mano...
+                {maxSelections > 1
+                    ? "Selecciona las cartas en el orden que te llamen..."
+                    : "La sincronicidad guiará tu mano..."
+                }
             </motion.p>
         </div>
     );

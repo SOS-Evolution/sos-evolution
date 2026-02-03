@@ -31,7 +31,7 @@ const schema: Schema = {
 export async function POST(req: Request) {
     try {
         const body = await req.json().catch(() => ({}));
-        const { question, cardIndex, readingTypeCode = 'general' } = body;
+        const { question, cardIndex, readingTypeCode = 'general', position } = body;
 
         // 1. VERIFICAR USUARIO
         const supabase = await createClient();
@@ -45,17 +45,33 @@ export async function POST(req: Request) {
         }
 
         // 2. VALIDAR TIPO Y CRÉDITOS
-        const { data: readingType } = await supabase
+        console.log("Processing reading request:", { readingTypeCode, position });
+
+        let { data: readingType } = await supabase
             .from('reading_types')
             .select('*')
             .eq('code', readingTypeCode)
             .single();
 
         if (!readingType) {
-            return NextResponse.json({ error: 'Tipo de lectura no válido' }, { status: 400 });
+            console.log(`Reading type '${readingTypeCode}' not found. Falling back to 'general'.`);
+            // Guardamos en la misma variable
+            const { data: generalType } = await supabase
+                .from('reading_types')
+                .select('*')
+                .eq('code', 'general')
+                .single();
+
+            readingType = generalType;
+
+            if (!readingType) {
+                console.error("Critical: 'general' reading type not found in DB.");
+                return NextResponse.json({ error: 'Tipo de lectura no válido' }, { status: 400 });
+            }
         }
 
         const cost = readingType.credit_cost;
+        console.log("Reading Type Resolved:", readingType.name, "Cost:", cost);
 
         // Verificación optimista de saldo (para no gastar IA si no alcanza)
         if (cost > 0) {
@@ -66,6 +82,7 @@ export async function POST(req: Request) {
         }
 
         // 3. IA GENERATIVA
+        console.log("Generating content with Gemini...");
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
             generationConfig: {
@@ -86,18 +103,49 @@ export async function POST(req: Request) {
 
         let typeContext = `Tipo de lectura: ${readingType.name}. ${readingType.description}`;
 
+        // Contexto especial para tiradas de posición (Pasado/Presente/Futuro)
+        let positionContext = "";
+        if (position) {
+            positionContext = `
+            Esta carta representa la posición "${position}" en una tirada de Evolución Temporal.
+            ${position === "Pasado" ? "Interpreta esta carta como las energías, lecciones o patrones que vienen del pasado del consultante. ¿Qué fundamentos o bloqueos heredados influyen?" : ""}
+            ${position === "Presente" ? "Interpreta esta carta como la energía actual que domina la situación. ¿Qué está ocurriendo ahora y qué consciencia se necesita?" : ""}
+            ${position === "Futuro" ? "Interpreta esta carta como la energía hacia la que se dirige el consultante. ¿Qué potencial se está manifestando si sigue este camino?" : ""}
+            `;
+        }
+
         const prompt = `
           Actúa como SOS (Soul Operating System). Carta: ${selectedCard}.
           ${typeContext}
+          ${positionContext}
           Contexto del usuario: ${userContext}
           Dame lectura JSON en español.
         `;
 
         const result = await model.generateContent(prompt);
-        const aiResponse = JSON.parse(result.response.text());
+        console.log("Gemini response received.");
+
+        const dirtyText = result.response.text();
+        const cleanText = dirtyText.replace(/```json/g, "").replace(/```/g, "").trim();
+
+        let aiResponse;
+        try {
+            aiResponse = JSON.parse(cleanText);
+        } catch (e) {
+            console.error("JSON Parse Error:", e);
+            console.error("Raw Text:", dirtyText);
+            return NextResponse.json({ error: 'Error procesando respuesta de la IA' }, { status: 500 });
+        }
+
         aiResponse.cardName = selectedCard;
 
         // 4. GUARDAR EN DB
+        console.log("Inserting reading into DB...", {
+            card: aiResponse.cardName,
+            typeId: readingType.id,
+            position
+        });
+
         const { data: savedReading, error: dbError } = await supabase
             .from('lecturas')
             .insert([
@@ -108,7 +156,8 @@ export async function POST(req: Request) {
                     action: aiResponse.action,
                     user_id: user.id,
                     reading_type_id: readingType.id,
-                    question: question || null
+                    question: question || null,
+                    position: position || null
                 }
             ])
             .select()
@@ -124,7 +173,7 @@ export async function POST(req: Request) {
                 await supabase.rpc('spend_credits', {
                     p_user_id: user.id,
                     p_amount: cost,
-                    p_description: `Lectura: ${readingType.name}`,
+                    p_description: `Lectura: ${readingType?.name || 'General'}`,
                     p_reference_id: savedReading.id
                 });
             }
@@ -140,8 +189,9 @@ export async function POST(req: Request) {
             newBalance: newBalance || 0
         });
 
-    } catch (error) {
-        console.error('Error general:', error);
-        return NextResponse.json({ error: 'Error del sistema' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Error general en /api/lectura:', error);
+        console.error('Stack:', error?.stack);
+        return NextResponse.json({ error: 'Error del sistema: ' + (error?.message || 'Unknown') }, { status: 500 });
     }
 }
