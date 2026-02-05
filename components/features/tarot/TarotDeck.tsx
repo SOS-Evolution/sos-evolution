@@ -62,14 +62,7 @@ export default function TarotDeck({
         return () => clearTimeout(timer);
     }, []);
 
-    // Detectar móvil para ajustar el abanico
-    const [isMobile, setIsMobile] = useState(false);
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
+
 
     const handleCardClick = (cardIndex: number) => {
         if (disabled || isShuffling) return;
@@ -126,7 +119,7 @@ export default function TarotDeck({
                 {getTitle()}
             </motion.h2>
 
-            <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center scale-75 md:scale-100 origin-center">
+            <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center scale-[0.85] md:scale-100 origin-center">
                 <AnimatePresence>
                     {shuffledIndices.map((originalIndex, visualIndex) => {
                         const isSelected = isCardSelected(originalIndex);
@@ -136,8 +129,8 @@ export default function TarotDeck({
                         // Si la carta está animando al centro, no renderizar aquí
                         if (isAnimating) return null;
 
-                        // Lógica del abanico adaptativa
-                        const totalDegrees = isMobile ? 190 : 300; // 190° en móvil evita cortes laterales
+                        // Lógica del abanico
+                        const totalDegrees = 300;
                         const anglePerCard = totalDegrees / (DECK_SIZE - 1);
                         const startRotation = -totalDegrees / 2;
                         const finalRotation = startRotation + (anglePerCard * visualIndex);
