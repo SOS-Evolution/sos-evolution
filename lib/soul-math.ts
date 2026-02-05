@@ -23,22 +23,22 @@ export function reduceNumber(num: number): number {
     return result;
 }
 
-// Calcula el Signo Zodiacal
+// Calcula el Signo Zodiacal (Retorna el nombre en inglés como llave para i18n)
 export function getZodiacSign(day: number, month: number): string {
     const zodiacSigns = [
-        { sign: "Capricornio", endDay: 19 },
-        { sign: "Acuario", endDay: 18 },
-        { sign: "Piscis", endDay: 20 },
+        { sign: "Capricorn", endDay: 19 },
+        { sign: "Aquarius", endDay: 18 },
+        { sign: "Pisces", endDay: 20 },
         { sign: "Aries", endDay: 19 },
-        { sign: "Tauro", endDay: 20 },
-        { sign: "Géminis", endDay: 20 },
-        { sign: "Cáncer", endDay: 22 },
+        { sign: "Taurus", endDay: 20 },
+        { sign: "Gemini", endDay: 20 },
+        { sign: "Cancer", endDay: 22 },
         { sign: "Leo", endDay: 22 },
         { sign: "Virgo", endDay: 22 },
         { sign: "Libra", endDay: 22 },
-        { sign: "Escorpio", endDay: 21 },
-        { sign: "Sagitario", endDay: 21 },
-        { sign: "Capricornio", endDay: 31 },
+        { sign: "Scorpio", endDay: 21 },
+        { sign: "Sagittarius", endDay: 21 },
+        { sign: "Capricorn", endDay: 31 },
     ];
 
     const index = month - 1;

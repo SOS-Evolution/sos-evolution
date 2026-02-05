@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
-import { createClient } from '@/lib/supabase/server'; // <--- USAMOS EL CLIENTE DE SERVIDOR
+import { createClient } from '@/lib/supabase/server';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -31,7 +31,7 @@ const schema: Schema = {
 export async function POST(req: Request) {
     try {
         const body = await req.json().catch(() => ({}));
-        const { question, cardIndex, readingTypeCode = 'general', position } = body;
+        const { question, cardIndex, readingTypeCode = 'general', position, locale = 'es' } = body;
 
         // 1. VERIFICAR USUARIO
         const supabase = await createClient();
@@ -119,7 +119,9 @@ export async function POST(req: Request) {
           ${typeContext}
           ${positionContext}
           Contexto del usuario: ${userContext}
-          Dame lectura JSON en español.
+          
+          IMPORTANT: Respond strictly in ${locale === 'en' ? 'English' : 'Spanish'}.
+          Dame lectura JSON.
         `;
 
         const result = await model.generateContent(prompt);

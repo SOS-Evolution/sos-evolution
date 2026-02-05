@@ -1,0 +1,424 @@
+{
+    "HomePage": {
+        "title": "Your Temporal Evolution"
+    },
+    "Common": {
+        "loading": "Loading..."
+    },
+    "Landing": {
+        "hero": {
+            "beta": "Open Beta - Try it for Free",
+            "subtitle": "The Evolution of the Spirit",
+            "description": "Install a new version of your consciousness. A platform that merges <purple> Artificial Intelligence </purple> with the ancestral wisdom of <purple> Tarot </purple> to guide you through your own Hero's Journey.",
+            "cta_start": "START THE JOURNEY!",
+            "cta_access": "ACCESS THE SYSTEM",
+            "cta_how": "How it Works?"
+        },
+        "authority": {
+            "jung": "Jungian Psychology",
+            "arquetipos": "Archetypal Symbolism",
+            "ia": "Generative AI"
+        },
+        "protocol": {
+            "title": "The <purple>Evolution</purple> Protocol",
+            "subtitle": "Three steps to recode your reality and awaken your hidden potential.",
+            "step1_title": "Identity",
+            "step1_desc": "Create your sacred profile. The system analyzes your name and date to establish your initial cosmic coordinates.",
+            "step2_title": "Channeling",
+            "step2_desc": "Consult the AI Oracle. Receive a deep reading based on the present moment and synchronicity.",
+            "step3_title": "Integration",
+            "step3_desc": "The reading is saved in your \"Soul Journal\". Detect patterns and complete evolutionary missions."
+        },
+        "faq": {
+            "title": "System <purple>Data</purple>",
+            "q1": "Is this divination or fortune-telling?",
+            "a1": "No. S.O.S. is based on synchronicity and psychological projection. We use the cards as symbolic mirrors to understand your present, not to predict an unalterable future.",
+            "q2": "How does the mystic AI work?",
+            "a2": "We use advanced language models trained with \"The Hero's Journey\" structures and Tarot de Marseille symbolism. The AI acts as a neutral facilitator.",
+            "q3": "Is my data private?",
+            "a3": "Absolutely. Your journal is sacred. We use row-level security (RLS) in our database, which means it is technically impossible for another user to read your entries."
+        },
+        "final_cta": {
+            "title": "Your soul is <purple>calling</purple> you.",
+            "free": "Free Registration",
+            "immediate": "Immediate Access",
+            "button": "Answer the Call"
+        }
+    },
+    "Dashboard": {
+        "aura": "Evolution Aura",
+        "rewards": "Rewards",
+        "missions": "Missions",
+        "gain_aura": "Gain Evolution Aura",
+        "control_panel": "Control Panel",
+        "astrology": {
+            "title": "Astrology",
+            "essence": "Your sun sign defines your essence.",
+            "unknown": "Discover more",
+            "setup": "Set up your birth date."
+        },
+        "numerology": {
+            "title": "Numerology",
+            "path": "Path {count}",
+            "calculate": "Calculate your No.",
+            "discovery": "Discover the power of your numbers."
+        },
+        "tarot": {
+            "title": "Tarot",
+            "desc": "Consult the oracle to receive divine guidance.",
+            "button": "Start Reading",
+            "stats_title": "Arcane Affinity",
+            "stats_count": "x{count}"
+        },
+        "journal": {
+            "title": "Soul Journal",
+            "desc": "Review your reading history and revelations.",
+            "button": "Open Journal"
+        },
+        "profile": {
+            "title": "Soul Identity",
+            "unknown_traveler": "Nameless Traveler",
+            "unknown_date": "Unknown date",
+            "unknown_place": "Unknown place",
+            "edit": "Edit"
+        }
+    },
+    "Zodiac": {
+        "Aries": "Aries",
+        "Taurus": "Taurus",
+        "Gemini": "Gemini",
+        "Cancer": "Cancer",
+        "Leo": "Leo",
+        "Virgo": "Virgo",
+        "Libra": "Libra",
+        "Scorpio": "Scorpio",
+        "Sagittarius": "Sagittarius",
+        "Capricorn": "Capricorn",
+        "Aquarius": "Aquarius",
+        "Pisces": "Pisces"
+    },
+    "Auth": {
+        "login": "Login",
+        "my_account": "My Account",
+        "change_password": "Change Password",
+        "logout": "Logout",
+        "logging_out": "Logging out...",
+        "language_label": "Language"
+    },
+    "Navbar": {
+        "home": "Home",
+        "tarot": "Tarot",
+        "history": "Journal",
+        "astrology": "Astrology",
+        "numerology": "Numerology"
+    },
+    "PurchasePage": {
+        "title_shop": "Mystic Shop",
+        "title_main": "Evolution Aura Packs",
+        "description": "Choose the perfect pack for your spiritual journey",
+        "buy_button": "Buy Now",
+        "aura": "Aura",
+        "payment_methods_title": "Secure Payment Methods",
+        "payment_methods_desc": "We process your payments safely with encrypted technology",
+        "cards_label": "Credit/debit cards",
+        "lock_note": "🔒 Secure payments processed by Stripe & PayPal",
+        "faq_title": "Have questions?",
+        "faq_desc": "Evolution Aura does not expire and you can use it whenever you want. The Soul Amulet does not renew automatically.",
+        "back_to_dashboard": "Back to Dashboard",
+        "tiers": {
+            "explorador": {
+                "name": "Explorer Pack",
+                "badge": "OFFER",
+                "features": [
+                    "Get 150 Evolution Aura",
+                    "Your first step into the system",
+                    "Perfect for a deep reading",
+                    "Welcome offer"
+                ]
+            },
+            "iniciado": {
+                "name": "Initiate Pack",
+                "features": [
+                    "Get 500 Evolution Aura",
+                    "Ideal for 2-3 specific readings",
+                    "Access to all basic readings",
+                    "Permanent validity"
+                ]
+            },
+            "adepto": {
+                "name": "Adept Pack",
+                "badge": "POPULAR",
+                "features": [
+                    "Get 2,500 Evolution Aura",
+                    "+25% Bonus included",
+                    "For recurring users",
+                    "Best value for money",
+                    "Access to deep readings"
+                ]
+            },
+            "maestro": {
+                "name": "Master Pack",
+                "features": [
+                    "Get 6,500 Evolution Aura",
+                    "+45% Bonus included",
+                    "Perfect for power users",
+                    "Unlimited zodiac readings",
+                    "Maximum savings per credit"
+                ]
+            },
+            "avatar": {
+                "name": "Avatar of Light",
+                "badge": "WHALE",
+                "features": [
+                    "Get 15,000 Evolution Aura",
+                    "Exclusive Avatar badge",
+                    "Priority support",
+                    "Early access to new AIs",
+                    "The ultimate pack for masters"
+                ]
+            },
+            "amuleto": {
+                "name": "Soul's Path",
+                "duration": "30 days",
+                "badge": "VIP",
+                "features": [
+                    "30 days Premium Subscription",
+                    "Mystic actions cost 50% less",
+                    "300 Aura gift every month",
+                    "x2 Aura gain on Missions",
+                    "Unlimited Deep Dive AI"
+                ]
+            }
+        }
+    },
+    "AstrologyPage": {
+        "title_natal": "Natal Astrology",
+        "chart_title": "Birth Chart for {name}",
+        "location_unknown": "Unknown location",
+        "setup_button": "Configure Natal",
+        "planets_title": "Planets",
+        "houses_title": "Astrological Houses",
+        "house_label": "House {number}",
+        "cusp_label": "Cusp: {degree}°",
+        "no_data_title": "Birth Chart Not Available",
+        "no_data_description": "We need your exact birth date, time and place.",
+        "complete_profile_button": "Complete Profile",
+        "sun": "Sun",
+        "moon": "Moon",
+        "asc": "Asc",
+        "in_sign": "in",
+        "planets": {
+            "Sun": "Sun",
+            "Moon": "Moon",
+            "Mercury": "Mercury",
+            "Venus": "Venus",
+            "Mars": "Mars",
+            "Jupiter": "Jupiter",
+            "Saturn": "Saturn",
+            "Uranus": "Uranus",
+            "Neptune": "Neptune",
+            "Pluto": "Pluto",
+            "Chiron": "Chiron",
+            "Lilith": "Lilith",
+            "North Node": "North Node",
+            "South Node": "South Node",
+            "Rahu": "Rahu",
+            "Ketu": "Ketu",
+            "Ascendant": "Ascendant"
+        }
+    },
+    "NumerologyPage": {
+        "title": "Pythagorean Numerology",
+        "map_vibrational": "Vibrational Map for {name}",
+        "about_title": "About Pythagorean Numerology",
+        "about_desc": "This system uses the Pythagorean method of assigning numerical values to the letters of the Latin alphabet. Each letter vibrates at a frequency from 1 to 9, allowing your name to be transformed into a mathematical sequence that represents your energetic identity.",
+        "input_title": "Enter Your Coordinates",
+        "input_desc": "The system requires your full name and original birth date to decode your frequency.",
+        "fullname_label": "Full Name (as in birth certificate)",
+        "fullname_placeholder": "Your full name...",
+        "birthdate_label": "Birth Date",
+        "calculate_button": "Decode Frequency",
+        "results_title": "Your Energetic Signature",
+        "results_desc": "These are the vibrations that rule your life, your personality, and your soul's deepest longing.",
+        "card_lifepath": "# Life Path",
+        "card_destiny": "# Destiny",
+        "card_soul": "# Soul Urge",
+        "card_personality": "# Personality",
+        "interpretation_title": "System Interpretation",
+        "interpretation_lifepath": "Your **# Life Path ({number})** indicates the path you have come to travel. It is your main luggage and the central lesson of your incarnation.",
+        "interpretation_destiny": "The **# Destiny ({number})** shows your natural talents and how you project yourself towards your goals. It is the tool you work with.",
+        "interpretation_soul": "Your **# Soul Urge ({number})** reveals what really motivates you internally, your most secret longings and what gives you true happiness.",
+        "interpretation_personality": "Finally, your **# Personality ({number})** is the \"interface\" you show to the world, how others perceive you before knowing your depth.",
+        "footer_quote": "\"Numbers do not rule your life, but they reveal the map you came with to navigate it.\"",
+        "recalculate": "Recalculate Coordinates",
+        "essence_label": "Essence: {word}"
+    },
+    "Numerology": {
+        "1": {
+            "title": "Leadership and Initiative",
+            "powerWord": "INITIATOR",
+            "essence": "Independence, ambition, originality and self-sufficiency.",
+            "quote": "I am the cause of my own destiny."
+        },
+        "2": {
+            "title": "Harmony and Cooperation",
+            "powerWord": "COOPERATION",
+            "essence": "Duality, diplomacy, sensitivity and teamwork.",
+            "quote": "In unity lies true strength."
+        },
+        "3": {
+            "title": "Expression and Creativity",
+            "powerWord": "CREATIVITY",
+            "essence": "Communication, optimism, joy and artistic self-expression.",
+            "quote": "Life is a canvas for my expression."
+        },
+        "4": {
+            "title": "Stability and Construction",
+            "powerWord": "STRUCTURE",
+            "essence": "Order, discipline, hard work and solid foundations.",
+            "quote": "I build on foundations of truth."
+        },
+        "5": {
+            "title": "Freedom and Change",
+            "powerWord": "ADVENTURE",
+            "essence": "Versatility, adaptability, curiosity and search for freedom.",
+            "quote": "Change is the only constant."
+        },
+        "6": {
+            "title": "Responsibility and Service",
+            "powerWord": "HARMONY",
+            "essence": "Love, home, family, balance and care for others.",
+            "quote": "I serve the world through love."
+        },
+        "7": {
+            "title": "Wisdom and Introspection",
+            "powerWord": "CONSCIOUSNESS",
+            "essence": "Mental analysis, spirituality, search for truth and creative solitude.",
+            "quote": "I search for the truth beyond the surface."
+        },
+        "8": {
+            "title": "Power and Manifestation",
+            "powerWord": "ACHIEVEMENT",
+            "essence": "Authority, material success, karmic justice and pragmatic ambition.",
+            "quote": "What I sow, I reap with power."
+        },
+        "9": {
+            "title": "Idealism and Humanity",
+            "powerWord": "COMPASIÓN",
+            "essence": "Universalidad, cierre de ciclos, altruismo y sabiduría global.",
+            "quote": "Mi corazón late por la humanidad entera."
+        },
+        "11": {
+            "title": "Spiritual Messenger",
+            "powerWord": "ENLIGHTENMENT",
+            "essence": "Deep intuition, prophetic vision and collective inspiration.",
+            "quote": "I am a channel of light for the world."
+        },
+        "22": {
+            "title": "Master Builder",
+            "powerWord": "MANIFESTATION",
+            "essence": "Ability to materialize great visions for the common good.",
+            "quote": "My dreams become tangible realities."
+        },
+        "33": {
+            "title": "Master Guide",
+            "powerWord": "UNIVERSAL LOVE",
+            "essence": "Healing through unconditional love and elevated spiritual guidance.",
+            "quote": "I lift the world with the purity of my spirit."
+        }
+    },
+    "Onboarding": {
+        "welcome_title": "Welcome to SOS Evolution",
+        "welcome_desc": "You are about to start a journey of deep self-discovery.",
+        "feature_astro": "Precise astrological calculations.",
+        "feature_num": "Evolutionary numerology maps.",
+        "feature_essence": "Interpretations aligned with your essence.",
+        "nickname_label": "How would you like us to call you?",
+        "nickname_placeholder": "Your nickname or preferred name",
+        "nickname_hint": "This name is just to greet you and does not influence technical interpretations.",
+        "next": "Next",
+        "edit_title": "Edit Identity",
+        "identity_title": "Soul Identity",
+        "identity_hint": "All the data below is fundamental for astral and numerological calculation. The precision and efficacy of your results depend directly on the accuracy of this information.",
+        "fullname_label": "Full Name (First and Last Names)",
+        "fullname_placeholder": "Your complete mystic name",
+        "birthdate_label": "Birth Date",
+        "birthtime_label": "Time (Approx)",
+        "gender_label": "Birth Sex",
+        "gender_options": {
+            "masculino": "Male",
+            "femenino": "Female",
+            "intersexual": "Intersex"
+        },
+        "birthplace_label": "Birth Place",
+        "birthplace_placeholder": "City, Country",
+        "confirm": "Confirm",
+        "confirmed": "Confirmed",
+        "security_hint": "Your data is safe and protected.",
+        "syncing": "Syncing...",
+        "save_changes": "Save Changes",
+        "complete_identity": "Complete My Identity",
+        "back": "Back to start",
+        "error_title": "Error",
+        "error_retry": "Retry",
+        "error_hint": "Tip: Check your connection or retry in a few moments."
+    },
+    "Tarot": {
+        "cards": [
+            "The Fool",
+            "The Magician",
+            "The High Priestess",
+            "The Empress",
+            "The Emperor",
+            "The Hierophant",
+            "The Lovers",
+            "The Chariot",
+            "Strength",
+            "The Hermit",
+            "Wheel of Fortune",
+            "Justice",
+            "The Hanged Man",
+            "Death",
+            "Temperance",
+            "The Devil",
+            "The Tower",
+            "The Star",
+            "The Moon",
+            "The Sun",
+            "Judgement",
+            "The World"
+        ]
+    },
+    "TarotPage": {
+        "choose_path": "Choose your <purple>Path</purple>",
+        "choose_path_desc": "Select the type of consultation that resonates with your energy.",
+        "mode_oracle_title": "Soul Mirror",
+        "mode_oracle_desc": "The archetype that your energy needs to integrate today.",
+        "mode_question_title": "Ask the Oracle",
+        "mode_question_desc": "Formulate a question and receive specific guidance.",
+        "mode_classic_title": "Temporal Evolution",
+        "mode_classic_desc": "Past, Present, and Future. The trajectory of your energy.",
+        "one_card": "1 Card",
+        "three_cards": "3 Cards",
+        "new_badge": "New",
+        "question_title": "What's on your mind?",
+        "question_placeholder": "Write your question here...",
+        "cancel": "Cancel",
+        "choose_card": "Choose Card",
+        "channeling": "Channeling {count, plural, =1 {your card} other {your cards}}...",
+        "consulting": "Consulting the oracle...",
+        "message_cosmic": "Your Cosmic Message",
+        "touch_reveal": "{count, plural, =1 {Tap the card to reveal} other {Tap the cards to reveal}}",
+        "reveal_all": "Reveal All",
+        "evolution_title": "Your <purple>Temporal Evolution</purple>",
+        "your_question": "Your Question",
+        "mission": "Mission",
+        "new_reading": "New Reading",
+        "dashboard": "Dashboard",
+        "labels": {
+            "Pasado": "Past",
+            "Presente": "Present",
+            "Futuro": "Future"
+        }
+    }
+}

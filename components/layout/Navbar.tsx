@@ -1,15 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { Sparkles, Home, Layers, BookOpen, Star, Hash } from "lucide-react";
 import AuthButton from "@/components/ui/AuthButton";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
+import { routing } from "@/i18n/routing";
+import LocaleSwitcher from "./LocaleSwitcher";
+
+type Pathname = keyof typeof routing.pathnames;
 
 export default function Navbar({ user, role, profile }: { user: any, role?: string, profile?: any }) {
     const pathname = usePathname();
+    const t = useTranslations('Navbar');
 
     const isActive = (path: string) =>
         pathname === path
@@ -18,20 +23,18 @@ export default function Navbar({ user, role, profile }: { user: any, role?: stri
 
     const isAdmin = role === 'admin';
 
-    const clientItems = [
-        { href: "/dashboard", icon: Home, label: "Inicio" },
-        { href: "/lectura", icon: Layers, label: "Lectura" },
-        { href: "/historial", icon: BookOpen, label: "Diario" },
-        { href: "/astrology", icon: Star, label: "Astrología" },
-        { href: "/numerology", icon: Hash, label: "Numerología" },
-    ];
-
-    const adminItems = [
-        { href: "/admin", icon: Layers, label: "Administrador" },
-        { href: "/dashboard", icon: Home, label: "SOS" },
-    ];
-
-    const navItems = isAdmin ? adminItems : clientItems;
+    const navItems: { href: Pathname, icon: any, label: string }[] = isAdmin
+        ? [
+            { href: "/admin", icon: Layers, label: "Administrador" } as any,
+            { href: "/dashboard", icon: Home, label: "SOS" },
+        ]
+        : [
+            { href: "/dashboard", icon: Home, label: t('home') },
+            { href: "/tarot", icon: Layers, label: t('tarot') },
+            { href: "/historial", icon: BookOpen, label: t('history') },
+            { href: "/astrology", icon: Star, label: t('astrology') },
+            { href: "/numerology", icon: Hash, label: t('numerology') },
+        ];
 
     return (
         <nav className="w-full bg-black/60 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50 transition-all duration-300 supports-[backdrop-filter]:bg-black/40">
@@ -86,6 +89,7 @@ export default function Navbar({ user, role, profile }: { user: any, role?: stri
                 {/* --- USUARIO / SALDOS --- */}
                 <div className="flex items-center gap-4">
                     {user && <CreditsDisplay minimal />}
+                    {!user && <LocaleSwitcher />}
                     <AuthButton user={user} profile={profile} />
                 </div>
 

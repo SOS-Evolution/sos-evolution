@@ -5,8 +5,10 @@ import { Sparkles, Sparkle, Trophy, Coins } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { UserBalance } from "@/types";
+import { useTranslations } from 'next-intl';
 
 export default function CreditsDisplay({ minimal = false }: { minimal?: boolean }) {
+    const t = useTranslations('Dashboard');
     const [balance, setBalance] = useState<number | null>(null);
 
     // Fetch credits
@@ -51,7 +53,7 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
                 <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1 text-purple-300">
                         <Sparkle className="w-3.5 h-3.5" />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">Aura de Evolución</span>
+                        <span className="text-[10px] uppercase tracking-wider font-bold">{t('aura')}</span>
                     </div>
 
                     <div className="flex items-baseline gap-1.5">
@@ -64,7 +66,7 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
                     {/* Indicador visual de que es clickeable */}
                     <div className="mt-4 flex items-center gap-1.5 text-purple-400 group-hover:text-purple-300 transition-colors">
                         <Coins className="w-3.5 h-3.5" />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">Ofrenda Evolutiva - Recarga de aura</span>
+                        <span className="text-[10px] uppercase tracking-wider font-bold">{t('aura')} - Recarga</span>
                     </div>
                 </div>
             </Card>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Check } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 interface TarotDeckProps {
     onSelectCard: (cardIndex: number) => void;
@@ -16,7 +17,6 @@ interface TarotDeckProps {
 
 const DECK_SIZE = 22;
 
-// Tamaño consistente de las cartas - usado en todo el flujo
 export const CARD_SIZE = {
     mobile: { width: 90, height: 135 },
     desktop: { width: 110, height: 165 }
@@ -31,6 +31,7 @@ export default function TarotDeck({
     animatingCards = [],
     fadeOthers = false
 }: TarotDeckProps) {
+    const t = useTranslations('TarotDeck');
     const [isShuffling, setIsShuffling] = useState(true);
     const [internalSelected, setInternalSelected] = useState<number[]>([]);
 
@@ -62,7 +63,14 @@ export default function TarotDeck({
         return () => clearTimeout(timer);
     }, []);
 
-
+    // Detectar móvil para ajustar el abanico
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
 
     const handleCardClick = (cardIndex: number) => {
         if (disabled || isShuffling) return;
@@ -91,20 +99,27 @@ export default function TarotDeck({
         if (isShuffling) {
             return (
                 <span className="flex items-center gap-3">
-                    Barajando el <span className="text-gradient-purple">Destino</span>...
+                    {t.rich('shuffling', {
+                        span: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+                    })}
                 </span>
             );
         }
         if (maxSelections === 1) {
-            return <>Elige una <span className="text-gradient-purple">Carta</span></>;
+            return <>{t.rich('choose_card', {
+                span: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+            })}</>;
         }
         const remaining = maxSelections - currentSelected.length;
         if (remaining === 0) {
-            return <span className="text-gradient-purple">Cartas Seleccionadas</span>;
+            return <span className="text-gradient-purple">{t('selected')}</span>;
         }
         return (
             <>
-                Elige <span className="text-gradient-purple">{remaining}</span> {remaining === 1 ? 'carta' : 'cartas'} más
+                {t.rich('choose_more', {
+                    count: remaining,
+                    span: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+                })}
             </>
         );
     };
@@ -119,7 +134,7 @@ export default function TarotDeck({
                 {getTitle()}
             </motion.h2>
 
-            <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center scale-[0.85] md:scale-100 origin-center">
+            <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center scale-75 md:scale-100 origin-center">
                 <AnimatePresence>
                     {shuffledIndices.map((originalIndex, visualIndex) => {
                         const isSelected = isCardSelected(originalIndex);
@@ -130,7 +145,7 @@ export default function TarotDeck({
                         if (isAnimating) return null;
 
                         // Lógica del abanico
-                        const totalDegrees = 300;
+                        const totalDegrees = isMobile ? 220 : 300; // Reducir arco en móvil
                         const anglePerCard = totalDegrees / (DECK_SIZE - 1);
                         const startRotation = -totalDegrees / 2;
                         const finalRotation = startRotation + (anglePerCard * visualIndex);
@@ -269,8 +284,8 @@ export default function TarotDeck({
                 className="text-slate-500 text-sm text-center italic"
             >
                 {maxSelections > 1
-                    ? "Selecciona las cartas en el orden que te llamen..."
-                    : "La sincronicidad guiará tu mano..."
+                    ? t('select_order')
+                    : t('synchronicity')
                 }
             </motion.p>
         </div>

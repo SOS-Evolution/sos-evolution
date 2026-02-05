@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { LifePathDetails } from "@/lib/soul-math";
+import { useTranslations } from 'next-intl';
 
 interface NumerologyCardProps {
     title: string;
@@ -27,6 +28,7 @@ const glowMap = {
 };
 
 export default function NumerologyCard({ title, details, icon: Icon, delay = 0, color = "purple" }: NumerologyCardProps) {
+    const t = useTranslations('NumerologyPage');
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -53,7 +55,7 @@ export default function NumerologyCard({ title, details, icon: Icon, delay = 0, 
 
                     <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-white/10 uppercase tracking-tighter`}>
-                            Esencia: {details.powerWord}
+                            {t('essence_label', { word: details.powerWord })}
                         </span>
                     </div>
 

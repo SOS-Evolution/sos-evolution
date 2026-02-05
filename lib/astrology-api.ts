@@ -79,8 +79,8 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
 
         const planetsData = await planetsRes.json();
 
-        // Zodiac sign mapping (0-11 index to names)
-        const zodiacs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+        // Zodiac sign mapping (0-11 index to names - using English as base keys for i18n)
+        const zodiacs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
         // Extract planets from the unusual structure
         // The API returns output as an array where the first element is an object with numeric keys
@@ -144,21 +144,21 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
     }
 }
 
-// import { getZodiacSign } from "./soul-math";
-
 // Helper to get dummy data for dev/visual testing if API fails
 export function getMockChartData(details?: BirthDetails): WesternChartData {
-    const sunSign = details ? getZodiacSign(details.date, details.month) : "Aries";
+    const sunSignES = details ? getZodiacSign(details.date, details.month) : "Aries";
+    const signMap: Record<string, string> = {
+        "Aries": "Aries", "Tauro": "Taurus", "Géminis": "Gemini", "Cáncer": "Cancer",
+        "Leo": "Leo", "Virgo": "Virgo", "Libra": "Libra", "Escorpio": "Scorpio",
+        "Sagitario": "Sagittarius", "Capricornio": "Capricorn", "Acuario": "Aquarius", "Piscis": "Pisces"
+    };
+    const sunSign = signMap[sunSignES] || sunSignES;
 
-    // Un cálculo muy aproximado del ascendente basado en la hora (cada 2 horas cambia el signo)
-    // El sol sale en el ascendente al amanecer (aprox 6am)
-    const zodiacs = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+    const zodiacs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
     const sunIndex = zodiacs.indexOf(sunSign);
     const hour = details?.hours ?? 12;
-    // Offset aproximado: a las 6am el Asc e sunIndex, a las 12pm es +3 signos, etc.
-    const ascOffset = Math.floor((hour + 18) % 24 / 2); // Ajuste rústico
+    const ascOffset = Math.floor((hour + 18) % 24 / 2);
     const ascIndex = (sunIndex + ascOffset) % 12;
-    const ascSign = zodiacs[ascIndex];
 
     return {
         planets: [

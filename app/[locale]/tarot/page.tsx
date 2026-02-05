@@ -8,20 +8,21 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Sparkles, RotateCcw, Home, MessageCircleQuestion, ScanEye, Clock } from "lucide-react";
 import { ReadingData } from "@/types";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Input } from "@/components/ui/input";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type ReadingMode = "oracle" | "question" | "classic"; // classic = 3 cartas
 type Step = "selection" | "question_input" | "card_selection" | "reveal" | "reading";
-
-// Etiquetas para la tirada de 3 cartas
-const CLASSIC_LABELS = ["Pasado", "Presente", "Futuro"];
 
 interface CardReadingData extends ReadingData {
   position?: string; // Para tiradas multi-carta
 }
 
 export default function ReadingPage() {
+  const params = useParams();
+  const t = useTranslations("TarotPage");
   const [step, setStep] = useState<Step>("selection");
   const [selectedMode, setSelectedMode] = useState<ReadingMode>("oracle");
   const [question, setQuestion] = useState("");
@@ -30,6 +31,9 @@ export default function ReadingPage() {
   const [readingData, setReadingData] = useState<CardReadingData[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
+
+  // Etiquetas para la tirada de 3 cartas (enviadas a la API)
+  const CLASSIC_LABELS_KEYS = ["Pasado", "Presente", "Futuro"];
 
   // Número de cartas según el modo
   const getMaxCards = useCallback(() => {
@@ -68,8 +72,6 @@ export default function ReadingPage() {
     setRevealedCards(new Array(cards.length).fill(false));
 
     try {
-      // Para tirada clásica, hacer múltiples llamadas a la API o una sola
-      // Por ahora hacemos una llamada por carta
       const readings: CardReadingData[] = [];
 
       for (let i = 0; i < cards.length; i++) {
@@ -81,20 +83,20 @@ export default function ReadingPage() {
             question: question || null,
             cardIndex: cardIndex,
             readingTypeCode: selectedMode === "classic" ? "classic" : "general",
-            position: selectedMode === "classic" ? CLASSIC_LABELS[i] : undefined
+            position: selectedMode === "classic" ? CLASSIC_LABELS_KEYS[i] : undefined,
+            locale: params.locale
           })
         });
 
         const data = await response.json();
         readings.push({
           ...data,
-          position: selectedMode === "classic" ? CLASSIC_LABELS[i] : undefined
+          position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[i]}`) : undefined
         });
       }
 
       setReadingData(readings);
 
-      // Pequeña pausa antes de mostrar las cartas para revelar
       setTimeout(() => {
         setStep("reveal");
         setIsLoading(false);
@@ -114,7 +116,6 @@ export default function ReadingPage() {
     newRevealed[index] = true;
     setRevealedCards(newRevealed);
 
-    // Si todas las cartas están reveladas, pasar a reading
     if (newRevealed.every(r => r)) {
       setTimeout(() => setStep("reading"), 800);
     }
@@ -161,10 +162,12 @@ export default function ReadingPage() {
                 className="w-full text-center"
               >
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
-                  Elige tu <span className="text-gradient-purple">Camino</span>
+                  {t.rich('choose_path', {
+                    purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+                  }) as any}
                 </h1>
                 <p className="text-slate-400 mb-12 max-w-lg mx-auto">
-                  Selecciona el tipo de consulta que resuene con tu energía.
+                  {t('choose_path_desc')}
                 </p>
 
                 <div className="grid md:grid-cols-3 gap-6 w-full max-w-3xl mx-auto">
@@ -176,12 +179,12 @@ export default function ReadingPage() {
                         <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <ScanEye className="w-7 h-7 text-purple-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Espejo del Alma</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_oracle_title')}</h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                          El arquetipo que tu energía necesita integrar hoy.
+                          {t('mode_oracle_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
-                          <span className="text-purple-400 text-xs font-bold">1 Carta</span>
+                          <span className="text-purple-400 text-xs font-bold">{t('one_card')}</span>
                           <span className="text-purple-400 text-sm font-bold uppercase tracking-wider">➜</span>
                         </div>
                       </div>
@@ -195,12 +198,12 @@ export default function ReadingPage() {
                         <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <MessageCircleQuestion className="w-7 h-7 text-cyan-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Pregunta al Oráculo</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_question_title')}</h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                          Formula una pregunta y recibe guía específica.
+                          {t('mode_question_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
-                          <span className="text-cyan-400 text-xs font-bold">1 Carta</span>
+                          <span className="text-cyan-400 text-xs font-bold">{t('one_card')}</span>
                           <span className="text-cyan-400 text-sm font-bold uppercase tracking-wider">➜</span>
                         </div>
                       </div>
@@ -213,17 +216,17 @@ export default function ReadingPage() {
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
                         {/* Badge NEW */}
                         <div className="absolute top-2 right-2 bg-amber-500 text-[10px] text-black font-bold px-2 py-0.5 rounded-full uppercase">
-                          Nuevo
+                          {t('new_badge')}
                         </div>
                         <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <Clock className="w-7 h-7 text-amber-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Evolución Temporal</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_classic_title')}</h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                          Pasado, Presente y Futuro. La trayectoria de tu energía.
+                          {t('mode_classic_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
-                          <span className="text-amber-400 text-xs font-bold">3 Cartas</span>
+                          <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
                           <span className="text-amber-400 text-sm font-bold uppercase tracking-wider">➜</span>
                         </div>
                       </div>
@@ -246,20 +249,20 @@ export default function ReadingPage() {
                 <div className="inline-flex p-4 rounded-full bg-cyan-900/20 mb-6">
                   <MessageCircleQuestion className="w-8 h-8 text-cyan-400" />
                 </div>
-                <h2 className="text-3xl font-serif font-bold text-white mb-6">¿Qué inquietud tienes?</h2>
+                <h2 className="text-3xl font-serif font-bold text-white mb-6">{t('question_title')}</h2>
 
                 <form onSubmit={handleQuestionSubmit} className="space-y-6">
                   <Input
                     autoFocus
-                    placeholder="Escribe tu pregunta aquí..."
+                    placeholder={t('question_placeholder')}
                     className="bg-slate-900/50 border-purple-500/30 h-14 text-lg text-center rounded-xl focus:ring-purple-500/50"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                   />
                   <div className="flex gap-3">
-                    <Button type="button" variant="ghost" onClick={() => setStep("selection")} className="flex-1">Cancelar</Button>
+                    <Button type="button" variant="ghost" onClick={() => setStep("selection")} className="flex-1">{t('cancel')}</Button>
                     <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold" disabled={!question.trim()}>
-                      Elegir Carta
+                      {t('choose_card')}
                     </Button>
                   </div>
                 </form>
@@ -294,7 +297,7 @@ export default function ReadingPage() {
                 className="flex flex-col items-center gap-8"
               >
                 <p className="text-purple-300 font-serif text-xl">
-                  Canalizando {selectedCards.length > 1 ? "tus cartas" : "tu carta"}...
+                  {t('channeling', { count: selectedCards.length })}
                 </p>
 
                 {/* Cartas seleccionadas animándose */}
@@ -318,7 +321,7 @@ export default function ReadingPage() {
                     >
                       {selectedCards.length > 1 && (
                         <span className="text-xs font-bold uppercase tracking-widest text-purple-400">
-                          {CLASSIC_LABELS[i]}
+                          {t(`labels.${CLASSIC_LABELS_KEYS[i]}`)}
                         </span>
                       )}
                       {/* Carta con glow pulsante */}
@@ -359,7 +362,7 @@ export default function ReadingPage() {
                   transition={{ duration: 1.5, repeat: Infinity }}
                   className="text-sm text-slate-500"
                 >
-                  Consultando el oráculo...
+                  {t('consulting')}
                 </motion.div>
               </motion.div>
             )}
@@ -375,10 +378,8 @@ export default function ReadingPage() {
               >
                 <p className="text-sm text-slate-500 uppercase tracking-widest">
                   {revealedCards.every(r => r)
-                    ? "Tu Mensaje Cósmico"
-                    : selectedCards.length > 1
-                      ? "Toca las cartas para revelar"
-                      : "Toca la carta para revelar"
+                    ? t('message_cosmic')
+                    : t('touch_reveal', { count: selectedCards.length })
                   }
                 </p>
 
@@ -397,7 +398,7 @@ export default function ReadingPage() {
                         isRevealed={revealedCards[i]}
                         onClick={() => handleRevealCard(i)}
                         cardName={readingData[i]?.cardName || DECK[cardIndex]}
-                        label={selectedCards.length > 1 ? CLASSIC_LABELS[i] : undefined}
+                        label={selectedCards.length > 1 ? t(`labels.${CLASSIC_LABELS_KEYS[i]}`) : undefined}
                       />
                     </motion.div>
                   ))}
@@ -415,7 +416,7 @@ export default function ReadingPage() {
                       className="bg-purple-600/50 hover:bg-purple-600 text-white"
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
-                      Revelar Todas
+                      {t('reveal_all')}
                     </Button>
                   </motion.div>
                 )}
@@ -435,7 +436,9 @@ export default function ReadingPage() {
                 {/* Título para tirada de 3 cartas */}
                 {selectedCards.length > 1 && (
                   <h2 className="text-2xl md:text-3xl font-serif font-bold text-white text-center mb-8">
-                    Tu <span className="text-gradient-purple">Evolución Temporal</span>
+                    {t.rich('evolution_title', {
+                      purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+                    }) as any}
                   </h2>
                 )}
 
@@ -468,7 +471,7 @@ export default function ReadingPage() {
                           {/* Pregunta Contextual */}
                           {question && (
                             <div className="mb-4 pb-3 border-b border-white/5">
-                              <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Tu Pregunta</p>
+                              <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">{t('your_question')}</p>
                               <p className="text-slate-300 italic text-sm">"{question}"</p>
                             </div>
                           )}
@@ -493,7 +496,7 @@ export default function ReadingPage() {
                           </p>
 
                           <div className="p-4 bg-gradient-to-r from-purple-900/30 to-slate-900/50 rounded-xl border border-purple-500/30">
-                            <p className="text-xs text-purple-400 font-bold mb-1 uppercase tracking-wider">⚡ Misión</p>
+                            <p className="text-xs text-purple-400 font-bold mb-1 uppercase tracking-wider">⚡ {t('mission')}</p>
                             <p className="text-xs text-slate-200 italic leading-relaxed">"{readingData[0]?.action}"</p>
                           </div>
                         </div>
@@ -516,7 +519,7 @@ export default function ReadingPage() {
                           className="flex flex-col items-center gap-2"
                         >
                           <span className="text-xs font-bold uppercase tracking-widest text-purple-400">
-                            {CLASSIC_LABELS[i]}
+                            {t(`labels.${CLASSIC_LABELS_KEYS[i]}`)}
                           </span>
                           <div className="scale-[0.7] md:scale-[0.85]">
                             <TarotCard
@@ -569,7 +572,7 @@ export default function ReadingPage() {
                               </p>
 
                               <div className="p-3 bg-gradient-to-r from-purple-900/30 to-slate-900/50 rounded-lg border border-purple-500/30">
-                                <p className="text-[10px] text-purple-400 font-bold mb-1 uppercase tracking-wider">⚡ Misión</p>
+                                <p className="text-[10px] text-purple-400 font-bold mb-1 uppercase tracking-wider">⚡ {t('mission')}</p>
                                 <p className="text-[10px] text-slate-200 italic leading-relaxed">"{reading.action}"</p>
                               </div>
                             </div>
@@ -584,12 +587,12 @@ export default function ReadingPage() {
                 <div className="flex gap-3 mt-8 justify-center">
                   <Button variant="ghost" className="text-slate-400 hover:text-white" onClick={resetReading}>
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Nueva Lectura
+                    {t('new_reading')}
                   </Button>
                   <Link href="/dashboard">
                     <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                       <Home className="w-4 h-4 mr-2" />
-                      Dashboard
+                      {t('dashboard')}
                     </Button>
                   </Link>
                 </div>

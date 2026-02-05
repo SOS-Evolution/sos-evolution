@@ -11,25 +11,29 @@ interface AstrologyWheelProps {
     size?: number;
 }
 
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+
 const ZODIAC_SIGNS = [
     { name: "Aries", symbol: "♈", color: "#ef4444" },
-    { name: "Tauro", symbol: "♉", color: "#f59e0b" },
-    { name: "Géminis", symbol: "♊", color: "#10b981" },
-    { name: "Cáncer", symbol: "♋", color: "#3b82f6" },
+    { name: "Taurus", symbol: "♉", color: "#f59e0b" },
+    { name: "Gemini", symbol: "♊", color: "#10b981" },
+    { name: "Cancer", symbol: "♋", color: "#3b82f6" },
     { name: "Leo", symbol: "♌", color: "#fbbf24" },
     { name: "Virgo", symbol: "♍", color: "#059669" },
     { name: "Libra", symbol: "♎", color: "#ec4899" },
-    { name: "Escorpio", symbol: "♏", color: "#991b1b" },
-    { name: "Sagitario", symbol: "♐", color: "#a855f7" },
-    { name: "Capricornio", symbol: "♑", color: "#64748b" },
-    { name: "Acuario", symbol: "♒", color: "#2563eb" },
-    { name: "Piscis", symbol: "♓", color: "#6366f1" },
+    { name: "Scorpio", symbol: "♏", color: "#991b1b" },
+    { name: "Sagittarius", symbol: "♐", color: "#a855f7" },
+    { name: "Capricorn", symbol: "♑", color: "#64748b" },
+    { name: "Aquarius", symbol: "♒", color: "#2563eb" },
+    { name: "Pisces", symbol: "♓", color: "#6366f1" },
 ];
-
-import { useState, useEffect } from "react";
 
 export default function AstrologyWheel({ planets, houses, size = 500 }: AstrologyWheelProps) {
     const [mounted, setMounted] = useState(false);
+    const t = useTranslations('AstrologyPage');
+    const tz = useTranslations('Zodiac');
+
     useEffect(() => { setMounted(true); }, []);
 
     const radius = size / 2;
@@ -75,6 +79,7 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
 
                     return (
                         <g key={sign.name} className="group">
+                            <title>{tz(sign.name)}</title>
                             <path
                                 d={d}
                                 fill="rgba(15, 23, 42, 0.4)"
@@ -137,7 +142,9 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                                     <PlanetIcon name={planet.name} size={28} />
                                 </g>
 
-                                <title>{planet.name} en {planet.sign} ({planet.normDegree.toFixed(1)}°)</title>
+                                <title>
+                                    {t.rich(`planets.${planet.name}`, { fallback: () => planet.name }) as any} {t('in_sign')} {tz.rich(planet.sign, { fallback: () => planet.sign }) as any} ({planet.normDegree.toFixed(1)}°)
+                                </title>
                             </g>
                         </motion.g>
                     );

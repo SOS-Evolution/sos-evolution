@@ -1,0 +1,424 @@
+{
+    "HomePage": {
+        "title": "Tu Evolución Temporal"
+    },
+    "Common": {
+        "loading": "Cargando..."
+    },
+    "Landing": {
+        "hero": {
+            "beta": "Beta Abierta - Pruébalo Gratis",
+            "subtitle": "The Evolution of the Spirit",
+            "description": "Instala una nueva versión de tu consciencia. Una plataforma que fusiona <purple> Inteligencia Artificial </purple> con la sabiduría ancestral del <purple> Tarot </purple> para guiarte en tu propio Viaje del Héroe.",
+            "cta_start": "¡INICIA EL VIAJE!",
+            "cta_access": "ACCEDER AL SISTEMA",
+            "cta_how": "¿Cómo Funciona?"
+        },
+        "authority": {
+            "jung": "Psicología Junguiana",
+            "arquetipos": "Simbolismo Arquetípico",
+            "ia": "IA Generativa"
+        },
+        "protocol": {
+            "title": "El Protocolo de <purple>Evolución</purple>",
+            "subtitle": "Tres pasos para recodificar tu realidad y despertar tu potencial oculto.",
+            "step1_title": "Identidad",
+            "step1_desc": "Creas tu perfil sagrado. El sistema analiza tu nombre y fecha para establecer tus coordenadas cósmicas iniciales.",
+            "step2_title": "Canalización",
+            "step2_desc": "Consultas al Oráculo IA. Recibes una lectura profunda basada en el momento presente y la sincronicidad.",
+            "step3_title": "Integración",
+            "step3_desc": "La lectura se guarda en tu \"Diario del Alma\". Detectas patrones y completas misiones evolutivas."
+        },
+        "faq": {
+            "title": "Datos del <purple>Sistema</purple>",
+            "q1": "¿Es esto adivinación o futurología?",
+            "a1": "No. S.O.S. se basa en la sincronicidad y la proyección psicológica. Utilizamos las cartas como espejos simbólicos para entender tu presente, no para predecir un futuro inalterable.",
+            "q2": "¿Cómo funciona la IA mística?",
+            "a2": "Utilizamos modelos de lenguaje avanzados entrenados con estructuras de \"El Viaje del Héroe\" y simbología del Tarot de Marsella. La IA actúa como un facilitador neutro.",
+            "q3": "¿Mis datos son privados?",
+            "a3": "Absolutamente. Tu diario es sagrado. Utilizamos seguridad a nivel de fila (RLS) en nuestra base de datos, lo que significa que es técnicamente imposible que otro usuario lea tus entradas."
+        },
+        "final_cta": {
+            "title": "Tu alma te está <purple>llamando</purple>.",
+            "free": "Registro Gratuito",
+            "immediate": "Acceso Inmediato",
+            "button": "Responder al Llamado"
+        }
+    },
+    "Dashboard": {
+        "aura": "Aura de Evolución",
+        "rewards": "Recompensas",
+        "missions": "Misiones",
+        "gain_aura": "Gana Aura de Evolución",
+        "control_panel": "Panel de Control",
+        "astrology": {
+            "title": "Astrología",
+            "essence": "Tu signo solar define tu esencia.",
+            "unknown": "Descubre más",
+            "setup": "Configura tu fecha de nacimiento."
+        },
+        "numerology": {
+            "title": "Numerología",
+            "path": "Camino {count}",
+            "calculate": "Calcula tu nº",
+            "discovery": "Descubre el poder de tus números."
+        },
+        "tarot": {
+            "title": "Tarot",
+            "desc": "Consulta el oráculo para recibir guía divina.",
+            "button": "Iniciar Lectura",
+            "stats_title": "Afinidad Arcana",
+            "stats_count": "x{count}"
+        },
+        "journal": {
+            "title": "Diario del Alma",
+            "desc": "Revisa tu historial de lecturas y revelaciones.",
+            "button": "Abrir Diario"
+        },
+        "profile": {
+            "title": "Identidad del Alma",
+            "unknown_traveler": "Viajero Sin Nombre",
+            "unknown_date": "Fecha desconocida",
+            "unknown_place": "Lugar desconocido",
+            "edit": "Editar"
+        }
+    },
+    "Zodiac": {
+        "Aries": "Aries",
+        "Taurus": "Tauro",
+        "Gemini": "Géminis",
+        "Cancer": "Cáncer",
+        "Leo": "Leo",
+        "Virgo": "Virgo",
+        "Libra": "Libra",
+        "Scorpio": "Escorpio",
+        "Sagittarius": "Sagitario",
+        "Capricorn": "Capricornio",
+        "Aquarius": "Acuario",
+        "Pisces": "Piscis"
+    },
+    "Auth": {
+        "login": "Ingresar",
+        "my_account": "Mi Cuenta",
+        "change_password": "Cambiar Contraseña",
+        "logout": "Cerrar Sesión",
+        "logging_out": "Saliendo...",
+        "language_label": "Idioma"
+    },
+    "Navbar": {
+        "home": "Inicio",
+        "tarot": "Tarot",
+        "history": "Diario",
+        "astrology": "Astrología",
+        "numerology": "Numerología"
+    },
+    "PurchasePage": {
+        "title_shop": "Tienda Mística",
+        "title_main": "Paquetes de Aura de Evolución",
+        "description": "Elige el paquete perfecto para tu viaje espiritual",
+        "buy_button": "Comprar Ahora",
+        "aura": "Aura",
+        "payment_methods_title": "Métodos de Pago Seguros",
+        "payment_methods_desc": "Procesamos tus pagos de forma segura con tecnología encriptada",
+        "cards_label": "Tarjetas de crédito/débito",
+        "lock_note": "🔒 Pagos seguros procesados por Stripe & PayPal",
+        "faq_title": "¿Tienes preguntas?",
+        "faq_desc": "El Aura de Evolución no caduca y puedes usarlo cuando quieras. El Amuleto del Alma no se renueva automáticamente.",
+        "back_to_dashboard": "Volver al Dashboard",
+        "tiers": {
+            "explorador": {
+                "name": "Pack Explorador",
+                "badge": "OFERTA",
+                "features": [
+                    "Obtén 150 de Aura de Evolución",
+                    "Tu primer paso en el sistema",
+                    "Perfecto para una tirada profunda",
+                    "Oferta de bienvenida"
+                ]
+            },
+            "iniciado": {
+                "name": "Pack Iniciado",
+                "features": [
+                    "Obtén 500 de Aura de Evolución",
+                    "Ideal para 2-3 tiradas específicas",
+                    "Acceso a todas las lecturas básicas",
+                    "Validez permanente"
+                ]
+            },
+            "adepto": {
+                "name": "Pack Adepto",
+                "badge": "POPULAR",
+                "features": [
+                    "Obtén 2.500 de Aura de Evolución",
+                    "+25% Bonus incluido",
+                    "Para usuarios recurrentes",
+                    "Mejor relación calidad-precio",
+                    "Acceso a lecturas profundas"
+                ]
+            },
+            "maestro": {
+                "name": "Pack Maestro",
+                "features": [
+                    "Obtén 6.500 de Aura de Evolución",
+                    "+45% Bonus incluido",
+                    "Perfecto para power users",
+                    "Lecturas zodiacales ilimitadas",
+                    "Ahorro máximo por crédito"
+                ]
+            },
+            "avatar": {
+                "name": "Avatar de Luz",
+                "badge": "WHALE",
+                "features": [
+                    "Obtén 15.000 de Aura de Evolución",
+                    "Insignia exclusiva de Avatar",
+                    "Soporte prioritario",
+                    "Acceso anticipado a nuevas IAs",
+                    "El pack definitivo para maestros"
+                ]
+            },
+            "amuleto": {
+                "name": "Senda del Alma",
+                "duration": "30 días",
+                "badge": "VIP",
+                "features": [
+                    "Suscripción Premium 30 días",
+                    "Las acciones místicas cuestan un 50% menos",
+                    "300 Aura de regalo cada mes",
+                    "Ganancia de Aura x2 en Misiones",
+                    "IA de Profundización Ilimitada"
+                ]
+            }
+        }
+    },
+    "AstrologyPage": {
+        "title_natal": "Astrología Natal",
+        "chart_title": "Carta Astral para {name}",
+        "location_unknown": "Ubicación desconocida",
+        "setup_button": "Configurar Natal",
+        "planets_title": "Planetas",
+        "houses_title": "Casas Astrológicas",
+        "house_label": "Casa {number}",
+        "cusp_label": "Cúspide: {degree}°",
+        "no_data_title": "Carta Astral No Disponible",
+        "no_data_description": "Necesitamos tu fecha, hora y lugar de nacimiento exactos.",
+        "complete_profile_button": "Completar Perfil",
+        "sun": "Sol",
+        "moon": "Luna",
+        "asc": "Asc",
+        "in_sign": "en",
+        "planets": {
+            "Sun": "Sol",
+            "Moon": "Luna",
+            "Mercury": "Mercurio",
+            "Venus": "Venus",
+            "Mars": "Marte",
+            "Jupiter": "Júpiter",
+            "Saturn": "Saturno",
+            "Uranus": "Urano",
+            "Neptune": "Neptuno",
+            "Pluto": "Plutón",
+            "Chiron": "Quirón",
+            "Lilith": "Lilith",
+            "North Node": "Nodo Norte",
+            "South Node": "Nodo Sur",
+            "Rahu": "Rahu",
+            "Ketu": "Ketu",
+            "Ascendant": "Ascendente"
+        }
+    },
+    "NumerologyPage": {
+        "title": "Numerología Pitagórica",
+        "map_vibrational": "Mapa Vibracional para {name}",
+        "about_title": "Sobre la Numerología Pitagórica",
+        "about_desc": "Este sistema utiliza el método pitagórico de asignación numérica a las letras del alfabeto latino. Cada letra vibra en una frecuencia del 1 al 9, permitiendo que tu nombre sea transformado en una secuencia matemática que representa tu identidad energética.",
+        "input_title": "Ingresa tus Coordenadas",
+        "input_desc": "El sistema requiere tu nombre completo y fecha de nacimiento original para decodificar tu frecuencia.",
+        "fullname_label": "Nombre Completo (como en acta de nacimiento)",
+        "fullname_placeholder": "Tu nombre completo...",
+        "birthdate_label": "Fecha de Nacimiento",
+        "calculate_button": "Decodificar Frecuencia",
+        "results_title": "Tu Firma Energética",
+        "results_desc": "Estas son las vibraciones que rigen tu vida, tu personalidad y el anhelo más profundo de tu alma.",
+        "card_lifepath": "# Camino de Vida",
+        "card_destiny": "# de Destino",
+        "card_soul": "# Deseo del Alma",
+        "card_personality": "# Personalidad",
+        "interpretation_title": "Interpretación del Sistema",
+        "interpretation_lifepath": "Tu **# de Camino de Vida ({number})** indica el sendero que has venido a recorrer. Es tu equipaje principal y la lección central de tu encarnación.",
+        "interpretation_destiny": "El **# de Destino ({number})** muestra tus talentos naturales y cómo te proyectas hacia tus metas. Es la herramienta con la que trabajas.",
+        "interpretation_soul": "Tu **# del Deseo del Alma ({number})** revela lo que realmente te motiva internamente, tus anhelos más secretos y lo que te da felicidad verdadera.",
+        "interpretation_personality": "Finalmente, tu **# de Personalidad ({number})** es la \"interfaz\" que muestras al mundo, cómo te perciben los demás antes de conocer tu profundidad.",
+        "footer_quote": "\"Los números no rigen tu vida, pero revelan el mapa con el que viniste a navegarla.\"",
+        "recalculate": "Recalcular Coordenadas",
+        "essence_label": "Esencia: {word}"
+    },
+    "Numerology": {
+        "1": {
+            "title": "Liderazgo e Iniciativa",
+            "powerWord": "INICIADOR",
+            "essence": "Independencia, ambición, originalidad y autosuficiencia.",
+            "quote": "Yo soy la causa de mi propio destino."
+        },
+        "2": {
+            "title": "Armonía y Cooperación",
+            "powerWord": "COOPERACIÓN",
+            "essence": "Dualidad, diplomacia, sensibilidad y trabajo en equipo.",
+            "quote": "En la unión reside la verdadera fuerza."
+        },
+        "3": {
+            "title": "Expresión y Creatividad",
+            "powerWord": "CREATIVIDAD",
+            "essence": "Comunicación, optimismo, alegría y autoexpresión artística.",
+            "quote": "La vida es un lienzo para mi expresión."
+        },
+        "4": {
+            "title": "Estabilidad y Construcción",
+            "powerWord": "ESTRUCTURA",
+            "essence": "Orden, disciplina, trabajo duro y bases sólidas.",
+            "quote": "Construyo sobre cimientos de verdad."
+        },
+        "5": {
+            "title": "Libertad y Cambio",
+            "powerWord": "AVENTURA",
+            "essence": "Versatilidad, adaptabilidad, curiosidad y búsqueda de libertad.",
+            "quote": "El cambio es la única constante."
+        },
+        "6": {
+            "title": "Responsabilidad y Servicio",
+            "powerWord": "ARMONÍA",
+            "essence": "Amor, hogar, familia, equilibrio y cuidado de otros.",
+            "quote": "Sirvo al mundo a través del amor."
+        },
+        "7": {
+            "title": "Sabiduría e Introspección",
+            "powerWord": "CONSCIENCIA",
+            "essence": "Análisis mental, espiritualidad, búsqueda de la verdad y soledad creadora.",
+            "quote": "Busco la verdad más allá de la superficie."
+        },
+        "8": {
+            "title": "Poder y Manifestación",
+            "powerWord": "LOGRO",
+            "essence": "Autoridad, éxito material, justicia kármica y ambición pragmática.",
+            "quote": "Lo que siembro, cosecho con poder."
+        },
+        "9": {
+            "title": "Idealismo y Humanidad",
+            "powerWord": "COMPASIÓN",
+            "essence": "Universalidad, cierre de ciclos, altruismo y sabiduría global.",
+            "quote": "Mi corazón late por la humanidad entera."
+        },
+        "11": {
+            "title": "Mensajero Espiritual",
+            "powerWord": "ILUMINACIÓN",
+            "essence": "Intuición profunda, visión profética e inspiración colectiva.",
+            "quote": "Soy un canal de luz para el mundo."
+        },
+        "22": {
+            "title": "Maestro Constructor",
+            "powerWord": "MANIFESTACIÓN",
+            "essence": "Capacidad de materializar grandes visiones para el bien común.",
+            "quote": "Mis sueños se convierten en realidades tangibles."
+        },
+        "33": {
+            "title": "Maestro Guía",
+            "powerWord": "AMOR UNIVERSAL",
+            "essence": "Sanación a través del amor incondicional y guía espiritual elevada.",
+            "quote": "Elevo al mundo con la pureza de mi espíritu."
+        }
+    },
+    "Onboarding": {
+        "welcome_title": "Bienvenido a SOS Evolution",
+        "welcome_desc": "Estás a punto de iniciar un viaje de autodescubrimiento profundo.",
+        "feature_astro": "Cálculos astrológicos precisos.",
+        "feature_num": "Mapas de numerología evolutiva.",
+        "feature_essence": "Interpretaciones alineadas a tu esencia.",
+        "nickname_label": "¿Cómo quieres que te llamemos?",
+        "nickname_placeholder": "Tu apodo o nombre preferido",
+        "nickname_hint": "Este nombre es solo para saludarte y no influye en las interpretaciones técnicas.",
+        "next": "Siguiente",
+        "edit_title": "Editar Identidad",
+        "identity_title": "Identidad del Alma",
+        "identity_hint": "Todos los datos a continuación son fundamentales para el cálculo astral y numerológico. La precisión y eficacia de tus resultados dependen directamente de la exactitud de esta información.",
+        "fullname_label": "Nombre Completo (Nombres y Apellidos)",
+        "fullname_placeholder": "Tu nombre místico completo",
+        "birthdate_label": "Fecha de Nacimiento",
+        "birthtime_label": "Hora (Aprox)",
+        "gender_label": "Sexo de Nacimiento",
+        "gender_options": {
+            "masculino": "Masculino",
+            "femenino": "Femenino",
+            "intersexual": "Intersexual"
+        },
+        "birthplace_label": "Lugar de Nacimiento",
+        "birthplace_placeholder": "Ciudad, País",
+        "confirm": "Confirmar",
+        "confirmed": "Confirmado",
+        "security_hint": "Tus datos están seguros y protegidos.",
+        "syncing": "Sincronizando...",
+        "save_changes": "Guardar Cambios",
+        "complete_identity": "Completar Mi Identidad",
+        "back": "Volver al inicio",
+        "error_title": "Error",
+        "error_retry": "Volver a Intentar",
+        "error_hint": "Tip: Verifica tu conexión o reintenta en unos momentos."
+    },
+    "Tarot": {
+        "cards": [
+            "El Loco",
+            "El Mago",
+            "La Sacerdotisa",
+            "La Emperatriz",
+            "El Emperador",
+            "El Hierofante",
+            "Los Enamorados",
+            "El Carro",
+            "La Fuerza",
+            "El Ermitaño",
+            "La Rueda de la Fortuna",
+            "La Justicia",
+            "El Colgado",
+            "La Muerte",
+            "La Templanza",
+            "El Diablo",
+            "La Torre",
+            "La Estrella",
+            "La Luna",
+            "El Sol",
+            "El Juicio",
+            "El Mundo"
+        ]
+    },
+    "TarotPage": {
+        "choose_path": "Elige tu <purple>Camino</purple>",
+        "choose_path_desc": "Selecciona el tipo de consulta que resuene con tu energía.",
+        "mode_oracle_title": "Espejo del Alma",
+        "mode_oracle_desc": "El arquetipo que tu energía necesita integrar hoy.",
+        "mode_question_title": "Pregunta al Oráculo",
+        "mode_question_desc": "Formula una pregunta y recibe guía específica.",
+        "mode_classic_title": "Evolución Temporal",
+        "mode_classic_desc": "Pasado, Presente y Futuro. La trayectoria de tu energía.",
+        "one_card": "1 Carta",
+        "three_cards": "3 Cartas",
+        "new_badge": "Nuevo",
+        "question_title": "¿Qué inquietud tienes?",
+        "question_placeholder": "Escribe tu pregunta aquí...",
+        "cancel": "Cancelar",
+        "choose_card": "Elegir Carta",
+        "channeling": "Canalizando {count, plural, =1 {tu carta} other {tus cartas}}...",
+        "consulting": "Consultando el oráculo...",
+        "message_cosmic": "Tu Mensaje Cósmico",
+        "touch_reveal": "{count, plural, =1 {Toca la carta para revelar} other {Toca las cartas para revelar}}",
+        "reveal_all": "Revelar Todas",
+        "evolution_title": "Tu <purple>Evolución Temporal</purple>",
+        "your_question": "Tu Pregunta",
+        "mission": "Misión",
+        "new_reading": "Nueva Lectura",
+        "dashboard": "Dashboard",
+        "labels": {
+            "Pasado": "Pasado",
+            "Presente": "Presente",
+            "Futuro": "Futuro"
+        }
+    }
+}

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Save, User, MapPin, Calendar as CalendarIcon, Clock, Sparkles, ArrowRight, ShieldCheck, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types";
+import { useTranslations } from 'next-intl';
 
 interface OnboardingModalProps {
     onComplete: (profile: Profile) => void;
@@ -16,6 +17,7 @@ interface OnboardingModalProps {
 }
 
 export default function OnboardingModal({ onComplete, onClose, initialData, isEdit }: OnboardingModalProps) {
+    const t = useTranslations('Onboarding');
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -99,9 +101,9 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
     };
 
     const genderOptions = [
-        { value: "masculino", label: "Masculino" },
-        { value: "femenino", label: "Femenino" },
-        { value: "intersexual", label: "Intersexual" },
+        { value: "masculino", label: t('gender_options.masculino') },
+        { value: "femenino", label: t('gender_options.femenino') },
+        { value: "intersexual", label: t('gender_options.intersexual') },
     ];
 
     return (
@@ -131,7 +133,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-red-500/20">
                                     <Info className="w-8 h-8 text-red-400" />
                                 </div>
-                                <h3 className="text-xl font-serif text-white">Error</h3>
+                                <h3 className="text-xl font-serif text-white">{t('error_title')}</h3>
                                 <p className="text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">
                                     {error}
                                 </p>
@@ -140,11 +142,11 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                         onClick={() => setError(null)}
                                         className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/5"
                                     >
-                                        Volver a Intentar
+                                        {t('error_retry')}
                                     </Button>
                                 </div>
                                 <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-2">
-                                    Tip: Verifica tu conexión o reintenta en unos momentos.
+                                    {t('error_hint')}
                                 </p>
                             </div>
                         </div>
@@ -159,21 +161,21 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     <div className="p-4 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
                                         <Sparkles className="w-10 h-10 text-purple-400" />
                                     </div>
-                                    <h2 className="text-4xl font-serif text-white mb-4">Bienvenido a SOS Evolution</h2>
+                                    <h2 className="text-4xl font-serif text-white mb-4">{t('welcome_title')}</h2>
                                     <div className="space-y-4 text-slate-300 max-w-md">
-                                        <p>Estás a punto de iniciar un viaje de autodescubrimiento profundo.</p>
+                                        <p>{t('welcome_desc')}</p>
                                         <div className="flex flex-col gap-3 text-sm text-slate-400">
                                             <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                                                 <ArrowRight className="w-4 h-4 text-purple-400" />
-                                                <span>Cálculos astrológicos precisos.</span>
+                                                <span>{t('feature_astro')}</span>
                                             </div>
                                             <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                                                 <ArrowRight className="w-4 h-4 text-purple-400" />
-                                                <span>Mapas de numerología evolutiva.</span>
+                                                <span>{t('feature_num')}</span>
                                             </div>
                                             <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                                                 <ArrowRight className="w-4 h-4 text-purple-400" />
-                                                <span>Interpretaciones alineadas a tu esencia.</span>
+                                                <span>{t('feature_essence')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -181,18 +183,18 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
 
                                 <div className="space-y-4 max-w-sm mx-auto">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">¿Cómo quieres que te llamemos?</label>
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('nickname_label')}</label>
                                         <div className="relative">
                                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                             <Input
                                                 value={displayName}
                                                 onChange={(e) => setDisplayName(e.target.value)}
-                                                placeholder="Tu apodo o nombre preferido"
+                                                placeholder={t('nickname_placeholder')}
                                                 className="bg-slate-800/50 border-slate-700 pl-10 text-white h-12"
                                             />
                                         </div>
                                         <p className="text-[10px] text-slate-500 italic mt-1 text-center font-light">
-                                            Este nombre es solo para saludarte y no influye en las interpretaciones técnicas.
+                                            {t('nickname_hint')}
                                         </p>
                                     </div>
 
@@ -201,7 +203,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                         disabled={!displayName}
                                         className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold group"
                                     >
-                                        Siguiente
+                                        {t('next')}
                                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </div>
@@ -218,13 +220,12 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                         </div>
                                     )}
                                     <h2 className={cn("font-serif text-white mb-2", isEdit ? "text-2xl" : "text-3xl")}>
-                                        {isEdit ? "Editar Identidad" : "Identidad del Alma"}
+                                        {isEdit ? t('edit_title') : t('identity_title')}
                                     </h2>
                                     <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl flex items-start gap-3 max-w-lg mb-4 text-left">
                                         <Info className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
                                         <p className="text-xs text-purple-100/80 leading-relaxed">
-                                            Todos los datos a continuación son fundamentales para el cálculo astral y numerológico.
-                                            <strong> La precisión y eficacia de tus resultados dependen directamente de la exactitud de esta información.</strong>
+                                            {t('identity_hint')}
                                         </p>
                                     </div>
                                 </div>
@@ -233,30 +234,30 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     {/* Campo de Nombre Preferido (Solo en Edición o como parte del flujo integrado) */}
                                     {isEdit && (
                                         <div className="space-y-2 animate-in fade-in duration-500">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">¿Cómo quieres que te llamemos?</label>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('nickname_label')}</label>
                                             <div className="relative">
                                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                                 <Input
                                                     value={displayName}
                                                     onChange={(e) => setDisplayName(e.target.value)}
-                                                    placeholder="Tu apodo o nombre preferido"
+                                                    placeholder={t('nickname_placeholder')}
                                                     className="bg-slate-800/50 border-slate-700 pl-10 text-white h-12"
                                                 />
                                             </div>
                                             <p className="text-[10px] text-slate-500 italic mt-1 font-light ml-1">
-                                                Este nombre es solo para saludarte y no influye en las interpretaciones técnicas.
+                                                {t('nickname_hint')}
                                             </p>
                                         </div>
                                     )}
                                     {/* Nombre Completo */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Nombre Completo (Nombres y Apellidos)</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('fullname_label')}</label>
                                         <div className="relative">
                                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                             <Input
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
-                                                placeholder="Tu nombre místico completo"
+                                                placeholder={t('fullname_placeholder')}
                                                 className="bg-slate-800/50 border-slate-700 pl-10 text-white h-12"
                                             />
                                         </div>
@@ -265,7 +266,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     {/* Fecha y Hora */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Fecha de Nacimiento</label>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('birthdate_label')}</label>
                                             <div className="relative">
                                                 <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                                 <Input
@@ -277,7 +278,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Hora (Aprox)</label>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('birthtime_label')}</label>
                                             <div className="relative">
                                                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                                 <Input
@@ -292,7 +293,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
 
                                     {/* Sexo */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Sexo de Nacimiento</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('gender_label')}</label>
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                             {genderOptions.map((opt) => (
                                                 <button
@@ -314,7 +315,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
 
                                     {/* Lugar */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">Lugar de Nacimiento</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-1">{t('birthplace_label')}</label>
                                         <div className="relative flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-md pr-2 overflow-hidden focus-within:border-purple-500/50 transition-colors">
                                             <MapPin className="ml-3 w-4 h-4 text-slate-500" />
                                             <Input
@@ -323,13 +324,13 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                                     setBirthPlace(e.target.value);
                                                     setIsLocationConfirmed(false);
                                                 }}
-                                                placeholder="Ciudad, País"
+                                                placeholder={t('birthplace_placeholder')}
                                                 className="bg-transparent border-none text-white h-12 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-600"
                                             />
                                             {isLocationConfirmed ? (
                                                 <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg animate-in zoom-in duration-300 mr-1">
                                                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                                                    <span className="text-[10px] text-emerald-300 font-bold uppercase tracking-tighter">Confirmado</span>
+                                                    <span className="text-[10px] text-emerald-300 font-bold uppercase tracking-tighter">{t('confirmed')}</span>
                                                 </div>
                                             ) : (
                                                 <Button
@@ -339,7 +340,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                                     onClick={handleAutoDetect}
                                                     disabled={!birthPlace || loading}
                                                 >
-                                                    Confirmar
+                                                    {t('confirm')}
                                                 </Button>
                                             )}
                                         </div>
@@ -348,17 +349,17 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                     <div className="pt-4 flex flex-col gap-4">
                                         <div className="flex items-center justify-center gap-2 text-emerald-400/60 text-[10px] uppercase tracking-widest font-bold">
                                             <ShieldCheck className="w-3.5 h-3.5" />
-                                            Tus datos están seguros y protegidos.
+                                            {t('security_hint')}
                                         </div>
                                         <Button
                                             onClick={handleSave}
                                             disabled={loading || !isStep2Complete}
                                             className="w-full bg-purple-600 hover:bg-purple-700 text-white h-14 text-lg font-serif shadow-lg shadow-purple-900/20"
                                         >
-                                            {loading ? "Sincronizando..." : (
+                                            {loading ? t('syncing') : (
                                                 <>
                                                     <Save className="w-5 h-5 mr-2" />
-                                                    {isEdit ? "Guardar Cambios" : "Completar Mi Identidad"}
+                                                    {isEdit ? t('save_changes') : t('complete_identity')}
                                                 </>
                                             )}
                                         </Button>
@@ -367,7 +368,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                                                 onClick={() => setStep(1)}
                                                 className="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-300 transition-colors py-2"
                                             >
-                                                Volver al inicio
+                                                {t('back')}
                                             </button>
                                         )}
                                     </div>

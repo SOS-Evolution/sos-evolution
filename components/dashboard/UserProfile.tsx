@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails, LifePathDetails } from "@/lib/soul-math";
 import MagicModal from "@/components/ui/MagicModal";
 import type { Profile } from "@/types";
+import { useTranslations } from 'next-intl';
 
 interface UserProfileProps {
     user: any; // Mantenemos el usuario de auth como prop inicial
@@ -19,6 +20,7 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ user, profile: externalProfile, onEdit, className }: UserProfileProps) {
+    const t = useTranslations('Dashboard.profile');
     const [profile, setProfile] = useState<Profile | null>(externalProfile || null);
     const [loading, setLoading] = useState(false);
 
@@ -77,7 +79,7 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
                     onClick={onEdit}
                     className="absolute top-2 right-2 z-20 text-slate-500 hover:text-white h-7 text-xs hover:bg-white/5"
                 >
-                    <Edit2 className="w-3 h-3 mr-1" /> Editar
+                    <Edit2 className="w-3 h-3 mr-1" /> {t('edit')}
                 </Button>
 
                 <div className="flex flex-col md:flex-row gap-4 items-start relative z-10">
@@ -88,19 +90,19 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
                             <div className="flex items-center">
                                 <h2 className="text-[10px] font-serif text-purple-300 flex items-center gap-1.5 uppercase tracking-[0.2em]">
                                     <User className="w-3.5 h-3.5" />
-                                    Identidad del Alma
+                                    {t('title')}
                                 </h2>
                             </div>
                         </div>
 
                         <div className="space-y-3">
                             <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                                {profile?.full_name || user.user_metadata?.full_name || "Viajero Sin Nombre"}
+                                {profile?.full_name || user.user_metadata?.full_name || t('unknown_traveler')}
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                     <CalendarIcon className="w-3 h-3" />
-                                    {birthDate || "Fecha desconocida"}
+                                    {birthDate || t('unknown_date')}
                                     {birthTime && (
                                         <span className="flex items-center gap-1 ml-2">
                                             <Clock className="w-3 h-3" />
@@ -110,7 +112,7 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
                                 </div>
                                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                                     <MapPin className="w-3 h-3" />
-                                    {birthPlace || "Lugar desconocido"}
+                                    {birthPlace || t('unknown_place')}
                                     {latitude && longitude && <span className="text-[10px] opacity-50">({latitude.toFixed(2)}, {longitude.toFixed(2)})</span>}
                                 </div>
                                 {gender && (

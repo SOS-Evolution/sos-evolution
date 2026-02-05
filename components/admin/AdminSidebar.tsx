@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, CreditCard, ScrollText, LogOut, Settings, BookOpen, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { logout } from "@/app/login/actions";
+import { logout } from "@/app/[locale]/login/actions";
 import { useState, useEffect } from "react";
 
 const sidebarItems = [

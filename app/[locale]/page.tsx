@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, Brain, Zap, History, Star, Fingerprint,
   Instagram, Twitter, Youtube, Linkedin, ChevronDown, CheckCircle2, Moon
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getTranslations } from 'next-intl/server';
 
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
@@ -12,6 +13,7 @@ import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const t = await getTranslations('Landing');
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -19,7 +21,6 @@ export default async function Home() {
     <div className="min-h-screen text-slate-200 font-sans overflow-x-hidden">
 
       {/* ===== FONDO ANIMADO PREMIUM ===== */}
-
 
       {/* Aurora Orbs */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
@@ -37,7 +38,7 @@ export default async function Home() {
           <div className="animate-fade-in-up mb-4 md:mb-6">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-purple-300 border border-purple-500/20">
               <Moon className="w-4 h-4" />
-              Beta Abierta - Pruebalo Gratis
+              {t('hero.beta')}
             </span>
           </div>
 
@@ -55,17 +56,15 @@ export default async function Home() {
             </span>
             <span className="hidden md:inline text-slate-700 text-2xl">|</span>
             <span className="text-slate-400 font-serif italic tracking-wide">
-              The Evolution of the Spirit
+              {t('hero.subtitle')}
             </span>
           </div>
 
           {/* Descripción */}
           <p className="animate-fade-in-up text-sm md:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6 md:mb-8 font-light" style={{ animationDelay: "0.4s" }}>
-            Instala una nueva versión de tu consciencia. Una plataforma que fusiona
-            <strong className="text-purple-300"> Inteligencia Artificial </strong>
-            con la sabiduría ancestral del
-            <strong className="text-purple-300"> Tarot </strong>
-            para guiarte en tu propio Viaje del Héroe.
+            {t.rich('hero.description', {
+              purple: (chunks) => <strong className="text-purple-300">{chunks}</strong>
+            })}
           </p>
 
           {/* CTAs - VERTICALES Y ANCHOS */}
@@ -75,24 +74,24 @@ export default async function Home() {
                 size="lg"
                 className="w-full bg-white text-purple-950 hover:bg-purple-50 text-lg px-8 py-6 rounded-full font-bold animate-glow-pulse hover:scale-[1.02] transition-transform group"
               >
-                {user ? "ACCEDER AL SISTEMA" : "¡INICIA EL VIAJE!"}
+                {user ? t('hero.cta_access') : t('hero.cta_start')}
                 <Sparkles className="ml-2 w-5 h-5 text-purple-600 group-hover:rotate-12 transition-transform animate-pulse" />
               </Button>
             </Link>
 
-            <Link href="#how-it-works" className="w-full">
+            <Link href={"#how-it-works" as any} className="w-full">
               <Button
                 variant="ghost"
                 size="lg"
                 className="w-full text-slate-400 hover:text-white border border-transparent hover:border-white/10 hover:bg-white/5 px-8 py-5 rounded-full text-lg backdrop-blur-sm transition-all"
               >
-                ¿Cómo Funciona?
+                {t('hero.cta_how')}
                 <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
               </Button>
             </Link>
           </div>
 
-          {/* Scroll indicator - ahora en el flujo del documento para evitar solapamiento */}
+          {/* Scroll indicator */}
           <div className="animate-fade-in-up mt-6 md:mt-8" style={{ animationDelay: "0.8s" }}>
             <div className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2 animate-bounce">
               <div className="w-1 h-2 bg-white/40 rounded-full animate-pulse" />
@@ -104,13 +103,13 @@ export default async function Home() {
         <AnimatedSection className="border-y border-white/5 bg-white/[0.02] py-10 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 flex justify-center gap-8 md:gap-20 items-center flex-wrap">
             <div className="flex items-center gap-3 text-sm uppercase tracking-widest text-slate-500 hover:text-purple-400 transition-colors">
-              <Brain className="w-5 h-5" /> Psicología Junguiana
+              <Brain className="w-5 h-5" /> {t('authority.jung')}
             </div>
             <div className="flex items-center gap-3 text-sm uppercase tracking-widest text-slate-500 hover:text-purple-400 transition-colors">
-              <Star className="w-5 h-5" /> Simbolismo Arquetípico
+              <Star className="w-5 h-5" /> {t('authority.arquetipos')}
             </div>
             <div className="flex items-center gap-3 text-sm uppercase tracking-widest text-slate-500 hover:text-purple-400 transition-colors">
-              <Zap className="w-5 h-5" /> IA Generativa
+              <Zap className="w-5 h-5" /> {t('authority.ia')}
             </div>
           </div>
         </AnimatedSection>
@@ -119,18 +118,18 @@ export default async function Home() {
         <section id="how-it-works" className="py-32 px-6 max-w-7xl mx-auto">
           <AnimatedSection className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold font-serif text-white mb-6">
-              El Protocolo de <span className="text-gradient-purple">Evolución</span>
+              {t.rich('protocol.title', {
+                purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+              })}
             </h2>
             <p className="text-slate-400 text-lg max-w-xl mx-auto">
-              Tres pasos para recodificar tu realidad y despertar tu potencial oculto.
+              {t('protocol.subtitle')}
             </p>
           </AnimatedSection>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Línea conectora animada */}
             <div className="hidden md:block absolute top-20 left-[15%] w-[70%] h-[2px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent z-0" />
 
-            {/* Paso 1 */}
             <AnimatedSection delay={0.1} direction="up">
               <GlowingBorderCard className="h-full">
                 <div className="p-8 text-center">
@@ -138,15 +137,14 @@ export default async function Home() {
                     <span className="absolute -top-2 -right-2 w-8 h-8 bg-purple-600 rounded-full text-white text-sm flex items-center justify-center font-bold shadow-lg">1</span>
                     <Fingerprint className="w-10 h-10 text-purple-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Identidad</h3>
+                  <h3 className="text-2xl font-bold text-white mb-4">{t('protocol.step1_title')}</h3>
                   <p className="text-slate-400 leading-relaxed">
-                    Creas tu perfil sagrado. El sistema analiza tu nombre y fecha para establecer tus coordenadas cósmicas iniciales.
+                    {t('protocol.step1_desc')}
                   </p>
                 </div>
               </GlowingBorderCard>
             </AnimatedSection>
 
-            {/* Paso 2 */}
             <AnimatedSection delay={0.2} direction="up">
               <GlowingBorderCard className="h-full" glowColor="purple">
                 <div className="p-8 text-center relative overflow-hidden">
@@ -156,16 +154,15 @@ export default async function Home() {
                       <span className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full text-white text-sm flex items-center justify-center font-bold shadow-lg">2</span>
                       <Sparkles className="w-10 h-10 text-purple-300" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-4">Canalización</h3>
+                    <h3 className="text-2xl font-bold text-white mb-4">{t('protocol.step2_title')}</h3>
                     <p className="text-slate-400 leading-relaxed">
-                      Consultas al Oráculo IA. Recibes una lectura profunda basada en el momento presente y la sincronicidad.
+                      {t('protocol.step2_desc')}
                     </p>
                   </div>
                 </div>
               </GlowingBorderCard>
             </AnimatedSection>
 
-            {/* Paso 3 */}
             <AnimatedSection delay={0.3} direction="up">
               <GlowingBorderCard className="h-full">
                 <div className="p-8 text-center">
@@ -173,9 +170,9 @@ export default async function Home() {
                     <span className="absolute -top-2 -right-2 w-8 h-8 bg-indigo-600 rounded-full text-white text-sm flex items-center justify-center font-bold shadow-lg">3</span>
                     <History className="w-10 h-10 text-indigo-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Integración</h3>
+                  <h3 className="text-2xl font-bold text-white mb-4">{t('protocol.step3_title')}</h3>
                   <p className="text-slate-400 leading-relaxed">
-                    La lectura se guarda en tu "Diario del Alma". Detectas patrones y completas misiones evolutivas.
+                    {t('protocol.step3_desc')}
                   </p>
                 </div>
               </GlowingBorderCard>
@@ -186,31 +183,20 @@ export default async function Home() {
         {/* ===== FAQ SECTION ===== */}
         <AnimatedSection className="py-24 px-6 max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold font-serif text-white mb-16 text-center">
-            Datos del <span className="text-gradient-purple">Sistema</span>
+            {t.rich('faq.title', {
+              purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+            })}
           </h2>
 
           <div className="space-y-4">
-            {[
-              {
-                q: "¿Es esto adivinación o futurología?",
-                a: "No. S.O.S. se basa en la sincronicidad y la proyección psicológica. Utilizamos las cartas como espejos simbólicos para entender tu presente, no para predecir un futuro inalterable."
-              },
-              {
-                q: "¿Cómo funciona la IA mística?",
-                a: "Utilizamos modelos de lenguaje avanzados entrenados con estructuras de \"El Viaje del Héroe\" y simbología del Tarot de Marsella. La IA actúa como un facilitador neutro."
-              },
-              {
-                q: "¿Mis datos son privados?",
-                a: "Absolutamente. Tu diario es sagrado. Utilizamos seguridad a nivel de fila (RLS) en nuestra base de datos, lo que significa que es técnicamente imposible que otro usuario lea tus entradas."
-              }
-            ].map((faq, i) => (
-              <details key={i} className="group glass rounded-2xl overflow-hidden">
+            {[1, 2, 3].map((num) => (
+              <details key={num} className="group glass rounded-2xl overflow-hidden">
                 <summary className="flex justify-between items-center p-6 cursor-pointer font-medium text-slate-200 list-none hover:bg-white/5 transition-colors">
-                  {faq.q}
+                  {t(`faq.q${num}`)}
                   <ChevronDown className="w-5 h-5 text-purple-400 group-open:rotate-180 transition-transform duration-300" />
                 </summary>
                 <p className="text-slate-400 px-6 pb-6 text-sm leading-relaxed">
-                  {faq.a}
+                  {t(`faq.a${num}`)}
                 </p>
               </details>
             ))}
@@ -222,20 +208,21 @@ export default async function Home() {
           <div className="max-w-4xl mx-auto relative">
             <GlowingBorderCard glowColor="purple">
               <div className="p-16 relative overflow-hidden">
-                {/* Background effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-indigo-900/20 animate-aurora" />
 
                 <div className="relative z-10">
                   <h2 className="text-4xl md:text-6xl font-bold font-serif text-white mb-6">
-                    Tu alma te está <span className="text-gradient-purple">llamando</span>.
+                    {t.rich('final_cta.title', {
+                      purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
+                    })}
                   </h2>
 
                   <div className="flex items-center justify-center gap-6 text-slate-400 text-sm mb-10">
                     <span className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" /> Registro Gratuito
+                      <CheckCircle2 className="w-4 h-4 text-green-500" /> {t('final_cta.free')}
                     </span>
                     <span className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" /> Acceso Inmediato
+                      <CheckCircle2 className="w-4 h-4 text-green-500" /> {t('final_cta.immediate')}
                     </span>
                   </div>
 
@@ -244,7 +231,7 @@ export default async function Home() {
                       size="lg"
                       className="bg-white text-purple-950 hover:bg-purple-50 text-xl px-14 py-8 rounded-full font-bold shadow-2xl hover:scale-105 transition-all animate-breathe"
                     >
-                      Responder al Llamado
+                      {t('final_cta.button')}
                       <Sparkles className="ml-3 w-6 h-6" />
                     </Button>
                   </Link>
@@ -259,8 +246,6 @@ export default async function Home() {
       {/* ===== FOOTER ===== */}
       <footer className="border-t border-white/5 bg-black/50 backdrop-blur-sm py-16 px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
-
-          {/* Marca */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
@@ -269,10 +254,8 @@ export default async function Home() {
               <span className="font-serif text-xl font-bold text-white">SOS EVOLUTION</span>
             </div>
             <p className="text-slate-500 text-sm max-w-sm mb-8 leading-relaxed">
-              Soul Operating System es una plataforma dedicada a la evolución de la consciencia humana a través de la tecnología y el símbolo.
+              Soul Operating System is a platform dedicated to the evolution of human consciousness through technology and symbol.
             </p>
-
-            {/* Redes Sociales */}
             <div className="flex gap-3">
               {[Instagram, Twitter, Youtube, Linkedin].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 hover:bg-purple-600 hover:text-white transition-all hover:scale-110">
@@ -281,30 +264,25 @@ export default async function Home() {
               ))}
             </div>
           </div>
-
-          {/* Links */}
           <div>
-            <h4 className="text-white font-bold mb-6">Plataforma</h4>
+            <h4 className="text-white font-bold mb-6">Platform</h4>
             <ul className="space-y-3 text-sm text-slate-500">
-              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Ingresar</Link></li>
-              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Registro</Link></li>
-              <li><Link href="#how-it-works" className="hover:text-purple-400 transition-colors">Características</Link></li>
+              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Login</Link></li>
+              <li><Link href="/login" className="hover:text-purple-400 transition-colors">Register</Link></li>
+              <li><Link href={"#how-it-works" as any} className="hover:text-purple-400 transition-colors">Features</Link></li>
             </ul>
           </div>
-
-          {/* Legal */}
           <div>
             <h4 className="text-white font-bold mb-6">Legal</h4>
             <ul className="space-y-3 text-sm text-slate-500">
-              <li><a href="#" className="hover:text-purple-400 transition-colors">Privacidad</a></li>
-              <li><a href="#" className="hover:text-purple-400 transition-colors">Términos de Uso</a></li>
-              <li><a href="#" className="hover:text-purple-400 transition-colors">Manifiesto</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Privacy</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Terms of Use</a></li>
+              <li><a href="#" className="hover:text-purple-400 transition-colors">Manifesto</a></li>
             </ul>
           </div>
         </div>
-
         <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 text-center text-slate-700 text-xs">
-          © 2026 SOS Evolution. Todos los derechos reservados.
+          © 2026 SOS Evolution. All rights reserved.
         </div>
       </footer>
     </div>

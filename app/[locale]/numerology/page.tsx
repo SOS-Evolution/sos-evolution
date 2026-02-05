@@ -2,13 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { ArrowLeft, Hash, Sparkles, Calendar } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import NumerologyResult from "@/components/numerology/NumerologyResult";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function NumerologyPage() {
+export default async function NumerologyPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
+    const t = await getTranslations('NumerologyPage');
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -42,8 +45,13 @@ export default async function NumerologyPage() {
                                 </Button>
                             </Link>
                             <div>
-                                <h2 className="text-xs font-bold text-purple-400 uppercase tracking-[0.3em] mb-1">Numerología Pitagórica</h2>
-                                <h1 className="text-3xl font-serif text-white">Mapa Vibracional para <span className="text-purple-400">{profile?.full_name || "Ti"}</span></h1>
+                                <h2 className="text-xs font-bold text-purple-400 uppercase tracking-[0.3em] mb-1">{t('title')}</h2>
+                                <h1 className="text-3xl font-serif text-white">
+                                    {t.rich('map_vibrational', {
+                                        name: profile?.full_name || "Ti",
+                                        span: (chunks) => <span className="text-purple-400">{chunks}</span>
+                                    })}
+                                </h1>
                                 <p className="text-slate-400 text-sm flex items-center gap-2 mt-1">
                                     <Calendar className="w-3 h-3" />
                                     {profile?.birth_date || "---"}
@@ -60,9 +68,9 @@ export default async function NumerologyPage() {
                 <AnimatedSection delay={0.8}>
                     <div className="mt-20 text-center max-w-2xl mx-auto border-t border-white/5 pt-12">
                         <Hash className="w-8 h-8 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-slate-300 font-serif text-xl mb-4">Sobre la Numerología Pitagórica</h3>
+                        <h3 className="text-slate-300 font-serif text-xl mb-4">{t('about_title')}</h3>
                         <p className="text-slate-500 text-sm leading-relaxed">
-                            Este sistema utiliza el método pitagórico de asignación numérica a las letras del alfabeto latino. Cada letra vibra en una frecuencia del 1 al 9, permitiendo que tu nombre sea transformado en una secuencia matemática que representa tu identidad energética.
+                            {t('about_desc')}
                         </p>
                     </div>
                 </AnimatedSection>

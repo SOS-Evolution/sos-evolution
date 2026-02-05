@@ -1,8 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Trophy, Sparkles, LogOut, Check, X, Shield, Star, BookOpen, Clock, Settings, User, Compass, History, HelpCircle, Palette, Sparkle, LayoutDashboard, ChevronRight, Hash, Layers, ArrowRight } from "lucide-react";
+import { Link } from "@/i18n/routing";
+import {
+    Trophy,
+    Sparkles,
+    LogOut,
+    Check,
+    X,
+    Shield,
+    Star,
+    BookOpen,
+    Clock,
+    Settings,
+    User,
+    Compass,
+    History,
+    HelpCircle,
+    Palette,
+    Sparkle,
+    LayoutDashboard,
+    ChevronRight,
+    Hash,
+    Layers,
+    ArrowRight
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +34,7 @@ import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
 import CardStats from "@/components/dashboard/CardStats";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import OnboardingModal from "@/components/dashboard/OnboardingModal";
+import { useTranslations } from 'next-intl';
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
 
 interface DashboardClientProps {
@@ -21,6 +44,9 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
+    const t = useTranslations('Dashboard');
+    const tz = useTranslations('Zodiac');
+    const tn = useTranslations('Numerology');
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
 
@@ -40,8 +66,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         zodiacSign = getZodiacSign(d, m);
         lifePathNum = getLifePathNumber(profile.birth_date);
         if (lifePathNum > 0) {
-            const details = getNumerologyDetails(lifePathNum, 'camino');
-            lifePathWord = details.powerWord;
+            lifePathWord = tn(`${lifePathNum}.powerWord`);
         }
     }
 
@@ -90,16 +115,16 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                         <div className="relative z-10">
                                             <div className="flex items-center gap-2 mb-1 text-yellow-500/80">
                                                 <Trophy className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] uppercase tracking-wider font-bold">Recompensas</span>
+                                                <span className="text-[10px] uppercase tracking-wider font-bold">{t('rewards')}</span>
                                             </div>
 
                                             <div className="text-3xl font-serif font-bold text-white group-hover:text-yellow-101 transition-colors">
-                                                Misiones
+                                                {t('missions')}
                                             </div>
 
                                             <div className="mt-4 flex items-center gap-1.5 text-yellow-500/60 group-hover:text-yellow-500/80 transition-colors">
                                                 <Sparkles className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] uppercase tracking-wider font-bold">Gana Aura de Evolución</span>
+                                                <span className="text-[10px] uppercase tracking-wider font-bold">{t('gain_aura')}</span>
                                             </div>
                                         </div>
                                     </Card>
@@ -126,7 +151,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                     <AnimatedSection delay={0.25}>
                         <div className="flex items-center gap-4 py-2 opacity-80">
                             <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent flex-1" />
-                            <span className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">Panel de Control</span>
+                            <span className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">{t('control_panel')}</span>
                             <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent flex-1" />
                         </div>
                     </AnimatedSection>
@@ -161,13 +186,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                                     <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
                                                 </div>
                                                 <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-2">
-                                                    Astrología
+                                                    {t('astrology.title')}
                                                 </h3>
                                                 <div className="text-xl font-serif font-bold text-white group-hover:text-indigo-200 transition-colors truncate">
-                                                    {zodiacSign !== "---" ? zodiacSign : "Descubre más"}
+                                                    {zodiacSign !== "---" ? tz(zodiacSign) : t('astrology.unknown')}
                                                 </div>
                                                 <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                                                    {zodiacSign !== "---" ? "Tu signo solar define tu esencia." : "Configura tu fecha de nacimiento."}
+                                                    {zodiacSign !== "---" ? t('astrology.essence') : t('astrology.setup')}
                                                 </p>
                                             </div>
                                         </div>
@@ -196,13 +221,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                                     <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
                                                 </div>
                                                 <h3 className="text-xs font-bold text-pink-300 uppercase tracking-widest mb-2">
-                                                    Numerología
+                                                    {t('numerology.title')}
                                                 </h3>
                                                 <div className="text-xl font-serif font-bold text-white group-hover:text-pink-200 transition-colors truncate">
-                                                    {lifePathNum > 0 ? `Camino ${lifePathNum}` : "Calcula tu nº"}
+                                                    {lifePathNum > 0 ? t('numerology.path', { count: lifePathNum }) : t('numerology.calculate')}
                                                 </div>
                                                 <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                                                    {lifePathNum > 0 ? lifePathWord : "Descubre el poder de tus números."}
+                                                    {lifePathNum > 0 ? lifePathWord : t('numerology.discovery')}
                                                 </p>
                                             </div>
                                         </div>
@@ -221,16 +246,16 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/30">
                                                     <Layers className="w-6 h-6 text-white" />
                                                 </div>
-                                                <h2 className="text-2xl font-bold text-white">Tiradas de Tarot</h2>
+                                                <h2 className="text-2xl font-bold text-white">{t('tarot.title')}</h2>
                                             </div>
                                             <p className="text-slate-400 text-sm leading-relaxed pl-[4rem]">
-                                                Consulta el oráculo para recibir guía divina.
+                                                {t('tarot.desc')}
                                             </p>
                                         </div>
                                         <div className="mt-auto">
-                                            <Link href="/lectura" className="block w-full">
+                                            <Link href="/tarot" className="block w-full">
                                                 <Button className="w-full bg-white text-purple-950 hover:bg-purple-50 font-bold py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] group">
-                                                    Seleccionar Tirada
+                                                    {t('tarot.button')}
                                                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                                                 </Button>
                                             </Link>
@@ -247,16 +272,16 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                                 <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center border border-slate-600">
                                                     <BookOpen className="w-6 h-6 text-slate-300" />
                                                 </div>
-                                                <h2 className="text-2xl font-bold text-white">Diario del Alma</h2>
+                                                <h2 className="text-2xl font-bold text-white">{t('journal.title')}</h2>
                                             </div>
                                             <p className="text-slate-400 text-sm leading-relaxed pl-[4rem]">
-                                                Revisa tu historial de lecturas y revelaciones.
+                                                {t('journal.desc')}
                                             </p>
                                         </div>
                                         <div className="mt-auto">
                                             <Link href="/historial" className="block w-full">
                                                 <Button className="w-full bg-slate-800 text-white hover:bg-slate-700 font-bold py-4 rounded-xl shadow-lg border border-slate-600 transition-all hover:scale-[1.02] group">
-                                                    Abrir Diario
+                                                    {t('journal.button')}
                                                 </Button>
                                             </Link>
                                         </div>

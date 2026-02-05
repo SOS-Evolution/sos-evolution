@@ -5,6 +5,7 @@ import { Sparkles, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useConfig } from "@/components/providers/ConfigProvider";
 import { GoldenClassicFrame, MysticSilverFrame, CelestialFrame, GoldenOrnateFrame } from "@/components/features/tarot/frames";
+import { useTranslations } from 'next-intl';
 
 interface CardStatsProps {
     stats: {
@@ -14,23 +15,40 @@ interface CardStatsProps {
     className?: string;
 }
 
-const DECK = [
-    "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
-    "El Hierofante", "Los Enamorados", "El Carro", "La Fuerza", "El Ermitaño",
-    "La Rueda de la Fortuna", "La Justicia", "El Colgado", "La Muerte",
-    "La Templanza", "El Diablo", "La Torre", "La Estrella", "La Luna",
-    "El Sol", "El Juicio", "El Mundo"
-];
-
 const ROMAN_NUMERALS = [
     "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
     "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"
 ];
 
 export default function CardStats({ stats, className }: CardStatsProps) {
+    const t = useTranslations('Dashboard.tarot');
+    const tc = useTranslations('Tarot');
     const { tarotFrame } = useConfig();
-    const cardIndex = stats ? DECK.indexOf(stats.card_name) : -1;
+
+    // Convertir el array de nombres de cartas del JSON a una lista
+    const DECK_EN = [
+        "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor",
+        "The Hierophant", "The Lovers", "The Chariot", "Strength", "The Hermit",
+        "Wheel of Fortune", "Justice", "The Hanged Man", "Death",
+        "Temperance", "The Devil", "The Tower", "The Star", "The Moon",
+        "The Sun", "Judgement", "The World"
+    ];
+    const DECK_ES = [
+        "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
+        "El Hierofante", "Los Enamorados", "El Carro", "La Fuerza", "El Ermitaño",
+        "La Rueda de la Fortuna", "La Justicia", "El Colgado", "La Muerte",
+        "La Templanza", "El Diablo", "La Torre", "La Estrella", "La Luna",
+        "El Sol", "El Juicio", "El Mundo"
+    ];
+
+    // Buscar en ambos idiomas por si acaso
+    let cardIndex = stats ? DECK_ES.indexOf(stats.card_name) : -1;
+    if (cardIndex === -1 && stats) {
+        cardIndex = DECK_EN.indexOf(stats.card_name);
+    }
+
     const imageUrl = cardIndex !== -1 ? `/assets/tarot/arcano-${cardIndex}.jpg` : null;
+    const localizedCardName = cardIndex !== -1 ? tc.raw('cards')[cardIndex] : "???";
 
     const renderFrame = () => {
         const frameClass = "absolute inset-0 z-20 pointer-events-none w-full h-full";
@@ -54,13 +72,13 @@ export default function CardStats({ stats, className }: CardStatsProps) {
             <div className="flex justify-between items-start relative z-10 w-full shrink-0">
                 <div className="flex items-center gap-2 text-indigo-300/90 pt-0">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span className="text-[10px] uppercase tracking-wider font-bold leading-none">Afinidad Arcana</span>
+                    <span className="text-[10px] uppercase tracking-wider font-bold leading-none">{t('stats_title')}</span>
                 </div>
             </div>
 
             {/* Contador de Frecuencia: Absoluto para no afectar al nombre */}
             <div className="absolute top-3 right-3 z-20 text-4xl font-serif font-bold text-indigo-400/40 leading-none drop-shadow-[0_0_12px_rgba(129,140,248,0.2)]">
-                x{stats?.times_drawn || 0}
+                {t('stats_count', { count: stats?.times_drawn || 0 })}
             </div>
 
             {/* Título (Nombre de la carta): En la misma fila que el número */}
@@ -71,7 +89,7 @@ export default function CardStats({ stats, className }: CardStatsProps) {
                     </span>
                 </div>
                 <div className="text-2xl font-serif font-bold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
-                    {stats?.card_name || "???"}
+                    {localizedCardName}
                 </div>
             </div>
 

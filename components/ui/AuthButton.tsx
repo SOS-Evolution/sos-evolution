@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
 import { Button } from "./button";
-import { LogIn, LogOut, User, KeyRound, ChevronDown } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { logout } from "@/app/login/actions";
+import { LogIn, LogOut, User, KeyRound, ChevronDown, Languages } from "lucide-react";
+import { Link } from "@/i18n/routing";
+import { useState, useTransition } from "react";
+import { logout } from "@/app/[locale]/login/actions";
+import { useLocale, useTranslations } from "next-intl";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,8 +18,18 @@ import {
 
 export default function AuthButton({ user, profile }: { user: any, profile?: any }) {
     const [loading, setLoading] = useState(false);
+    const [isPending, startTransition] = useTransition();
+    const locale = useLocale();
+    const router = useRouter();
+    const pathname = usePathname();
+    const ta = useTranslations('Auth');
 
-    const router = useRouter();  // Asegúrate de que esto esté dentro del componente
+    const handleLocaleToggle = () => {
+        const nextLocale = locale === 'en' ? 'es' : 'en';
+        startTransition(() => {
+            router.replace(pathname, { locale: nextLocale });
+        });
+    };
 
     const handleLogout = async () => {
         setLoading(true);
@@ -37,7 +48,7 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
             <Link href="/login">
                 <Button variant="ghost" className="text-purple-200 hover:text-white hover:bg-white/10 transition-colors">
                     <LogIn className="w-4 h-4 mr-2" />
-                    Ingresar
+                    {ta('login')}
                 </Button>
             </Link>
         );
@@ -66,7 +77,7 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
             <DropdownMenuContent align="end" className="w-56 bg-black/90 backdrop-blur-xl border-white/10">
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none text-white">Mi Cuenta</p>
+                        <p className="text-sm font-medium leading-none text-white">{ta('my_account')}</p>
                         {fullName && (
                             <p className="text-xs leading-none text-slate-300 truncate font-normal">
                                 {fullName}
@@ -79,10 +90,26 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
 
+                <DropdownMenuItem
+                    onClick={handleLocaleToggle}
+                    disabled={isPending}
+                    className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
+                >
+                    <div className="flex items-center">
+                        <Languages className="mr-2 h-4 w-4 text-purple-400 group-hover:text-purple-300" />
+                        <span>{ta('language_label')}</span>
+                    </div>
+                    <div className="flex items-center gap-1 font-mono text-[10px] font-bold tracking-tighter bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                        <span className={locale === 'en' ? "text-white" : "text-slate-500"}>EN</span>
+                        <span className="text-slate-700">/</span>
+                        <span className={locale === 'es' ? "text-white" : "text-slate-500"}>ES</span>
+                    </div>
+                </DropdownMenuItem>
+
                 <DropdownMenuItem asChild className="focus:bg-white/10 focus:text-white cursor-pointer group">
                     <Link href="/dashboard/profile/reset-password">
                         <KeyRound className="mr-2 h-4 w-4 text-purple-400 group-hover:text-purple-300" />
-                        <span>Cambiar Contraseña</span>
+                        <span>{ta('change_password')}</span>
                     </Link>
                 </DropdownMenuItem>
 
@@ -94,7 +121,7 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
                     className="text-red-400 focus:text-red-300 focus:bg-red-900/10 cursor-pointer"
                 >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{loading ? "Saliendo..." : "Cerrar Sesión"}</span>
+                    <span>{loading ? ta('logging_out') : ta('logout')}</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
