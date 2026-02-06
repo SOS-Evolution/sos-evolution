@@ -170,7 +170,7 @@ export default async function AstrologyPage() {
                         <AnimatedSection delay={0.25}>
                             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                 <Sparkles className="w-5 h-5 text-indigo-500" />
-                                Aspectos Planetarios
+                                {t('aspects_title')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {chartData.aspects?.map((aspect, i) => (
@@ -192,7 +192,7 @@ export default async function AstrologyPage() {
                                         </div>
                                         <div className="text-right">
                                             <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
-                                                {aspect.type}
+                                                {t(`aspects.${aspect.type}`)}
                                             </div>
                                             <div className="text-[10px] text-slate-500 font-mono">
                                                 {aspect.orb.toFixed(2)}° orb

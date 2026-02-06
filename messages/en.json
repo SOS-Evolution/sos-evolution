@@ -197,6 +197,7 @@
         "location_unknown": "Unknown location",
         "setup_button": "Configure Natal",
         "planets_title": "Planets",
+        "aspects_title": "Planetary Aspects",
         "houses_title": "Astrological Houses",
         "house_label": "House {number}",
         "cusp_label": "Cusp: {degree}°",
@@ -225,6 +226,13 @@
             "Rahu": "Rahu",
             "Ketu": "Ketu",
             "Ascendant": "Ascendant"
+        },
+        "aspects": {
+            "Conjunction": "Conjunction",
+            "Opposition": "Opposition",
+            "Trine": "Trine",
+            "Square": "Square",
+            "Sextile": "Sextile"
         }
     },
     "NumerologyPage": {
