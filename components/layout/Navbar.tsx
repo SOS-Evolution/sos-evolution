@@ -3,6 +3,7 @@
 import { Sparkles, Home, Layers, BookOpen, Star, Hash } from "lucide-react";
 import AuthButton from "@/components/ui/AuthButton";
 import { Link, usePathname } from "@/i18n/routing";
+import NextLink from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -65,21 +66,39 @@ export default function Navbar({ user, role, profile }: { user: any, role?: stri
                                     {isAdmin && index === 1 && (
                                         <div className="w-px h-4 bg-white/10 mx-2" />
                                     )}
-                                    <Link href={item.href}>
-                                        <motion.div
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className={`gap-2 transition-all duration-200 ${isActive(item.href)}`}
+                                    {item.href.startsWith('/admin') ? (
+                                        <NextLink href={item.href}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                             >
-                                                <item.icon className="w-4 h-4" />
-                                                {item.label}
-                                            </Button>
-                                        </motion.div>
-                                    </Link>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={`gap-2 transition-all duration-200 ${isActive(item.href)}`}
+                                                >
+                                                    <item.icon className="w-4 h-4" />
+                                                    {item.label}
+                                                </Button>
+                                            </motion.div>
+                                        </NextLink>
+                                    ) : (
+                                        <Link href={item.href}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={`gap-2 transition-all duration-200 ${isActive(item.href)}`}
+                                                >
+                                                    <item.icon className="w-4 h-4" />
+                                                    {item.label}
+                                                </Button>
+                                            </motion.div>
+                                        </Link>
+                                    )}
                                 </div>
                             ))}
                         </div>
