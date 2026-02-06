@@ -37,6 +37,56 @@ export interface WesternChartData {
     planets: PlanetPosition[];
     houses: HouseCusp[];
     ascendant?: string;
+    aspects: Aspect[];
+}
+
+export interface Aspect {
+    planet1: string;
+    planet2: string;
+    type: AspectType;
+    orb: number;
+    angle: number;
+}
+
+export type AspectType = "Conjunction" | "Opposition" | "Trine" | "Square" | "Sextile";
+
+const ASPECTS = [
+    { name: "Conjunction", angle: 0, orb: 8 },
+    { name: "Opposition", angle: 180, orb: 8 },
+    { name: "Trine", angle: 120, orb: 8 },
+    { name: "Square", angle: 90, orb: 8 },
+    { name: "Sextile", angle: 60, orb: 6 }
+] as const;
+
+function calculateAspects(planets: PlanetPosition[]): Aspect[] {
+    const aspects: Aspect[] = [];
+    // Filter out Ascendant for aspect calculation if desired, or keep it. Usually relevant.
+    // We'll calculate aspects between all bodies including Ascendant.
+
+    for (let i = 0; i < planets.length; i++) {
+        for (let j = i + 1; j < planets.length; j++) {
+            const p1 = planets[i];
+            const p2 = planets[j];
+
+            // Calculate absolute difference
+            let diff = Math.abs(p1.fullDegree - p2.fullDegree);
+            // Shortest distance on circle
+            if (diff > 180) diff = 360 - diff;
+
+            for (const aspect of ASPECTS) {
+                if (Math.abs(diff - aspect.angle) <= aspect.orb) {
+                    aspects.push({
+                        planet1: p1.name,
+                        planet2: p2.name,
+                        type: aspect.name as AspectType,
+                        orb: parseFloat((Math.abs(diff - aspect.angle)).toFixed(2)),
+                        angle: parseFloat(diff.toFixed(2))
+                    });
+                }
+            }
+        }
+    }
+    return aspects;
 }
 
 const API_BASE_URL = "https://json.freeastrologyapi.com";
@@ -133,9 +183,12 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
             }
         }
 
+        const aspects = calculateAspects(planets);
+
         return {
             planets,
-            houses
+            houses,
+            aspects
         };
 
     } catch (error) {
@@ -160,17 +213,24 @@ export function getMockChartData(details?: BirthDetails): WesternChartData {
     const ascOffset = Math.floor((hour + 18) % 24 / 2);
     const ascIndex = (sunIndex + ascOffset) % 12;
 
+    const planets: PlanetPosition[] = [
+        { name: "Sun", fullDegree: 15, normDegree: 15, speed: 1, isRetro: false, sign: sunSign, house: 1 },
+        { name: "Moon", fullDegree: 45, normDegree: 15, speed: 13, isRetro: false, sign: "Taurus", house: 2 },
+        { name: "Mercury", fullDegree: 10, normDegree: 10, speed: 1.5, isRetro: true, sign: sunSign, house: 1 },
+        { name: "Venus", fullDegree: 125, normDegree: 5, speed: 1.2, isRetro: false, sign: sunSign, house: 1 },
+        { name: "Mars", fullDegree: 200, normDegree: 20, speed: 0.5, isRetro: false, sign: "Libra", house: 7 },
+        { name: "Jupiter", fullDegree: 280, normDegree: 10, speed: 0.1, isRetro: false, sign: "Capricorn", house: 10 },
+        { name: "Saturn", fullDegree: 310, normDegree: 10, speed: 0.05, isRetro: true, sign: "Aquarius", house: 11 },
+        { name: "Uranus", fullDegree: 45, normDegree: 15, speed: 0.01, isRetro: true, sign: "Taurus", house: 2 },
+        { name: "Neptune", fullDegree: 350, normDegree: 20, speed: 0.01, isRetro: false, sign: "Pisces", house: 12 },
+        { name: "Pluto", fullDegree: 290, normDegree: 20, speed: 0.005, isRetro: false, sign: "Capricorn", house: 10 },
+        { name: "Ascendant", fullDegree: 0, normDegree: 0, speed: 0, isRetro: false, sign: zodiacs[ascIndex], house: 1 },
+    ];
+
+    const aspects = calculateAspects(planets);
+
     return {
-        planets: [
-            { name: "Sun", fullDegree: 15, normDegree: 15, speed: 1, isRetro: false, sign: sunSign, house: 1 },
-            { name: "Moon", fullDegree: 45, normDegree: 15, speed: 13, isRetro: false, sign: "Taurus", house: 2 },
-            { name: "Mercury", fullDegree: 10, normDegree: 10, speed: 1.5, isRetro: true, sign: sunSign, house: 1 },
-            { name: "Venus", fullDegree: 125, normDegree: 5, speed: 1.2, isRetro: false, sign: sunSign, house: 1 },
-            { name: "Mars", fullDegree: 200, normDegree: 20, speed: 0.5, isRetro: false, sign: "Libra", house: 7 },
-            { name: "Jupiter", fullDegree: 280, normDegree: 10, speed: 0.1, isRetro: false, sign: "Capricorn", house: 10 },
-            { name: "Saturn", fullDegree: 310, normDegree: 10, speed: 0.05, isRetro: true, sign: "Aquarius", house: 11 },
-            { name: "Ascendant", fullDegree: 0, normDegree: 0, speed: 0, isRetro: false, sign: zodiacs[ascIndex], house: 1 },
-        ],
+        planets,
         houses: Array.from({ length: 12 }, (_, i) => {
             const hIndex = (ascIndex + i) % 12;
             return {
@@ -179,6 +239,7 @@ export function getMockChartData(details?: BirthDetails): WesternChartData {
                 normDegree: 0,
                 sign: zodiacs[hIndex]
             };
-        })
+        }),
+        aspects
     };
 }

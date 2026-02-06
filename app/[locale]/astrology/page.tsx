@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/routing";
 import AnimatedSection from "@/components/landing/AnimatedSection";
-import { ArrowLeft, Star, Disc, MapPin, Calendar, Compass } from "lucide-react";
+import { ArrowLeft, Star, Disc, MapPin, Calendar, Compass, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
@@ -126,6 +126,7 @@ export default async function AstrologyPage() {
                                 <AstrologyWheel planets={chartData.planets} houses={chartData.houses} size={400} />
                             </div>
                         </AnimatedSection>
+
                         {/* PLANETS SECTION */}
                         <AnimatedSection delay={0.2}>
                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
@@ -143,7 +144,7 @@ export default async function AstrologyPage() {
                                                 <div>
                                                     <div className="font-bold text-white">
                                                         {t.rich(`planets.${planet.name}`, {
-                                                            fallback: (chunks) => planet.name
+                                                            fallback: () => planet.name
                                                         }) as any}
                                                     </div>
                                                     <div className="text-xs text-slate-400">
@@ -165,9 +166,51 @@ export default async function AstrologyPage() {
                             </div>
                         </AnimatedSection>
 
+                        {/* ASPECTS SECTION */}
+                        <AnimatedSection delay={0.25}>
+                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-indigo-500" />
+                                Aspectos Planetarios
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {chartData.aspects?.map((aspect, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-slate-900/40 border border-white/5 hover:bg-slate-900/60 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-1">
+                                                <PlanetIcon name={aspect.planet1} size={18} className="text-slate-300" />
+                                                <span className="text-sm font-medium text-slate-200">
+                                                    {t.rich(`planets.${aspect.planet1}`, { fallback: () => aspect.planet1 }) as any}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs text-slate-500">vs</span>
+                                            <div className="flex items-center gap-1">
+                                                <PlanetIcon name={aspect.planet2} size={18} className="text-slate-300" />
+                                                <span className="text-sm font-medium text-slate-200">
+                                                    {t.rich(`planets.${aspect.planet2}`, { fallback: () => aspect.planet2 }) as any}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+                                                {aspect.type}
+                                            </div>
+                                            <div className="text-[10px] text-slate-500 font-mono">
+                                                {aspect.orb.toFixed(2)}° orb
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {(!chartData.aspects || chartData.aspects.length === 0) && (
+                                    <div className="col-span-full text-center py-8 text-slate-500 italic">
+                                        No se encontraron aspectos mayores significativos.
+                                    </div>
+                                )}
+                            </div>
+                        </AnimatedSection>
+
                         {/* HOUSES SECTION */}
                         <AnimatedSection delay={0.3}>
-                            <h2 className="text-xl font-bold text-white mb-6 mt-12 flex items-center gap-2">
+                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                 <Compass className="w-5 h-5 text-indigo-500" />
                                 {t('houses_title')}
                             </h2>
@@ -197,7 +240,6 @@ export default async function AstrologyPage() {
                                 ))}
                             </div>
                         </AnimatedSection>
-
                     </div>
                 ) : (
                     <AnimatedSection delay={0.1}>
