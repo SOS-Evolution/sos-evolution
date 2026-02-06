@@ -53,7 +53,7 @@ export default async function HistoryPage() {
                             <p className="text-slate-400">Tu registro akásico de evolución personal.</p>
                         </div>
 
-                        <Link href="/lectura">
+                        <Link href="/tarot">
                             <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-900/30 px-6 py-5 rounded-xl font-medium group">
                                 Nueva Consulta
                                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -69,7 +69,7 @@ export default async function HistoryPage() {
                             <Sparkles className="w-16 h-16 text-slate-600 mx-auto mb-6" />
                             <h3 className="text-2xl text-slate-300 font-serif mb-3">Tu diario está esperando</h3>
                             <p className="text-slate-500 mb-8 max-w-sm mx-auto">Aún no has realizado ninguna consulta al oráculo. Comienza tu viaje de autodescubrimiento.</p>
-                            <Link href="/lectura">
+                            <Link href="/tarot">
                                 <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-5 rounded-xl">
                                     Iniciar primera lectura
                                 </Button>

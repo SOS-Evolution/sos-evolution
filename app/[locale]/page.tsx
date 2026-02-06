@@ -226,7 +226,7 @@ export default async function Home() {
                     </span>
                   </div>
 
-                  <Link href={user ? "/lectura" : "/login"}>
+                  <Link href={user ? "/tarot" : "/login"}>
                     <Button
                       size="lg"
                       className="bg-white text-purple-950 hover:bg-purple-50 text-xl px-14 py-8 rounded-full font-bold shadow-2xl hover:scale-105 transition-all animate-breathe"
