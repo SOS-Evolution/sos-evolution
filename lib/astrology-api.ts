@@ -169,6 +169,7 @@ export function getMockChartData(details?: BirthDetails): WesternChartData {
             { name: "Mars", fullDegree: 200, normDegree: 20, speed: 0.5, isRetro: false, sign: "Libra", house: 7 },
             { name: "Jupiter", fullDegree: 280, normDegree: 10, speed: 0.1, isRetro: false, sign: "Capricorn", house: 10 },
             { name: "Saturn", fullDegree: 310, normDegree: 10, speed: 0.05, isRetro: true, sign: "Aquarius", house: 11 },
+            { name: "Ascendant", fullDegree: 0, normDegree: 0, speed: 0, isRetro: false, sign: zodiacs[ascIndex], house: 1 },
         ],
         houses: Array.from({ length: 12 }, (_, i) => {
             const hIndex = (ascIndex + i) % 12;
