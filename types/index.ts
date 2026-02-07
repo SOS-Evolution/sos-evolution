@@ -25,6 +25,7 @@ export interface Profile {
   zodiac_sign: string | null;
   avatar_url: string | null;
   extra_data: Record<string, unknown>;
+  astrology_chart?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +43,7 @@ export interface ProfileUpdate {
   zodiac_sign?: string;
   avatar_url?: string;
   extra_data?: Record<string, unknown>;
+  astrology_chart?: Record<string, unknown> | null;
 }
 
 // === CREDITS ===

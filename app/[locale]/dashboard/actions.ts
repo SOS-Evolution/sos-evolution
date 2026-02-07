@@ -41,6 +41,7 @@ export async function updateProfile(formData: FormData) {
         full_name: fullName,
         birth_date: birthDate || null,
         birth_place: birthPlace,
+        astrology_chart: null, // Invalidate cache
         updated_at: new Date().toISOString(),
     };
 
@@ -52,6 +53,14 @@ export async function updateProfile(formData: FormData) {
     if (error) {
         console.error("Error Supabase:", error);
         throw new Error("No se pudo actualizar el perfil");
+    }
+
+    // Invalidate old interpretations if birth data changed
+    if (birthDate || birthPlace) {
+        await supabase
+            .from('astrology_interpretations')
+            .delete()
+            .eq('user_id', user.id);
     }
 
     // Verificar misión complete_profile

@@ -66,6 +66,7 @@ export async function PUT(req: Request) {
             const date = new Date(body.birth_date);
             updates.life_path_number = getLifePathNumber(body.birth_date);
             updates.zodiac_sign = getZodiacSign(date.getDate(), date.getMonth() + 1);
+            updates.astrology_chart = null; // Invalidate cache
         }
 
         // Ensure new fields are included in updates if provided
@@ -90,6 +91,16 @@ export async function PUT(req: Request) {
                 details: error.message,
                 hint: 'Asegúrate de haber ejecutado las migraciones de base de datos.'
             }, { status: 500 });
+        }
+
+        // Invalidate old interpretations if birth data changed
+        if (body.birth_date || body.birth_place || body.birth_time || body.latitude) {
+            const { error: deleteError } = await supabase
+                .from('astrology_interpretations')
+                .delete()
+                .eq('user_id', user.id);
+
+            if (deleteError) console.error("Error clearing old interpretations:", deleteError);
         }
 
         // Verificar si se debe completar la misión de perfil

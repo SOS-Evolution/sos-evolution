@@ -233,6 +233,22 @@
             "Trine": "Trine",
             "Square": "Square",
             "Sextile": "Sextile"
+        },
+        "interpretation": {
+            "title": "Your Astral Evolution",
+            "summary_title": "Cosmic Essence",
+            "core_title": "Core of Your Being",
+            "strengths_title": "Gifts & Talents",
+            "challenges_title": "Evolutionary Challenges",
+            "advice_title": "Soul Guidance",
+            "generate_button": "Interpret My Astral Evolution",
+            "regenerate_button": "Generate new interpretation",
+            "aura_cost_badge": "20",
+            "insufficient_aura": "Insufficient Aura",
+            "interpretation_generated": "Interpretation generated",
+            "error_oracle": "Error connecting with the oracle",
+            "ai_soul_interpretation": "AI Soul Interpretation",
+            "aura_label": "Aura: {balance}"
         }
     },
     "NumerologyPage": {

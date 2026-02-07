@@ -26,7 +26,7 @@
             "step1_desc": "Creas tu perfil sagrado. El sistema analiza tu nombre y fecha para establecer tus coordenadas cósmicas iniciales.",
             "step2_title": "Canalización",
             "step2_desc": "Consultas al Oráculo IA. Recibes una lectura profunda basada en el momento presente y la sincronicidad.",
-            "step3_title": "Integración",
+            "step3_title": "Integration",
             "step3_desc": "La lectura se guarda en tu \"Diario del Alma\". Detectas patrones y completas misiones evolutivas."
         },
         "faq": {
@@ -233,6 +233,22 @@
             "Trine": "Trígono",
             "Square": "Cuadratura",
             "Sextile": "Sextil"
+        },
+        "interpretation": {
+            "title": "Tu Evolución Astral",
+            "summary_title": "Esencia Cósmica",
+            "core_title": "Núcleo de tu Ser",
+            "strengths_title": "Dones y Talentos",
+            "challenges_title": "Desafíos Evolutivos",
+            "advice_title": "Guía del Alma",
+            "generate_button": "Interpretar mi Evolución Astral",
+            "regenerate_button": "Generar nueva interpretación",
+            "aura_cost_badge": "20",
+            "insufficient_aura": "Aura insuficiente",
+            "interpretation_generated": "Interpretación generada",
+            "error_oracle": "Error conectando con el oráculo",
+            "ai_soul_interpretation": "AI Soul Interpretation",
+            "aura_label": "Aura: {balance}"
         }
     },
     "NumerologyPage": {
