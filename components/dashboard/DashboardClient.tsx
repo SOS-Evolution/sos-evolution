@@ -49,10 +49,13 @@ interface DashboardClientProps {
 
 import TransactionModal from "@/components/dashboard/TransactionModal";
 
+import { useRouter } from "next/navigation";
+
 export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
     const tz = useTranslations('Zodiac');
     const tn = useTranslations('Numerology');
+    const router = useRouter();
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
 
@@ -207,6 +210,8 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                     onComplete={(updatedProfile) => {
                         setProfile(updatedProfile);
                         setIsEditingManual(false);
+                        // Force refresh to update server components (Astrology Chart, etc.)
+                        router.refresh();
                     }}
                     onClose={isComplete ? () => setIsEditingManual(false) : undefined}
                 />

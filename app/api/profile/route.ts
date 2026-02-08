@@ -62,11 +62,17 @@ export async function PUT(req: Request) {
         // Calcular life_path_number y zodiac_sign si hay birth_date
         let updates: ProfileUpdate = { ...body };
 
+        // Check if sensitive birth data is changing
+        const isBirthDataChanged = body.birth_date || body.birth_time || body.birth_place || body.latitude !== undefined || body.longitude !== undefined;
+
         if (body.birth_date) {
             const date = new Date(body.birth_date);
             updates.life_path_number = getLifePathNumber(body.birth_date);
             updates.zodiac_sign = getZodiacSign(date.getDate(), date.getMonth() + 1);
-            updates.astrology_chart = null; // Invalidate cache
+        }
+
+        if (isBirthDataChanged) {
+            updates.astrology_chart = null; // Invalidate cache if ANY birth param changes
         }
 
         // Ensure new fields are included in updates if provided
@@ -94,7 +100,7 @@ export async function PUT(req: Request) {
         }
 
         // Invalidate old interpretations if birth data changed
-        if (body.birth_date || body.birth_place || body.birth_time || body.latitude) {
+        if (isBirthDataChanged) {
             const { error: deleteError } = await supabase
                 .from('astrology_interpretations')
                 .delete()
