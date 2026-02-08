@@ -81,6 +81,17 @@
             "unknown_date": "Fecha desconocida",
             "unknown_place": "Lugar desconocido",
             "edit": "Editar"
+        },
+        "unlock_button": "Desbloquear Acceso",
+        "unlock_cost": "{cost} AURA",
+        "unlock_confirm": "¿Desbloquear {feature} por {cost} AURA?",
+        "transaction": {
+            "title": "Confirmar Desbloqueo",
+            "description": "Estás a punto de desbloquear acceso permanente a la sabiduría de {feature}.",
+            "confirm": "Confirmar Desbloqueo",
+            "cancel": "Cancelar",
+            "processing": "Procesando...",
+            "success": "¡Has desbloqueado el acceso a {feature}!"
         }
     },
     "Zodiac": {

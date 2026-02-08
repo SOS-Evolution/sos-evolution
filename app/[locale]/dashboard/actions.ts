@@ -74,3 +74,48 @@ export async function updateProfile(formData: FormData) {
     revalidatePath("/dashboard");
     return { success: true };
 }
+
+export async function unlockFeature(feature: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("No autenticado");
+
+    const COST = 50;
+
+    // 1. Intentar gastar créditos
+    const { data: newBalance, error: spendError } = await supabase.rpc('spend_credits', {
+        p_user_id: user.id,
+        p_amount: COST,
+        p_description: `Unlock feature: ${feature}`
+    });
+
+    if (spendError) {
+        console.error("Error spending credits:", spendError);
+        return { success: false, error: spendError.message };
+    }
+
+    // 2. Obtener perfil actual para actualizar array
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('unlocked_features')
+        .eq('id', user.id)
+        .single();
+
+    const currentFeatures = profile?.unlocked_features || [];
+    if (!currentFeatures.includes(feature)) {
+        const updatedFeatures = [...currentFeatures, feature];
+
+        const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ unlocked_features: updatedFeatures })
+            .eq('id', user.id);
+
+        if (updateError) {
+            console.error("Error updating unlocked features:", updateError);
+            return { success: false, error: "Error al actualizar el perfil" };
+        }
+    }
+
+    revalidatePath("/dashboard");
+    return { success: true, newBalance };
+}

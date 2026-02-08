@@ -23,10 +23,14 @@ import {
     ChevronRight,
     Hash,
     Layers,
-    ArrowRight
+    ArrowRight,
+    Lock,
+    Loader2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { unlockFeature } from "@/app/[locale]/dashboard/actions";
 import { Card } from "@/components/ui/card";
 import UserProfile from "@/components/dashboard/UserProfile";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -43,12 +47,21 @@ interface DashboardClientProps {
     user: any;
 }
 
+import TransactionModal from "@/components/dashboard/TransactionModal";
+
 export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
     const tz = useTranslations('Zodiac');
     const tn = useTranslations('Numerology');
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
+
+    // Transaction Modal State
+    const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+    const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+    const [transactionLoading, setTransactionLoading] = useState(false);
+
+    const unlockedFeatures = profile?.unlocked_features || [];
 
     // Verificamos si el perfil está completo
     const isComplete = profile?.full_name && profile?.birth_date && profile?.gender;
@@ -70,6 +83,116 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         }
     }
 
+    // ABRIR MODAL DE CONFIRMACIÓN
+    const handleUnlockClick = (feature: string) => {
+        setSelectedFeature(feature);
+        setTransactionModalOpen(true);
+    };
+
+    // EJECUTAR DESBLOQUEO (CONFIRMADO)
+    const handleConfirmUnlock = async () => {
+        if (!selectedFeature) return;
+
+        setTransactionLoading(true);
+        try {
+            const result = await unlockFeature(selectedFeature);
+            if (result.success) {
+                toast.success(t('transaction.success', {
+                    feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
+                }));
+                setProfile((prev: any) => ({
+                    ...prev,
+                    unlocked_features: [...(prev.unlocked_features || []), selectedFeature]
+                }));
+                // Dispatch event to update CreditsDisplay
+                window.dispatchEvent(new CustomEvent('credits-updated', {
+                    detail: { newBalance: result.newBalance }
+                }));
+                setTransactionModalOpen(false);
+            } else {
+                toast.error(result.error || "Error");
+            }
+        } catch (err) {
+            toast.error("Error al procesar el pago");
+        } finally {
+            setTransactionLoading(false);
+        }
+    };
+
+    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: any) => {
+        const isUnlocked = unlockedFeatures.includes(feature);
+
+        // Ya no usamos el estado local 'unlocking' para el loader del botón de la tarjeta
+        // porque el loader ahora está en el modal.
+
+        const content = (
+            <GlowingBorderCard className="h-full overflow-hidden relative group" glowColor={color}>
+                {/* Contenido Principal (Ahora siempre visible para mostrar el "sample") */}
+                <div className={`flex h-full min-h-[140px] transition-all duration-300 ${!isUnlocked ? 'opacity-80' : ''}`}>
+                    {/* Sector Izquierdo: Icono */}
+                    <div className={`w-1/3 bg-${color}-500/10 border-r border-${color}-500/20 flex items-center justify-center group-hover:bg-${color}-500/20 transition-colors relative`}>
+                        <div className={`absolute inset-0 bg-${color}-500/5 group-hover:bg-${color}-500/10 blur-xl transition-colors`} />
+                        {icon}
+                    </div>
+
+                    {/* Sector Derecho: Contenido */}
+                    <div className="flex-1 p-6 pr-10 pt-4 pb-8 flex flex-col justify-start relative">
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400/50 group-hover:text-indigo-300 group-hover:translate-x-1 transition-all duration-300">
+                            {isUnlocked ? (
+                                <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
+                            ) : (
+                                <Lock className="w-5 h-5 text-slate-500" strokeWidth={2} />
+                            )}
+                        </div>
+                        <h3 className={`text-xs font-bold text-${color}-300 uppercase tracking-widest mb-1.5 flex items-center gap-2`}>
+                            {title}
+                        </h3>
+                        <div className="text-xl font-serif font-bold text-white group-hover:text-indigo-200 transition-colors truncate">
+                            {badge}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                            {description}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Overlay de Sombra y Botón de Desbloqueo */}
+                {!isUnlocked && (
+                    <>
+                        <div className="absolute inset-0 bg-slate-950/10 pointer-events-none z-10" />
+                        <div className="absolute bottom-3 right-3 z-20 flex items-center justify-end">
+                            <Button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleUnlockClick(feature);
+                                }}
+                                variant="secondary"
+                                className="bg-purple-600 hover:bg-purple-500 text-white border-none shadow-2xl h-8 px-3 font-bold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                            >
+                                <Sparkle className="w-3 h-3" />
+                                <span className="text-[10px] uppercase tracking-wider">{t('unlock_button')}</span>
+                                <span className="text-[9px] opacity-70 bg-black/20 px-1 py-0.5 rounded ml-1 font-mono">50 AURA</span>
+                            </Button>
+                        </div>
+                    </>
+                )}
+            </GlowingBorderCard>
+        );
+
+        if (isUnlocked) {
+            return <Link href={href} className="block group h-full">{content}</Link>;
+        }
+        return (
+            <div
+                className="block h-full cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
+                onClick={() => handleUnlockClick(feature)}
+            >
+                {content}
+            </div>
+        );
+    };
+
     return (
         <div className="min-h-screen text-slate-100 pb-20 relative overflow-hidden">
             {/* Overlay de Bloqueo si no está completo */}
@@ -88,6 +211,21 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                     onClose={isComplete ? () => setIsEditingManual(false) : undefined}
                 />
             )}
+
+            {/* MODAL DE TRANSACCIÓN */}
+            <TransactionModal
+                isOpen={transactionModalOpen}
+                onClose={() => setTransactionModalOpen(false)}
+                onConfirm={handleConfirmUnlock}
+                title={t('transaction.title')}
+                description={t('transaction.description', {
+                    feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
+                })}
+                cost={50}
+                loading={transactionLoading}
+                confirmText={t('transaction.confirm')}
+                cancelText={t('transaction.cancel')}
+            />
 
             {/* Fondo animado */}
             <div className="fixed inset-0 z-0 pointer-events-none">
@@ -161,78 +299,42 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                         <AnimatedSection delay={0.3}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* ASTROLOGÍA */}
-                                <Link href="/astrology" className="block group h-full">
-                                    <GlowingBorderCard className="h-full overflow-hidden" glowColor="purple">
-                                        <div className="flex h-full min-h-[140px]">
-                                            {/* Sector Izquierdo: Icono */}
-                                            <div className="w-1/3 bg-indigo-500/10 border-r border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors relative">
-                                                <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-indigo-500/10 blur-xl transition-colors" />
-                                                {zodiacSign !== "---" ? (
-                                                    <span className="text-5xl md::text-6xl text-indigo-400 font-serif relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 select-none">
-                                                        {{
-                                                            "Aries": "♈", "Tauro": "♉", "Géminis": "♊", "Cáncer": "♋",
-                                                            "Leo": "♌", "Virgo": "♍", "Libra": "♎", "Escorpio": "♏",
-                                                            "Sagitario": "♐", "Capricornio": "♑", "Acuario": "♒", "Piscis": "♓"
-                                                        }[zodiacSign] || <Star className="w-10 h-10" />}
-                                                    </span>
-                                                ) : (
-                                                    <Star className="w-10 h-10 text-indigo-400 relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500" />
-                                                )}
-                                            </div>
-
-                                            {/* Sector Derecho: Contenido */}
-                                            <div className="flex-1 p-6 pr-10 flex flex-col justify-center relative">
-                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400/50 group-hover:text-indigo-300 group-hover:translate-x-1 transition-all duration-300">
-                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
-                                                </div>
-                                                <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-2">
-                                                    {t('astrology.title')}
-                                                </h3>
-                                                <div className="text-xl font-serif font-bold text-white group-hover:text-indigo-200 transition-colors truncate">
-                                                    {zodiacSign !== "---" ? tz(zodiacSign) : t('astrology.unknown')}
-                                                </div>
-                                                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                                                    {zodiacSign !== "---" ? t('astrology.essence') : t('astrology.setup')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </GlowingBorderCard>
-                                </Link>
+                                <FeatureCard
+                                    feature="astrology"
+                                    href="/astrology"
+                                    color="purple"
+                                    title={t('astrology.title')}
+                                    badge={zodiacSign !== "---" ? tz(zodiacSign) : t('astrology.unknown')}
+                                    description={zodiacSign !== "---" ? t('astrology.essence') : t('astrology.setup')}
+                                    icon={zodiacSign !== "---" ? (
+                                        <span className="text-5xl md:text-6xl text-indigo-400 font-serif relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 select-none">
+                                            {{
+                                                "Aries": "♈", "Tauro": "♉", "Géminis": "♊", "Cáncer": "♋",
+                                                "Leo": "♌", "Virgo": "♍", "Libra": "♎", "Escorpio": "♏",
+                                                "Sagitario": "♐", "Capricornio": "♑", "Acuario": "♒", "Piscis": "♓"
+                                            }[zodiacSign] || <Star className="w-10 h-10" />}
+                                        </span>
+                                    ) : (
+                                        <Star className="w-10 h-10 text-indigo-400 relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500" />
+                                    )}
+                                />
 
                                 {/* NUMEROLOGÍA */}
-                                <Link href="/numerology" className="block group h-full">
-                                    <GlowingBorderCard className="h-full overflow-hidden" glowColor="cyan">
-                                        <div className="flex h-full min-h-[140px]">
-                                            {/* Sector Izquierdo: Icono */}
-                                            <div className="w-1/3 bg-pink-500/10 border-r border-pink-500/20 flex items-center justify-center group-hover:bg-pink-500/20 transition-colors relative">
-                                                <div className="absolute inset-0 bg-pink-500/5 group-hover:bg-pink-500/10 blur-xl transition-colors" />
-                                                {lifePathNum > 0 ? (
-                                                    <span className="text-5xl md:text-6xl font-bold text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500 select-none font-serif">
-                                                        {lifePathNum}
-                                                    </span>
-                                                ) : (
-                                                    <Hash className="w-10 h-10 text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500" />
-                                                )}
-                                            </div>
-
-                                            {/* Sector Derecho: Contenido */}
-                                            <div className="flex-1 p-6 pr-10 flex flex-col justify-center relative">
-                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-pink-400/50 group-hover:text-pink-300 group-hover:translate-x-1 transition-all duration-300">
-                                                    <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
-                                                </div>
-                                                <h3 className="text-xs font-bold text-pink-300 uppercase tracking-widest mb-2">
-                                                    {t('numerology.title')}
-                                                </h3>
-                                                <div className="text-xl font-serif font-bold text-white group-hover:text-pink-200 transition-colors truncate">
-                                                    {lifePathNum > 0 ? t('numerology.path', { count: lifePathNum }) : t('numerology.calculate')}
-                                                </div>
-                                                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                                                    {lifePathNum > 0 ? lifePathWord : t('numerology.discovery')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </GlowingBorderCard>
-                                </Link>
+                                <FeatureCard
+                                    feature="numerology"
+                                    href="/numerology"
+                                    color="pink"
+                                    title={t('numerology.title')}
+                                    badge={lifePathNum > 0 ? t('numerology.path', { count: lifePathNum }) : t('numerology.calculate')}
+                                    description={lifePathNum > 0 ? lifePathWord : t('numerology.discovery')}
+                                    icon={lifePathNum > 0 ? (
+                                        <span className="text-5xl md:text-6xl font-bold text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500 select-none font-serif">
+                                            {lifePathNum}
+                                        </span>
+                                    ) : (
+                                        <Hash className="w-10 h-10 text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500" />
+                                    )}
+                                />
                             </div>
                         </AnimatedSection>
 

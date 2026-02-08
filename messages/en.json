@@ -81,6 +81,17 @@
             "unknown_date": "Unknown date",
             "unknown_place": "Unknown place",
             "edit": "Edit"
+        },
+        "unlock_button": "Unlock Access",
+        "unlock_cost": "{cost} AURA",
+        "unlock_confirm": "Unlock {feature} for {cost} AURA?",
+        "transaction": {
+            "title": "Confirm Unlock",
+            "description": "You are about to unlock permanent access to the wisdom of {feature}.",
+            "confirm": "Confirm Unlock",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "success": "You have unlocked access to {feature}!"
         }
     },
     "Zodiac": {
