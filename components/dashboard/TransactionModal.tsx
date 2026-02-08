@@ -1,8 +1,8 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles, AlertCircle } from "lucide-react";
+import { Loader2, Sparkle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TransactionModalProps {
@@ -32,7 +32,18 @@ export default function TransactionModal({
 }: TransactionModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && !loading && onClose()}>
-            <DialogContent className="sm:max-w-md bg-slate-900/95 backdrop-blur-xl border-purple-500/20 shadow-2xl shadow-purple-900/20 text-slate-100 p-0 overflow-hidden gap-0">
+            <DialogContent className="sm:max-w-md bg-slate-900/95 backdrop-blur-xl border-purple-500/20 shadow-2xl shadow-purple-900/20 text-slate-100 p-0 overflow-hidden gap-0" showCloseButton={false}>
+                {/* Manual Close Button to ensure it works and is visible over p-0/overflow-hidden */}
+                {!loading && (
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 z-[60] text-slate-500 hover:text-white transition-colors p-1"
+                    >
+                        <X className="w-5 h-5" />
+                        <span className="sr-only">Cerrar</span>
+                    </button>
+                )}
+
                 {/* Decorative Elements */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50" />
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -42,8 +53,8 @@ export default function TransactionModal({
                     <div className="flex flex-col items-center text-center gap-4">
                         {/* Icon Container */}
                         <div className="w-16 h-16 rounded-full bg-slate-800/50 border border-purple-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.15)] relative group">
-                            <div className="absolute inset-0 rounded-full bg-purple-500/10 animate-pulse" />
-                            {icon || <Sparkles className="w-8 h-8 text-purple-400" />}
+                            <div className="absolute inset-0 rounded-full bg-amber-500/10 animate-pulse" />
+                            {icon || <Sparkle className="w-8 h-8 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" />}
                         </div>
 
                         <DialogHeader className="space-y-2">
@@ -61,8 +72,8 @@ export default function TransactionModal({
                 <div className="flex justify-center py-4 relative z-10">
                     <div className="flex flex-col items-center gap-1 bg-slate-950/40 px-6 py-2 rounded-xl border border-white/5">
                         <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Costo de la Transacción</span>
-                        <div className="flex items-center gap-2 text-purple-300 font-mono text-lg font-bold">
-                            <Sparkles className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-amber-400 font-mono text-lg font-bold">
+                            <Sparkle className="w-4 h-4 fill-amber-400/20" />
                             <span>{cost} AURA</span>
                         </div>
                     </div>
