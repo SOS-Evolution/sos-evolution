@@ -433,7 +433,7 @@ export default function ReadingPage() {
 
                     <TarotDeck
                       onSelectCard={handleCardSelect}
-                      maxSelection={getMaxCards()}
+                      maxSelections={getMaxCards()}
                       onSelectionComplete={handleSelectionComplete}
                       selectedCards={selectedCards}
                     />

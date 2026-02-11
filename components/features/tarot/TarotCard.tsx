@@ -14,6 +14,7 @@ interface TarotCardProps {
     frameId?: TarotFrameId;
     layoutId?: string;  // Para transiciones compartidas entre componentes
     label?: string;      // Etiqueta para tiradas (ej: "Pasado", "Presente", "Futuro")
+    className?: string;
 }
 
 export const DECK = [
@@ -24,7 +25,7 @@ export const DECK = [
     "El Sol", "El Juicio", "El Mundo"
 ];
 
-export function TarotCard({ cardName, imageUrl, isRevealed, onClick, frameId, layoutId, label }: TarotCardProps) {
+export function TarotCard({ cardName, imageUrl, isRevealed, onClick, frameId, layoutId, label, className }: TarotCardProps) {
     const { tarotFrame } = useConfig();
     const activeFrameId = frameId || tarotFrame;
     const resolvedImageUrl = imageUrl || (cardName ? `/assets/tarot/arcano-${DECK.indexOf(cardName)}.jpg` : null);
@@ -44,7 +45,7 @@ export function TarotCard({ cardName, imageUrl, isRevealed, onClick, frameId, la
     };
 
     return (
-        <div className="flex flex-col items-center gap-3">
+        <div className={cn("flex flex-col items-center gap-3", className)}>
             {/* Etiqueta de posición (para tiradas multi-carta) */}
             {label && (
                 <motion.span
