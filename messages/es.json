@@ -447,8 +447,8 @@
     "TarotPage": {
         "choose_path": "Elige tu <purple>Camino</purple>",
         "choose_path_desc": "Selecciona el tipo de consulta que resuene con tu energía.",
-        "mode_oracle_title": "Espejo del Alma",
-        "mode_oracle_desc": "El arquetipo que tu energía necesita integrar hoy.",
+        "mode_oracle_title": "Oráculo Diario",
+        "mode_oracle_desc": "Tu mensaje del universo para hoy.",
         "mode_question_title": "Pregunta al Oráculo",
         "mode_question_desc": "Formula una pregunta y recibe guía específica.",
         "mode_classic_title": "Evolución Temporal",

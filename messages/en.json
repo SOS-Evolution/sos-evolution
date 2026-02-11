@@ -447,8 +447,8 @@
     "TarotPage": {
         "choose_path": "Choose your <purple>Path</purple>",
         "choose_path_desc": "Select the type of consultation that resonates with your energy.",
-        "mode_oracle_title": "Soul Mirror",
-        "mode_oracle_desc": "The archetype that your energy needs to integrate today.",
+        "mode_oracle_title": "Daily Oracle",
+        "mode_oracle_desc": "Your message from the universe for today.",
         "mode_question_title": "Ask the Oracle",
         "mode_question_desc": "Formulate a question and receive specific guidance.",
         "mode_classic_title": "Temporal Evolution",
