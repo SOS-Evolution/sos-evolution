@@ -470,6 +470,8 @@
         "mission": "Misión",
         "new_reading": "Nueva Lectura",
         "dashboard": "Dashboard",
+        "aura_cost": "{cost} AURA",
+        "your_aura": "Tu Aura",
         "labels": {
             "Pasado": "Pasado",
             "Presente": "Presente",

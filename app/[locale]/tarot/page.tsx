@@ -80,6 +80,14 @@ export default function ReadingPage() {
 
   // 1. SELECCIONAR MODO
   const selectMode = (mode: ReadingMode) => {
+    const cost = readingCosts[mode === "classic" ? "classic" : "general"] ?? 20;
+
+    if (balance < cost) {
+      setNeededAmount(cost);
+      setInsufficientAuraModalOpen(true);
+      return;
+    }
+
     setSelectedMode(mode);
     if (mode === "question") {
       setStep("question_input");
@@ -205,6 +213,23 @@ export default function ReadingPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/20 rounded-full blur-[80px] animate-float-delayed" />
         </div>
 
+        {/* Balance Display */}
+        <div className="fixed top-24 right-6 z-50">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-purple-500/20 shadow-lg shadow-purple-900/10"
+          >
+            <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold font-mono leading-none mb-1">{t('your_aura')}</span>
+              <span className="text-sm font-bold text-white leading-none">{balance}</span>
+            </div>
+          </motion.div>
+        </div>
+
         <main className="flex flex-col items-center gap-8 max-w-4xl w-full z-10">
 
           {/* ========== PASO 1: SELECCIÓN DE TIRADA ========== */}
@@ -241,7 +266,12 @@ export default function ReadingPage() {
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-purple-400 text-xs font-bold">{t('one_card')}</span>
-                          <span className="text-purple-400 text-sm font-bold uppercase tracking-wider">➜</span>
+                          <div className="flex items-center gap-1.5 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">
+                            <Sparkles className="w-3 h-3 text-purple-400" />
+                            <span className="text-[10px] font-bold text-purple-300">
+                              {t('aura_cost', { cost: readingCosts['general'] ?? 20 })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
@@ -260,7 +290,12 @@ export default function ReadingPage() {
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-cyan-400 text-xs font-bold">{t('one_card')}</span>
-                          <span className="text-cyan-400 text-sm font-bold uppercase tracking-wider">➜</span>
+                          <div className="flex items-center gap-1.5 bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/20">
+                            <Sparkles className="w-3 h-3 text-cyan-400" />
+                            <span className="text-[10px] font-bold text-cyan-300">
+                              {t('aura_cost', { cost: readingCosts['general'] ?? 20 })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
@@ -283,7 +318,12 @@ export default function ReadingPage() {
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
-                          <span className="text-amber-400 text-sm font-bold uppercase tracking-wider">➜</span>
+                          <div className="flex items-center gap-1.5 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
+                            <Sparkles className="w-3 h-3 text-amber-400" />
+                            <span className="text-[10px] font-bold text-amber-300">
+                              {t('aura_cost', { cost: readingCosts['classic'] ?? 100 })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
