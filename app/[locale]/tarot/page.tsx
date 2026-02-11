@@ -272,8 +272,10 @@ export default function ReadingPage() {
                         <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <ScanEye className="w-7 h-7 text-purple-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_oracle_title')}</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
+                          {t('mode_oracle_title')}
+                        </h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
                           {t('mode_oracle_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
@@ -296,8 +298,10 @@ export default function ReadingPage() {
                         <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <MessageCircleQuestion className="w-7 h-7 text-cyan-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_question_title')}</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
+                          {t('mode_question_title')}
+                        </h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
                           {t('mode_question_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
@@ -324,8 +328,10 @@ export default function ReadingPage() {
                         <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           <Clock className="w-7 h-7 text-amber-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">{t('mode_classic_title')}</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
+                          {t('mode_classic_title')}
+                        </h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
                           {t('mode_classic_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
