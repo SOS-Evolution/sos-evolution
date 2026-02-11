@@ -67,6 +67,7 @@ export async function updateReadingTypeCost(id: string, cost: number) {
     revalidatePath("/(locale)/dashboard", "page");
     revalidatePath("/(locale)/astrology", "page");
     revalidatePath("/(locale)/numerology", "page");
+    revalidatePath("/(locale)/tarot", "page");
 
     return { success: true };
 }

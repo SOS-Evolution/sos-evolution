@@ -39,11 +39,13 @@ export default function ReadingPage() {
   // New states for Insufficient AURA
   const [balance, setBalance] = useState<number>(0);
   const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
+  const [isCostsLoading, setIsCostsLoading] = useState(true);
   const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
   const [neededAmount, setNeededAmount] = useState(50);
 
   useEffect(() => {
     async function loadInitialData() {
+      setIsCostsLoading(true);
       // 1. Fetch costs
       try {
         const costs = await getReadingTypes();
@@ -54,6 +56,8 @@ export default function ReadingPage() {
         setReadingCosts(costMap);
       } catch (err) {
         console.error("Error loading costs:", err);
+      } finally {
+        setIsCostsLoading(false);
       }
 
       // 2. Fetch initial balance via API (more reliable)
