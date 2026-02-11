@@ -119,7 +119,15 @@ export async function PUT(req: Request) {
         // 4. Force specific revalidation for core pages (both root and localized)
         const { revalidatePath } = await import('next/cache');
 
-        // Revalidate root paths
+        // Revalidate for all supported locales (critical for internationalized routes)
+        const locales = ['es', 'en'];
+        for (const locale of locales) {
+            revalidatePath(`/${locale}/dashboard`);
+            revalidatePath(`/${locale}/astrology`);
+            revalidatePath(`/${locale}/numerology`);
+        }
+
+        // Also revalidate root paths for compatibility
         revalidatePath('/dashboard');
         revalidatePath('/astrology');
         revalidatePath('/numerology');
@@ -127,7 +135,7 @@ export async function PUT(req: Request) {
         // Revalidate localized layouts/paths (nuclear option)
         revalidatePath('/', 'layout');
 
-        console.log(`[API/PROFILE] Profile updated for ${user.id}. Revalidation triggered for dashboard, astrology, and numerology.`);
+        console.log(`[API/PROFILE] Profile updated for ${user.id}. Revalidation triggered for all locale-prefixed routes.`);
 
         // Verificar si se debe completar la misión de perfil
         if (profile.full_name && profile.birth_date && profile.birth_place) {
