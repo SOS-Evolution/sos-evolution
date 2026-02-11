@@ -106,7 +106,8 @@
         "Sagittarius": "Sagitario",
         "Capricorn": "Capricornio",
         "Aquarius": "Acuario",
-        "Pisces": "Piscis"
+        "Pisces": "Piscis",
+        "---": "---"
     },
     "Auth": {
         "login": "Ingresar",
@@ -394,6 +395,7 @@
         "save_changes": "Guardar Cambios",
         "complete_identity": "Completar Mi Identidad",
         "back": "Volver al inicio",
+        "profile_updated_success": "Perfil actualizado con éxito.",
         "error_title": "Error",
         "error_retry": "Volver a Intentar",
         "error_hint": "Tip: Verifica tu conexión o reintenta en unos momentos."

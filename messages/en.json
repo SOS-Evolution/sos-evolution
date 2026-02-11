@@ -106,7 +106,8 @@
         "Sagittarius": "Sagittarius",
         "Capricorn": "Capricorn",
         "Aquarius": "Aquarius",
-        "Pisces": "Pisces"
+        "Pisces": "Pisces",
+        "---": "---"
     },
     "Auth": {
         "login": "Login",
@@ -394,6 +395,7 @@
         "save_changes": "Save Changes",
         "complete_identity": "Complete My Identity",
         "back": "Back to start",
+        "profile_updated_success": "Profile successfully updated.",
         "error_title": "Error",
         "error_retry": "Retry",
         "error_hint": "Tip: Check your connection or retry in a few moments."

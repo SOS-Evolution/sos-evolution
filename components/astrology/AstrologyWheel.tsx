@@ -143,7 +143,7 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                                 </g>
 
                                 <title>
-                                    {t.rich(`planets.${planet.name}`, { fallback: () => planet.name }) as any} {t('in_sign')} {tz.rich(planet.sign, { fallback: () => planet.sign }) as any} ({planet.normDegree.toFixed(1)}°)
+                                    {t.rich(`planets.${planet.name}`, { fallback: () => planet.name }) as any} {t('in_sign')} {planet.sign !== "---" ? tz.rich(planet.sign, { fallback: () => planet.sign }) as any : "---"} ({planet.normDegree.toFixed(1)}°)
                                 </title>
                             </g>
                         </motion.g>

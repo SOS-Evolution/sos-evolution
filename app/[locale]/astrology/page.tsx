@@ -4,6 +4,9 @@ import { getWesternChartData, getMockChartData, WesternChartData } from "@/lib/a
 import { getTranslations } from "next-intl/server";
 import AstrologyClient from "@/components/astrology/AstrologyClient";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AstrologyPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const t_raw = await getTranslations('AstrologyPage');

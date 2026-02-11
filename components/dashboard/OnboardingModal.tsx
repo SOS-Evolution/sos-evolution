@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +6,7 @@ import { Save, User, MapPin, Calendar as CalendarIcon, Clock, Sparkles, ArrowRig
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types";
 import { useTranslations } from 'next-intl';
+import { toast } from "sonner";
 
 interface OnboardingModalProps {
     onComplete: (profile: Profile) => void;
@@ -65,6 +64,7 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
             }
 
             onComplete(data);
+            toast.success(t('profile_updated_success') || "Perfil actualizado con éxito");
         } catch (err: any) {
             console.error("Error guardando perfil:", err);
             setError(err.message || "Hubo un error al sincronizar con el cosmos. Intenta de nuevo.");

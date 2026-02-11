@@ -37,6 +37,11 @@ export default function AstrologyClient({
     const [balance, setBalance] = useState<number | null>(null);
     const t_interp = useTranslations('AstrologyPage.interpretation');
 
+    // Sync state with props when server data changes (e.g. after profile update)
+    useEffect(() => {
+        setInterpretation(initialInterpretation);
+    }, [initialInterpretation]);
+
     useEffect(() => {
         const fetchBalance = async () => {
             const { data: { user } } = await supabase.auth.getUser();

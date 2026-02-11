@@ -99,15 +99,35 @@ export async function PUT(req: Request) {
             }, { status: 500 });
         }
 
-        // Invalidate old interpretations if birth data changed
+        // Invalidate old interpretations and chart if birth data changed
         if (isBirthDataChanged) {
+            console.log(`[API/PROFILE] Birth data changed for ${user.id}. Clearing cache.`);
+
+            // 1. Clear all interpretations
             const { error: deleteError } = await supabase
                 .from('astrology_interpretations')
                 .delete()
                 .eq('user_id', user.id);
 
-            if (deleteError) console.error("Error clearing old interpretations:", deleteError);
+            if (deleteError) {
+                console.error("[API/PROFILE] CRITICAL: Error clearing interpretations:", deleteError);
+            } else {
+                console.log("[API/PROFILE] Interpretations cleared successfully.");
+            }
         }
+
+        // 4. Force specific revalidation for core pages (both root and localized)
+        const { revalidatePath } = await import('next/cache');
+
+        // Revalidate root paths
+        revalidatePath('/dashboard');
+        revalidatePath('/astrology');
+        revalidatePath('/numerology');
+
+        // Revalidate localized layouts/paths (nuclear option)
+        revalidatePath('/', 'layout');
+
+        console.log(`[API/PROFILE] Profile updated for ${user.id}. Revalidation triggered for dashboard, astrology, and numerology.`);
 
         // Verificar si se debe completar la misión de perfil
         if (profile.full_name && profile.birth_date && profile.birth_place) {

@@ -66,7 +66,14 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
 
     return (
         <>
-            <Card className={cn("bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group", className)}>
+            <Card
+                onClick={onEdit}
+                className={cn(
+                    "bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/20 p-4 relative overflow-hidden group transition-all duration-300",
+                    onEdit && "cursor-pointer hover:border-purple-500/40 hover:shadow-[0_0_20px_rgba(168,85,247,0.1)]",
+                    className
+                )}
+            >
 
                 {/* Fondo Decorativo */}
                 <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
