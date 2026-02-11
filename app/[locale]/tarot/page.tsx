@@ -216,7 +216,10 @@ export default function ReadingPage() {
 
   // Revelar todas las cartas a la vez
   const handleRevealAll = () => {
-    const allRevealed = new Array(selectedCards.length).fill(true);
+    // Si no hay readingData aún, no hacer nada
+    if (!readingData) return;
+
+    const allRevealed = new Array(readingData.length).fill(true);
     setRevealedCards(allRevealed);
     setTimeout(() => setStep("reading"), 800);
   };
@@ -429,10 +432,10 @@ export default function ReadingPage() {
                     </div>
 
                     <TarotDeck
-                      onCardSelect={handleCardSelect}
-                      selectedCount={selectedCards.length}
+                      onSelectCard={handleCardSelect}
                       maxSelection={getMaxCards()}
                       onSelectionComplete={handleSelectionComplete}
+                      selectedCards={selectedCards}
                     />
                   </>
                 ) : (
@@ -471,9 +474,9 @@ export default function ReadingPage() {
 
                       <div onClick={() => !revealedCards[index] && handleRevealCard(index)}>
                         <TarotCard
-                          card={revealedCards[index] ? reading.card : DECK[0]} // DECK[0] es placeholder del reverso si se quiere, o usar isRevealed
+                          cardName={revealedCards[index] ? reading.cardName : undefined}
                           isRevealed={revealedCards[index]}
-                          showMeanings={false}
+                          onClick={() => !revealedCards[index] && handleRevealCard(index)}
                           className={`w-64 h-96 cursor-pointer hover:scale-105 transition-transform duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}
                         />
                       </div>
@@ -530,21 +533,26 @@ export default function ReadingPage() {
                           {reading.position}
                         </span>
                       )}
-                      <TarotCard card={reading.card} isRevealed={true} showMeanings={false} className="w-full max-w-[240px] aspect-[2/3]" />
+                      <TarotCard
+                        cardName={reading.cardName}
+                        isRevealed={true}
+                        onClick={() => { }}
+                        className="w-full max-w-[240px] aspect-[2/3]"
+                      />
                     </div>
 
                     <div className="flex-1 space-y-6">
                       <div>
-                        <h3 className="text-3xl font-serif text-white mb-2">{reading.card.name}</h3>
+                        <h3 className="text-3xl font-serif text-white mb-2">{reading.cardName}</h3>
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {reading.card.keywords.map(k => (
+                          {reading.keywords.map(k => (
                             <span key={k} className="px-3 py-1 bg-white/5 rounded-full text-xs text-slate-300 border border-white/10">
                               {k}
                             </span>
                           ))}
                         </div>
                         <p className="text-lg text-slate-300 leading-relaxed italic border-l-2 border-purple-500/50 pl-4">
-                          "{reading.interpretation}"
+                          "{reading.description}"
                         </p>
                       </div>
 
@@ -555,7 +563,7 @@ export default function ReadingPage() {
                             {t('mission')}
                           </h4>
                           <p className="text-sm text-slate-400">
-                            {reading.affirmation}
+                            {reading.action}
                           </p>
                         </div>
                       </div>
