@@ -14,6 +14,7 @@ import AstroInterpretation from "@/components/astrology/AstroInterpretation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 
 interface AstrologyClientProps {
     profile: any;
@@ -35,6 +36,8 @@ export default function AstrologyClient({
     const [interpretation, setInterpretation] = useState(initialInterpretation);
     const [isLoading, setIsLoading] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
+    const [auraCost, setAuraCost] = useState<number>(20); // Default fallback
+    const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
     const t_interp = useTranslations('AstrologyPage.interpretation');
 
     // Sync state with props when server data changes (e.g. after profile update)
@@ -43,14 +46,26 @@ export default function AstrologyClient({
     }, [initialInterpretation]);
 
     useEffect(() => {
-        const fetchBalance = async () => {
+        const fetchInitialData = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { data } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
-                setBalance(data);
+                // Fetch balance
+                const { data: balanceData } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+                setBalance(balanceData);
+
+                // Fetch dynamic cost for astrology analysis
+                const { data: readingTypes } = await supabase
+                    .from('reading_types')
+                    .select('credit_cost')
+                    .eq('code', 'astrology_full')
+                    .single();
+
+                if (readingTypes) {
+                    setAuraCost(readingTypes.credit_cost);
+                }
             }
         };
-        fetchBalance();
+        fetchInitialData();
     }, []);
 
     const handleInterpret = async () => {
@@ -68,7 +83,7 @@ export default function AstrologyClient({
 
             if (!res.ok) {
                 if (res.status === 402) {
-                    toast.error(t_interp('insufficient_aura'));
+                    setInsufficientAuraModalOpen(true);
                 } else {
                     toast.error(data.error || "Error");
                 }
@@ -174,7 +189,7 @@ export default function AstrologyClient({
                                     )}
                                     {t_interp('generate_button')}
                                     <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-black flex items-center gap-1 shadow-lg">
-                                        <Sparkles className="w-2.5 h-2.5" /> {t_interp('aura_cost_badge')}
+                                        <Sparkles className="w-2.5 h-2.5" /> {t_interp('aura_cost_badge', { cost: auraCost })}
                                     </div>
                                 </Button>
                             )}
@@ -195,7 +210,7 @@ export default function AstrologyClient({
                                     className="text-xs text-slate-400 border-white/5 hover:border-indigo-500/30 glass"
                                 >
                                     {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
-                                    {t_interp('regenerate_button')} ({t_interp('aura_cost_badge')} Aura)
+                                    {t_interp('regenerate_button')} ({t_interp('aura_cost_badge', { cost: auraCost })})
                                 </Button>
                             </div>
                         </AnimatedSection>
@@ -319,6 +334,12 @@ export default function AstrologyClient({
                     </div>
                 </AnimatedSection>
             )}
+            <InsufficientAuraModal
+                isOpen={insufficientAuraModalOpen}
+                onClose={() => setInsufficientAuraModalOpen(false)}
+                requiredAmount={auraCost}
+                currentBalance={balance || 0}
+            />
         </main>
     );
 }

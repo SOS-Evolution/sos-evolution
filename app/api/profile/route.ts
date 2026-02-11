@@ -82,6 +82,55 @@ export async function PUT(req: Request) {
         if (body.longitude !== undefined) updates.longitude = body.longitude;
         if (body.gender !== undefined) updates.gender = body.gender;
 
+        // CRITICAL: Clear interpretations and revoke unlocks BEFORE updating profile
+        // This prevents race conditions where the page might reload before cleanup
+        if (isBirthDataChanged) {
+            console.log(`[API/PROFILE] Birth data changed for ${user.id}. Clearing cache and revoking unlocks.`);
+
+            // 1. Clear all interpretations FIRST
+            const { error: deleteError } = await supabase
+                .from('astrology_interpretations')
+                .delete()
+                .eq('user_id', user.id);
+
+            if (deleteError) {
+                console.error("[API/PROFILE] CRITICAL: Error clearing interpretations:", deleteError);
+            } else {
+                // Verify deletion
+                const { data: remaining } = await supabase
+                    .from('astrology_interpretations')
+                    .select('id')
+                    .eq('user_id', user.id);
+
+                console.log("[API/PROFILE] Interpretations cleared successfully. Remaining count:", remaining?.length || 0);
+            }
+
+            // 2. Revoke astrology and numerology unlocks (user must pay again)
+            const { data: currentProfile } = await supabase
+                .from('profiles')
+                .select('unlocked_features')
+                .eq('id', user.id)
+                .single();
+
+            if (currentProfile?.unlocked_features) {
+                const newFeatures = currentProfile.unlocked_features.filter(
+                    (f: string) => f !== 'astrology' && f !== 'numerology'
+                );
+
+                const { error: unlockError } = await supabase
+                    .from('profiles')
+                    .update({ unlocked_features: newFeatures })
+                    .eq('id', user.id);
+
+                if (unlockError) {
+                    console.error("[API/PROFILE] Error revoking unlocks:", unlockError);
+                } else {
+                    console.log("[API/PROFILE] Astrology and Numerology unlocks revoked successfully.");
+                }
+            }
+        }
+
+        // Now update the main profile
         const { data: profile, error } = await supabase
             .from('profiles')
             .update(updates)
@@ -97,23 +146,6 @@ export async function PUT(req: Request) {
                 details: error.message,
                 hint: 'Asegúrate de haber ejecutado las migraciones de base de datos.'
             }, { status: 500 });
-        }
-
-        // Invalidate old interpretations and chart if birth data changed
-        if (isBirthDataChanged) {
-            console.log(`[API/PROFILE] Birth data changed for ${user.id}. Clearing cache.`);
-
-            // 1. Clear all interpretations
-            const { error: deleteError } = await supabase
-                .from('astrology_interpretations')
-                .delete()
-                .eq('user_id', user.id);
-
-            if (deleteError) {
-                console.error("[API/PROFILE] CRITICAL: Error clearing interpretations:", deleteError);
-            } else {
-                console.log("[API/PROFILE] Interpretations cleared successfully.");
-            }
         }
 
         // 4. Force specific revalidation for core pages (both root and localized)

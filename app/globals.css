@@ -227,6 +227,15 @@
     transform: rotate(360deg);
   }
 }
+/* Gradient X Animation */
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
 
 /* Utility Classes */
 .animate-float {
@@ -268,6 +277,10 @@
 .animate-aurora {
   background-size: 400% 400%;
   animation: aurora 15s ease infinite;
+}
+.animate-gradient-x {
+  background-size: 200% 100%;
+  animation: gradient-x 3s ease infinite;
 }
 
 /* Glass Effect Enhanced */

@@ -104,6 +104,13 @@ export default async function AstrologyPage({ params }: { params: Promise<{ loca
         if (!chartData || chartData.planets.length === 0) {
             chartData = getMockChartData(details);
         }
+
+        // DEBUG: Log planet data to investigate Moon issue
+        if (chartData) {
+            console.log("[ASTROLOGY DEBUG] Chart planets:", chartData.planets.map(p => ({ name: p.name, sign: p.sign })));
+            const moon = chartData.planets.find(p => p.name === "Moon");
+            console.log("[ASTROLOGY DEBUG] Moon data:", moon);
+        }
     }
 
     return (

@@ -80,7 +80,14 @@ export async function unlockFeature(feature: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("No autenticado");
 
-    const COST = 50;
+    // Fetch dynamic cost from database
+    const { data: readingType } = await supabase
+        .from('reading_types')
+        .select('credit_cost')
+        .eq('code', `unlock_${feature}`)
+        .single();
+
+    const COST = readingType?.credit_cost ?? 50;
 
     // 1. Intentar gastar créditos
     const { data: newBalance, error: spendError } = await supabase.rpc('spend_credits', {

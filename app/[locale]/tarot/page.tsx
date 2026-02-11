@@ -12,6 +12,10 @@ import { Link } from "@/i18n/routing";
 import { Input } from "@/components/ui/input";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
+import { supabase } from "@/lib/supabase/client";
+import { getReadingTypes } from "@/app/admin/settings/actions";
 
 type ReadingMode = "oracle" | "question" | "classic"; // classic = 3 cartas
 type Step = "selection" | "question_input" | "card_selection" | "reveal" | "reading";
@@ -31,6 +35,37 @@ export default function ReadingPage() {
   const [readingData, setReadingData] = useState<CardReadingData[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
+
+  // New states for Insufficient AURA
+  const [balance, setBalance] = useState<number>(0);
+  const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
+  const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
+  const [neededAmount, setNeededAmount] = useState(50);
+
+  // Fetch initial data
+  useState(() => {
+    async function loadInitialData() {
+      // 1. Fetch costs
+      try {
+        const costs = await getReadingTypes();
+        const costMap = costs.reduce((acc: any, curr: any) => {
+          acc[curr.code] = curr.credit_cost;
+          return acc;
+        }, {});
+        setReadingCosts(costMap);
+      } catch (err) {
+        console.error("Error loading costs:", err);
+      }
+
+      // 2. Fetch balance
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: balanceData } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+        setBalance(balanceData || 0);
+      }
+    }
+    loadInitialData();
+  });
 
   // Etiquetas para la tirada de 3 cartas (enviadas a la API)
   const CLASSIC_LABELS_KEYS = ["Pasado", "Presente", "Futuro"];
@@ -89,10 +124,28 @@ export default function ReadingPage() {
         });
 
         const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 402) {
+            const cost = readingCosts[selectedMode === "classic" ? "classic" : "general"] ?? 10;
+            setNeededAmount(cost);
+            setInsufficientAuraModalOpen(true);
+            setStep("selection");
+            setIsLoading(false);
+            return;
+          }
+          throw new Error(data.error || "Error in session");
+        }
+
         readings.push({
           ...data,
           position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[i]}`) : undefined
         });
+
+        // Update balance if returned
+        if (data.newBalance !== undefined) {
+          setBalance(data.newBalance);
+        }
       }
 
       setReadingData(readings);
@@ -102,11 +155,14 @@ export default function ReadingPage() {
         setIsLoading(false);
       }, 500);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error conectando con el alma:", error);
-      alert("Error de conexión cósmica. Intenta de nuevo.");
-      setStep("selection");
-      setIsLoading(false);
+      // Only show error toast if it's not a credit issue (already handled)
+      if (!insufficientAuraModalOpen) {
+        toast.error(error.message || "Error de conexión cósmica");
+        setStep("selection");
+        setIsLoading(false);
+      }
     }
   };
 
@@ -602,6 +658,12 @@ export default function ReadingPage() {
 
         </main>
       </div>
+      <InsufficientAuraModal
+        isOpen={insufficientAuraModalOpen}
+        onClose={() => setInsufficientAuraModalOpen(false)}
+        requiredAmount={neededAmount}
+        currentBalance={balance}
+      />
     </LayoutGroup>
   );
 }

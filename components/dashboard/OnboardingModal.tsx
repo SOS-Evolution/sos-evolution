@@ -7,18 +7,27 @@ import { cn } from "@/lib/utils";
 import { Profile } from "@/types";
 import { useTranslations } from 'next-intl';
 import { toast } from "sonner";
+import WarningModal from "@/components/dashboard/WarningModal";
 
 interface OnboardingModalProps {
-    onComplete: (profile: Profile) => void;
+    initialData: any;
+    onComplete: (updatedProfile: Profile) => void;
     onClose?: () => void;
-    initialData?: Profile | null;
     isEdit?: boolean;
+    astrologyUnlockCost?: number;
 }
 
-export default function OnboardingModal({ onComplete, onClose, initialData, isEdit }: OnboardingModalProps) {
+export default function OnboardingModal({
+    initialData,
+    onComplete,
+    onClose,
+    isEdit = false,
+    astrologyUnlockCost = 50
+}: OnboardingModalProps) {
     const t = useTranslations('Onboarding');
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(isEdit ? 3 : 1);
     const [loading, setLoading] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -35,10 +44,26 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
 
     const isStep2Complete = fullName && birthDate && birthPlace && gender && birthTime;
 
-    const handleSave = async () => {
+    // Detect if birth data changed (relevant for re-locking features)
+    // Normalize time for comparison (remove seconds if present)
+    const normalizeTime = (t: string | null | undefined) => {
+        if (!t) return "";
+        return t.split(':').slice(0, 2).join(':');
+    };
+
+    const birthDataChanged = isEdit && (
+        (birthDate || "") !== (initialData?.birth_date || "") ||
+        normalizeTime(birthTime) !== normalizeTime(initialData?.birth_time) ||
+        (birthPlace || "").trim() !== (initialData?.birth_place || "").trim() ||
+        Number(latitude || 0) !== Number(initialData?.latitude || 0) ||
+        Number(longitude || 0) !== Number(initialData?.longitude || 0)
+    );
+
+    const handleSaveConfirmed = async () => {
         if (!isStep2Complete) return;
         setError(null);
         setLoading(true);
+        setShowConfirmation(false);
         try {
             const res = await fetch('/api/profile', {
                 method: 'PUT',
@@ -65,11 +90,28 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
 
             onComplete(data);
             toast.success(t('profile_updated_success') || "Perfil actualizado con éxito");
+
+            // Force hard reload to clear all caches (including interpretations)
+            // Using location.reload() instead of window.location.href to ensure cache is cleared
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (err: any) {
             console.error("Error guardando perfil:", err);
             setError(err.message || "Hubo un error al sincronizar con el cosmos. Intenta de nuevo.");
-        } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!isStep2Complete) return;
+
+        // If birth data changed, show confirmation first
+        if (birthDataChanged) {
+            setShowConfirmation(true);
+        } else {
+            // If no birth data changed, save directly
+            await handleSaveConfirmed();
         }
     };
 
@@ -379,6 +421,22 @@ export default function OnboardingModal({ onComplete, onClose, initialData, isEd
                     </div>
                 </Card>
             </div>
+            {/* Confirmation Modal for Birth Data Changes */}
+            <WarningModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={handleSaveConfirmed}
+                title={t('confirmation.title')}
+                description={`${t('confirmation.description')} ${t('confirmation.warning', { cost: astrologyUnlockCost })}`}
+                confirmText={t('confirmation.confirm_button')}
+                cancelText={t('confirmation.cancel_button')}
+                loading={loading}
+                affectedFeaturesTitle={t('confirmation.features_affected')}
+                affectedFeatures={[
+                    t('confirmation.astrology_label', { cost: astrologyUnlockCost }),
+                    t('confirmation.numerology_label', { cost: astrologyUnlockCost })
+                ]}
+            />
         </div>
     );
 }

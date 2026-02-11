@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@/i18n/routing";
 import {
     Trophy,
@@ -31,6 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { unlockFeature } from "@/app/[locale]/dashboard/actions";
+import { getReadingTypes } from "@/app/admin/settings/actions";
 import { Card } from "@/components/ui/card";
 import UserProfile from "@/components/dashboard/UserProfile";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -40,6 +41,7 @@ import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import OnboardingModal from "@/components/dashboard/OnboardingModal";
 import { useTranslations } from 'next-intl';
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
+import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 
 interface DashboardClientProps {
     profile: any;
@@ -58,6 +60,45 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
     const router = useRouter();
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
+    const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
+    const [balance, setBalance] = useState<number>(0);
+    const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
+    const [neededAmount, setNeededAmount] = useState(50);
+
+    useEffect(() => {
+        async function loadCosts() {
+            try {
+                const costs = await getReadingTypes();
+                const costMap = costs.reduce((acc: any, curr: any) => {
+                    acc[curr.code] = curr.credit_cost;
+                    return acc;
+                }, {});
+                setReadingCosts(costMap);
+            } catch (err) {
+                console.error("Error loading costs:", err);
+            }
+        }
+        loadCosts();
+
+        // Fetch initial balance
+        fetch('/api/credits')
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.balance === 'number') {
+                    setBalance(data.balance);
+                }
+            })
+            .catch(err => console.error("Error fetching credits:", err));
+
+        // Sync balance updates
+        const handleUpdate = (e: any) => {
+            if (e.detail?.newBalance !== undefined) {
+                setBalance(e.detail.newBalance);
+            }
+        };
+        window.addEventListener('credits-updated', handleUpdate);
+        return () => window.removeEventListener('credits-updated', handleUpdate);
+    }, []);
 
     // Transaction Modal State
     const [transactionModalOpen, setTransactionModalOpen] = useState(false);
@@ -113,7 +154,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 }));
                 setTransactionModalOpen(false);
             } else {
-                toast.error(result.error || "Error");
+                if (result.error && result.error.includes("Insufficient credits")) {
+                    setNeededAmount(readingCosts[`unlock_${selectedFeature}`] ?? 50);
+                    setInsufficientAuraModalOpen(true);
+                    setTransactionModalOpen(false);
+                } else {
+                    toast.error(result.error || "Error");
+                }
             }
         } catch (err) {
             toast.error("Error al procesar el pago");
@@ -175,7 +222,9 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                             >
                                 <Sparkle className="w-3 h-3" />
                                 <span className="text-[10px] uppercase tracking-wider">{t('unlock_button')}</span>
-                                <span className="text-[9px] opacity-70 bg-black/20 px-1 py-0.5 rounded ml-1 font-mono">50 AURA</span>
+                                <span className="text-[9px] opacity-70 bg-black/20 px-1 py-0.5 rounded ml-1 font-mono">
+                                    {readingCosts[`unlock_${feature}`] ?? 50} AURA
+                                </span>
                             </Button>
                         </div>
                     </>
@@ -207,11 +256,15 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 <OnboardingModal
                     initialData={profile}
                     isEdit={isEditingManual}
+                    astrologyUnlockCost={readingCosts['unlock_astrology'] ?? 50}
                     onComplete={(updatedProfile) => {
                         setProfile(updatedProfile);
                         setIsEditingManual(false);
-                        // Force refresh to update server components (Astrology Chart, etc.)
-                        router.refresh();
+                        // Force hard reload to clear all caches (server + client + interpretations)
+                        // location.reload() ensures browser doesn't serve cached pages
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
                     }}
                     onClose={isComplete ? () => setIsEditingManual(false) : undefined}
                 />
@@ -230,6 +283,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 loading={transactionLoading}
                 confirmText={t('transaction.confirm')}
                 cancelText={t('transaction.cancel')}
+            />
+
+            <InsufficientAuraModal
+                isOpen={insufficientAuraModalOpen}
+                onClose={() => setInsufficientAuraModalOpen(false)}
+                requiredAmount={neededAmount}
+                currentBalance={balance}
             />
 
             {/* Fondo animado */}

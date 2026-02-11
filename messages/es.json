@@ -51,6 +51,14 @@
         "missions": "Misiones",
         "gain_aura": "Gana Aura de Evolución",
         "control_panel": "Panel de Control",
+        "insufficient_aura_modal": {
+            "title": "Aura Insuficiente",
+            "description": "No tienes energía suficiente para realizar esta acción. El universo requiere un intercambio de Aura para revelar sus secretos.",
+            "balance_label": "Tu Saldo Actual",
+            "required_label": "Aura Requerida",
+            "get_aura_button": "Obtener Más Aura",
+            "later_button": "Más Tarde"
+        },
         "astrology": {
             "title": "Astrología",
             "essence": "Tu signo solar define tu esencia.",
@@ -255,7 +263,7 @@
             "advice_title": "Guía del Alma",
             "generate_button": "Interpretar mi Evolución Astral",
             "regenerate_button": "Generar nueva interpretación",
-            "aura_cost_badge": "20",
+            "aura_cost_badge": "{cost}",
             "insufficient_aura": "Aura insuficiente",
             "interpretation_generated": "Interpretación generada",
             "error_oracle": "Error conectando con el oráculo",
@@ -398,7 +406,17 @@
         "profile_updated_success": "Perfil actualizado con éxito.",
         "error_title": "Error",
         "error_retry": "Volver a Intentar",
-        "error_hint": "Tip: Verifica tu conexión o reintenta en unos momentos."
+        "error_hint": "Tip: Verifica tu conexión o reintenta en unos momentos.",
+        "confirmation": {
+            "title": "⚠️ Cambios Importantes",
+            "description": "Al cambiar tu fecha de nacimiento, hora o lugar, se volverán a bloquear las secciones de Astrología y Numerología.",
+            "warning": "Necesitarás desbloquearlas nuevamente pagando {cost} AURA cada una.",
+            "confirm_button": "Entiendo, Continuar",
+            "cancel_button": "Cancelar Cambios",
+            "features_affected": "Secciones que se bloquearán:",
+            "astrology_label": "🔒 Astrología ({cost} AURA)",
+            "numerology_label": "🔒 Numerología ({cost} AURA)"
+        }
     },
     "Tarot": {
         "cards": [

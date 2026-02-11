@@ -5,24 +5,33 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings, Save, Check, Loader2, Sparkles } from "lucide-react";
 import { GoldenClassicFrame, MysticSilverFrame, CelestialFrame, GoldenOrnateFrame, TarotFrameId } from "@/components/features/tarot/frames";
-import { updateSystemSetting, getSystemSettings } from "./actions";
+import { updateSystemSetting, getSystemSettings, getReadingTypes, updateReadingTypeCost } from "./actions";
 import { toast } from "sonner";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Coins, Info, AlertCircle } from "lucide-react";
 
 export default function SettingsPage() {
     const [activeFrame, setActiveFrame] = useState<TarotFrameId>("celestial");
+    const [readingTypes, setReadingTypes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [savingAura, setSavingAura] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadSettings() {
             try {
-                const settings = await getSystemSettings();
+                const [settings, rTypes] = await Promise.all([
+                    getSystemSettings(),
+                    getReadingTypes()
+                ]);
+
                 const frameSetting = settings.find(s => s.key === "tarot_frame");
                 if (frameSetting) {
                     setActiveFrame(frameSetting.value as TarotFrameId);
                 }
+                setReadingTypes(rTypes);
             } catch (error) {
                 console.error("Failed to load settings:", error);
             } finally {
@@ -31,6 +40,19 @@ export default function SettingsPage() {
         }
         loadSettings();
     }, []);
+
+    const handleAuraCostSave = async (id: string, newCost: number) => {
+        setSavingAura(id);
+        try {
+            await updateReadingTypeCost(id, newCost);
+            toast.success("Costo de AURA actualizado");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al actualizar el costo");
+        } finally {
+            setSavingAura(null);
+        }
+    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -146,6 +168,85 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 </Card>
+
+                {/* Gestión de Economía AURA */}
+                <AnimatedSection delay={0.2}>
+                    <Card className="p-8 bg-slate-900/50 border-slate-800 shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-5">
+                            <Coins className="w-24 h-24 text-amber-400" />
+                        </div>
+
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                                    <Coins className="w-5 h-5 text-amber-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">Economía (Costos AURA)</h3>
+                                    <p className="text-slate-400 text-sm">Administra los costos de créditos para cada acción en la plataforma.</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-950/40 rounded-2xl border border-slate-800 overflow-hidden">
+                                <div className="grid grid-cols-12 gap-4 p-4 border-b border-slate-800 bg-slate-900/50 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                                    <div className="col-span-5">Sección / Acción</div>
+                                    <div className="col-span-4">Descripción</div>
+                                    <div className="col-span-3 text-right">Costo (AURA)</div>
+                                </div>
+
+                                <div className="divide-y divide-slate-800">
+                                    {readingTypes.length === 0 ? (
+                                        <div className="p-8 text-center text-slate-500 italic text-sm">
+                                            No se encontraron tipos de lectura...
+                                        </div>
+                                    ) : (
+                                        readingTypes.map((type) => (
+                                            <div key={type.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors">
+                                                <div className="col-span-5 flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-xl">
+                                                        {type.icon || '🔮'}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-medium text-slate-200">{type.name}</div>
+                                                        <div className="text-[10px] text-purple-400 font-mono">{type.code}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-4">
+                                                    <p className="text-xs text-slate-500 line-clamp-1">{type.description}</p>
+                                                </div>
+                                                <div className="col-span-3 flex items-center justify-end gap-3">
+                                                    <div className="relative w-24">
+                                                        <Input
+                                                            type="number"
+                                                            defaultValue={type.credit_cost}
+                                                            onBlur={(e) => {
+                                                                const val = parseInt(e.target.value);
+                                                                if (val !== type.credit_cost && !isNaN(val)) {
+                                                                    handleAuraCostSave(type.id, val);
+                                                                }
+                                                            }}
+                                                            className="h-10 bg-slate-900 border-slate-700 text-right pr-4 font-bold text-amber-400 rounded-lg focus:border-amber-500/50"
+                                                        />
+                                                    </div>
+                                                    {savingAura === type.id && (
+                                                        <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                        ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-6 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-3">
+                                <Info className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                                <p className="text-[11px] text-slate-500 italic leading-relaxed">
+                                    * Los cambios en los costos de AURA se aplicarán inmediatamente. Los usuarios verán los nuevos precios al recargar sus páginas. Los créditos ya gastados no se verán afectados.
+                                </p>
+                            </div>
+                        </div>
+                    </Card>
+                </AnimatedSection>
 
                 {/* Más ajustes en el futuro */}
                 <Card className="p-8 bg-slate-900/30 border-slate-800 border-dashed border-2 flex flex-col items-center justify-center text-center opacity-50">

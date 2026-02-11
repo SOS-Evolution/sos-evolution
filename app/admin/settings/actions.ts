@@ -35,3 +35,38 @@ export async function updateSystemSetting(key: string, value: any) {
 
     return { success: true };
 }
+
+export async function getReadingTypes() {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("reading_types")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching reading types:", error);
+        return [];
+    }
+
+    return data;
+}
+
+export async function updateReadingTypeCost(id: string, cost: number) {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from("reading_types")
+        .update({ credit_cost: cost })
+        .eq("id", id);
+
+    if (error) {
+        throw new Error(`Failed to update cost for reading type ${id}: ${error.message}`);
+    }
+
+    revalidatePath("/admin/settings");
+    revalidatePath("/(locale)/dashboard", "page");
+    revalidatePath("/(locale)/astrology", "page");
+    revalidatePath("/(locale)/numerology", "page");
+
+    return { success: true };
+}

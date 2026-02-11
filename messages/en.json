@@ -51,6 +51,14 @@
         "missions": "Missions",
         "gain_aura": "Gain Evolution Aura",
         "control_panel": "Control Panel",
+        "insufficient_aura_modal": {
+            "title": "Insufficient Aura",
+            "description": "You don't have enough energy to perform this action. The universe requires an exchange of Aura to reveal its secrets.",
+            "balance_label": "Your Current Balance",
+            "required_label": "Required Aura",
+            "get_aura_button": "Get More Aura",
+            "later_button": "Later"
+        },
         "astrology": {
             "title": "Astrology",
             "essence": "Your sun sign defines your essence.",
@@ -255,7 +263,7 @@
             "advice_title": "Soul Guidance",
             "generate_button": "Interpret My Astral Evolution",
             "regenerate_button": "Generate new interpretation",
-            "aura_cost_badge": "20",
+            "aura_cost_badge": "{cost}",
             "insufficient_aura": "Insufficient Aura",
             "interpretation_generated": "Interpretation generated",
             "error_oracle": "Error connecting with the oracle",
@@ -398,7 +406,17 @@
         "profile_updated_success": "Profile successfully updated.",
         "error_title": "Error",
         "error_retry": "Retry",
-        "error_hint": "Tip: Check your connection or retry in a few moments."
+        "error_hint": "Tip: Check your connection or retry in a few moments.",
+        "confirmation": {
+            "title": "⚠️ Important Changes",
+            "description": "By changing your birth date, time, or place, the Astrology and Numerology sections will be locked again.",
+            "warning": "You will need to unlock them again by paying {cost} AURA each.",
+            "confirm_button": "I Understand, Continue",
+            "cancel_button": "Cancel Changes",
+            "features_affected": "Sections that will be locked:",
+            "astrology_label": "🔒 Astrology ({cost} AURA)",
+            "numerology_label": "🔒 Numerology ({cost} AURA)"
+        }
     },
     "Tarot": {
         "cards": [
