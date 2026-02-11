@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { TarotCard, DECK } from "@/components/features/tarot/TarotCard";
 import TarotDeck from "@/components/features/tarot/TarotDeck";
 import { Button } from "@/components/ui/button";
@@ -42,8 +42,7 @@ export default function ReadingPage() {
   const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
   const [neededAmount, setNeededAmount] = useState(50);
 
-  // Fetch initial data
-  useState(() => {
+  useEffect(() => {
     async function loadInitialData() {
       // 1. Fetch costs
       try {
@@ -57,15 +56,28 @@ export default function ReadingPage() {
         console.error("Error loading costs:", err);
       }
 
-      // 2. Fetch balance
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: balanceData } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
-        setBalance(balanceData || 0);
-      }
+      // 2. Fetch initial balance via API (more reliable)
+      fetch('/api/credits')
+        .then(res => res.json())
+        .then(data => {
+          if (data && typeof data.balance === 'number') {
+            setBalance(data.balance);
+          }
+        })
+        .catch(err => console.error("Error fetching credits:", err));
     }
+
     loadInitialData();
-  });
+
+    // 3. Sync balance updates via custom event
+    const handleUpdate = (e: any) => {
+      if (e.detail?.newBalance !== undefined) {
+        setBalance(e.detail.newBalance);
+      }
+    };
+    window.addEventListener('credits-updated', handleUpdate);
+    return () => window.removeEventListener('credits-updated', handleUpdate);
+  }, []);
 
   // Etiquetas para la tirada de 3 cartas (enviadas a la API)
   const CLASSIC_LABELS_KEYS = ["Pasado", "Presente", "Futuro"];
@@ -580,7 +592,7 @@ export default function ReadingPage() {
                           </div>
 
                           <div className="flex flex-wrap gap-1.5 mb-4">
-                            {readingData[0]?.keywords?.slice(0, 3).map((k, j) => (
+                            {readingData[0]?.keywords?.slice(0, 3).map((k: string, j: number) => (
                               <span key={j} className="text-xs bg-purple-950/50 text-purple-300 px-2 py-1 rounded-lg border border-purple-500/20">
                                 {k}
                               </span>
@@ -656,7 +668,7 @@ export default function ReadingPage() {
                               </div>
 
                               <div className="flex flex-wrap gap-1 mb-3">
-                                {reading.keywords?.slice(0, 3).map((k, j) => (
+                                {reading.keywords?.slice(0, 3).map((k: string, j: number) => (
                                   <span key={j} className="text-[10px] bg-purple-950/50 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/20">
                                     {k}
                                   </span>
