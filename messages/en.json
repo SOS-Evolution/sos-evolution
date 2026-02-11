@@ -54,7 +54,7 @@
         "insufficient_aura_modal": {
             "title": "Insufficient Aura",
             "description": "You don't have enough energy to perform this action. The universe requires an exchange of Aura to reveal its secrets.",
-            "balance_label": "Your Current Balance",
+            "balance_label": "Current Balance",
             "required_label": "Required Aura",
             "get_aura_button": "Get More Aura",
             "later_button": "Later"

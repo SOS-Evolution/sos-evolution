@@ -70,18 +70,22 @@ export default function InsufficientAuraModal({
                 {/* Balance Comparison */}
                 <div className="px-8 pb-8 relative z-10">
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-4 flex flex-col items-center gap-1 transition-all hover:border-purple-500/20">
-                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('balance_label')}</span>
+                        <div className="bg-slate-900/50 rounded-2xl border border-white/5 p-4 flex flex-col items-center justify-between text-center gap-2 transition-all hover:border-purple-500/20 min-h-[110px]">
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold leading-tight h-8 flex items-center justify-center">
+                                {t('balance_label')}
+                            </span>
                             <div className="flex items-center gap-2">
-                                <span className="text-xl font-mono font-bold text-slate-300">{currentBalance}</span>
-                                <span className="text-[10px] text-slate-500 font-bold uppercase">Aura</span>
+                                <span className="text-2xl font-mono font-bold text-slate-300">{currentBalance}</span>
+                                <span className="text-[10px] text-slate-500 font-bold uppercase mt-1">Aura</span>
                             </div>
                         </div>
-                        <div className="bg-purple-900/10 rounded-2xl border border-purple-500/10 p-4 flex flex-col items-center gap-1 transition-all hover:border-purple-500/30">
-                            <span className="text-[10px] text-purple-400/70 uppercase tracking-widest font-bold">{t('required_label')}</span>
+                        <div className="bg-purple-900/10 rounded-2xl border border-purple-500/10 p-4 flex flex-col items-center justify-between text-center gap-2 transition-all hover:border-purple-500/30 min-h-[110px]">
+                            <span className="text-[10px] text-purple-400/70 uppercase tracking-widest font-bold leading-tight h-8 flex items-center justify-center">
+                                {t('required_label')}
+                            </span>
                             <div className="flex items-center gap-2">
-                                <span className="text-xl font-mono font-bold text-purple-300">{requiredAmount}</span>
-                                <span className="text-[10px] text-purple-500/70 font-bold uppercase">Aura</span>
+                                <span className="text-2xl font-mono font-bold text-purple-300">{requiredAmount}</span>
+                                <span className="text-[10px] text-purple-500/70 font-bold uppercase mt-1">Aura</span>
                             </div>
                         </div>
                     </div>
