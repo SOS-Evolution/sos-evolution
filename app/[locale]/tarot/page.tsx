@@ -249,22 +249,6 @@ export default function ReadingPage() {
           <div className="absolute bottom-[-15%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/20 rounded-full blur-[80px] animate-float-delayed" />
         </div>
 
-        {/* Balance Display */}
-        <div className="fixed top-24 right-6 z-50">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-purple-500/20 shadow-lg shadow-purple-900/10"
-          >
-            <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold font-mono leading-none mb-1">{t('your_aura')}</span>
-              <span className="text-sm font-bold text-white leading-none">{balance}</span>
-            </div>
-          </motion.div>
-        </div>
 
         <main className="flex flex-col items-center gap-8 max-w-4xl w-full z-10">
 

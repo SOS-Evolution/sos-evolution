@@ -444,6 +444,14 @@
             "El Mundo"
         ]
     },
+    "TarotDeck": {
+        "shuffling": "Barajando <span>...</span>",
+        "choose_card": "Elige tu <span>Arcano</span>",
+        "selected": "Selección Completada",
+        "choose_more": "Elige {count, plural, =1 {<span>1 Arcano</span> más} other {<span>{count} Arcanos</span> más}}",
+        "select_order": "El orden de selección influye en la lectura",
+        "synchronicity": "Confía en tu intuición y en la sincronicidad"
+    },
     "TarotPage": {
         "choose_path": "Elige tu <purple>Camino</purple>",
         "choose_path_desc": "Selecciona el tipo de consulta que resuene con tu energía.",

@@ -444,6 +444,14 @@
             "The World"
         ]
     },
+    "TarotDeck": {
+        "shuffling": "Shuffling <span>...</span>",
+        "choose_card": "Choose your <span>Arcane</span>",
+        "selected": "Selection Completed",
+        "choose_more": "Choose {count, plural, =1 {<span>1 more Arcane</span>} other {<span>{count} more Arcanes</span>}}",
+        "select_order": "The order of selection influences the reading",
+        "synchronicity": "Trust your intuition and synchronicity"
+    },
     "TarotPage": {
         "choose_path": "Choose your <purple>Path</purple>",
         "choose_path_desc": "Select the type of consultation that resonates with your energy.",

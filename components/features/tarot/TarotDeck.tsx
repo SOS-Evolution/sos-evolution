@@ -125,16 +125,16 @@ export default function TarotDeck({
     };
 
     return (
-        <div className="flex flex-col items-center gap-6 overflow-hidden py-10">
+        <div className="flex flex-col items-center gap-6 overflow-hidden md:overflow-visible py-10 w-full">
             <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-2xl md:text-3xl font-serif text-white text-center z-50"
+                className="text-2xl md:text-3xl font-serif text-white text-center z-50 pointer-events-none"
             >
                 {getTitle()}
             </motion.h2>
 
-            <div className="relative w-full max-w-[600px] h-[400px] md:h-[600px] flex items-center justify-center scale-75 md:scale-100 origin-center">
+            <div className="relative w-full max-w-[350px] md:max-w-4xl h-[400px] md:h-[600px] flex items-center justify-center scale-90 md:scale-100 origin-center perspective-1000">
                 <AnimatePresence>
                     {shuffledIndices.map((originalIndex, visualIndex) => {
                         const isSelected = isCardSelected(originalIndex);
