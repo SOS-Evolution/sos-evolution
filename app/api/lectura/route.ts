@@ -118,8 +118,6 @@ export async function POST(req: Request) {
         }
 
         // 3. IA GENERATIVA (GROQ)
-        console.log("Generating content with Groq (Llama 3.3 70B)...");
-
         // Elegir carta
         const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < DECK.length)
             ? DECK[cardIndex]
@@ -167,7 +165,6 @@ export async function POST(req: Request) {
         });
 
         const resultText = completion.choices[0]?.message?.content || "{}";
-        console.log("Groq response received.");
 
         let aiResponse;
         try {
@@ -181,12 +178,6 @@ export async function POST(req: Request) {
         aiResponse.cardName = selectedCard;
 
         // 4. GUARDAR EN DB
-        console.log("Inserting reading into DB...", {
-            card: aiResponse.cardName,
-            typeId: readingType.id,
-            position
-        });
-
         const { data: savedReading, error: dbError } = await supabase
             .from('lecturas')
             .insert([
@@ -215,10 +206,8 @@ export async function POST(req: Request) {
             });
             // if insertion fails, we don't charge credits
         } else {
-            console.log("Reading saved successfully. ID:", savedReading.id);
             // 5. DESCONTAR CRÉDITOS (Si se guardó bien)
             if (cost > 0) {
-                console.log(`Spending ${cost} credits for user ${user.id}...`);
                 const { error: spendError } = await supabase.rpc('spend_credits', {
                     p_user_id: user.id,
                     p_amount: cost,
@@ -228,8 +217,6 @@ export async function POST(req: Request) {
 
                 if (spendError) {
                     console.error("Error spending credits:", spendError);
-                } else {
-                    console.log("Credits deducted successfully.");
                 }
             }
         }

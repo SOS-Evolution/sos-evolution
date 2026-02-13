@@ -68,8 +68,6 @@ export async function POST(req: Request) {
         }
 
         // 3. IA GENERATIVA (GROQ)
-        console.log("Generating astrological interpretation with Groq...");
-
         const isEn = locale.startsWith('en');
 
         const systemPrompt = isEn
@@ -115,8 +113,6 @@ Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON p
   "challenges": ["desafío 1", "desafío 2", "desafío 3"],
   "evolutionary_advice": "Consejos para la evolución del alma en esta encarnación"
 }`;
-
-        console.log("Calling Groq API...");
 
         const completion = await groq.chat.completions.create({
             messages: [
@@ -203,8 +199,6 @@ Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON p
 
             if (spendError) {
                 console.error("Error spending credits:", spendError);
-            } else {
-                console.log("Credits deducted successfully.");
             }
         }
 
