@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import { useTransition } from 'react';
-import { Languages } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +33,7 @@ export default function LocaleSwitcher() {
                 )}
             >
                 <div className="flex items-center gap-2">
-                    <Languages className="w-4 h-4 text-purple-400 group-hover:rotate-12 transition-transform" />
+                    <Globe className="w-4 h-4 text-purple-400 group-hover:rotate-12 transition-transform" />
                     <div className="flex items-center gap-1 font-mono text-[10px] font-bold tracking-tighter">
                         <span className={cn(
                             "transition-colors",
