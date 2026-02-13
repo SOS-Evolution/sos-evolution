@@ -502,7 +502,11 @@ export default function ReadingPage() {
                 className="w-full max-w-4xl space-y-12 pb-20"
               >
                 <div className="flex flex-col md:flex-row items-center gap-6 mb-8 border-b border-white/5 pb-8">
-                  <Button onClick={resetReading} variant="ghost" className="text-slate-400 hover:text-white">
+                  <Button
+                    onClick={resetReading}
+                    variant="outline"
+                    className="bg-white/5 border-white/10 hover:bg-white/10 text-slate-300 hover:text-white backdrop-blur-sm transition-all duration-300"
+                  >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     {t('new_reading')}
                   </Button>
@@ -569,11 +573,15 @@ export default function ReadingPage() {
                   </div>
                 ))}
 
-                <div className="flex justify-center pt-8">
+                <div className="flex justify-center pt-12 pb-8">
                   <Link href="/dashboard">
-                    <Button size="lg" className="bg-slate-800 hover:bg-slate-700 text-white">
-                      <Home className="w-4 h-4 mr-2" />
-                      {t('dashboard')}
+                    <Button
+                      size="lg"
+                      className="relative overflow-hidden group bg-slate-900/60 hover:bg-slate-800/80 text-white border border-white/10 backdrop-blur-xl px-12 py-6 rounded-2xl transition-all duration-500 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <Home className="w-5 h-5 mr-3 relative z-10 transition-transform duration-500 group-hover:-translate-y-0.5" />
+                      <span className="text-lg font-medium relative z-10">{t('home')}</span>
                     </Button>
                   </Link>
                 </div>
