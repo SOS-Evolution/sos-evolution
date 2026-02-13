@@ -17,6 +17,7 @@ import {
     DropdownMenuSub,
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
+    DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
 
@@ -104,28 +105,30 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
                             <span className="text-white uppercase">{locale}</span>
                         </div>
                     </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="bg-black/90 backdrop-blur-xl border-white/10 min-w-[8rem]">
-                        <DropdownMenuItem
-                            onClick={() => switchLocale('es')}
-                            className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
-                        >
-                            <div className="flex items-center">
-                                <span className="mr-2">🇪🇸</span>
-                                <span>{ta('language_es')}</span>
-                            </div>
-                            {locale === 'es' && <Check className="w-4 h-4 text-purple-400" />}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => switchLocale('en')}
-                            className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
-                        >
-                            <div className="flex items-center">
-                                <span className="mr-2">🇺🇸</span>
-                                <span>{ta('language_en')}</span>
-                            </div>
-                            {locale === 'en' && <Check className="w-4 h-4 text-purple-400" />}
-                        </DropdownMenuItem>
-                    </DropdownMenuSubContent>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="bg-black/90 backdrop-blur-xl border-white/10 min-w-[8rem]">
+                            <DropdownMenuItem
+                                onClick={() => switchLocale('es')}
+                                className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
+                            >
+                                <div className="flex items-center">
+                                    <span className="mr-2">🇪🇸</span>
+                                    <span>{ta('language_es')}</span>
+                                </div>
+                                {locale === 'es' && <Check className="w-4 h-4 text-purple-400" />}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => switchLocale('en')}
+                                className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
+                            >
+                                <div className="flex items-center">
+                                    <span className="mr-2">🇺🇸</span>
+                                    <span>{ta('language_en')}</span>
+                                </div>
+                                {locale === 'en' && <Check className="w-4 h-4 text-purple-400" />}
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
                 </DropdownMenuSub>
 
                 <DropdownMenuItem asChild className="focus:bg-white/10 focus:text-white cursor-pointer group">

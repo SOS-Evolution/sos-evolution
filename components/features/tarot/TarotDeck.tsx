@@ -85,9 +85,11 @@ export default function TarotDeck({
         setInternalSelected(newSelected);
         onSelectCard(cardIndex);
 
-        // Si se completó la selección, notificar
+        // Si se completó la selección, notificar con un ligero retraso para ver la animación
         if (newSelected.length >= maxSelections && onSelectionComplete) {
-            onSelectionComplete(newSelected);
+            setTimeout(() => {
+                onSelectionComplete(newSelected);
+            }, 1000);
         }
     };
 
@@ -145,7 +147,7 @@ export default function TarotDeck({
                         if (isAnimating) return null;
 
                         // Lógica del abanico
-                        const totalDegrees = isMobile ? 220 : 300; // Reducir arco en móvil
+                        const totalDegrees = 300; // Ángulo unificado para móvil y escritorio
                         const anglePerCard = totalDegrees / (DECK_SIZE - 1);
                         const startRotation = -totalDegrees / 2;
                         const finalRotation = startRotation + (anglePerCard * visualIndex);
@@ -171,13 +173,13 @@ export default function TarotDeck({
                             },
                             fan: {
                                 x: 0,
-                                y: isSelected ? -30 : 0,
-                                rotate: finalRotation,
-                                scale: isSelected ? 1.1 : 1,
+                                y: isSelected ? (isMobile ? -60 : -100) : 0,
+                                rotate: isSelected ? 0 : finalRotation,
+                                scale: isSelected ? 1.3 : 1,
                                 opacity: shouldFade ? 0 : 1,
                                 zIndex: isSelected ? 100 : visualIndex,
                                 transition: {
-                                    delay: visualIndex * 0.04,
+                                    delay: isSelected ? 0 : visualIndex * 0.04,
                                     type: "spring",
                                     stiffness: 200,
                                     damping: 20

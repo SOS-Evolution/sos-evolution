@@ -175,6 +175,17 @@ export default function ReadingPage() {
             setIsLoading(false);
             return;
           }
+
+          if (response.status === 429 || (data.error && (data.error.includes('429') || data.error.toLowerCase().includes('quota')))) {
+            toast.error(t('error_quota'), {
+              description: t('error_quota_desc'),
+              duration: 5000,
+            });
+            setStep("selection");
+            setIsLoading(false);
+            return;
+          }
+
           throw new Error(data.error || "Error in session");
         }
 
@@ -198,12 +209,11 @@ export default function ReadingPage() {
 
     } catch (error: any) {
       console.error("Error conectando con el alma:", error);
-      // Only show error toast if it's not a credit issue (already handled)
-      if (!insufficientAuraModalOpen) {
-        toast.error(error.message || "Error de conexión cósmica");
-        setStep("selection");
-        setIsLoading(false);
-      }
+      toast.error(t('error_generic'), {
+        description: error.message || t('error_generic_desc'),
+      });
+      setStep("selection");
+      setIsLoading(false);
     }
   };
 

@@ -486,6 +486,10 @@
             "Pasado": "Pasado",
             "Presente": "Presente",
             "Futuro": "Futuro"
-        }
+        },
+        "error_quota": "Sobrecarga Cósmica",
+        "error_quota_desc": "Las energías están muy intensas en este momento. Por favor espera un instante y vuelve a intentar.",
+        "error_generic": "Conexión Interrumpida",
+        "error_generic_desc": "Hubo un problema al conectar con el oráculo. Por favor intenta nuevamente."
     }
 }

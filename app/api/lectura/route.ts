@@ -194,6 +194,14 @@ export async function POST(req: Request) {
     } catch (error: any) {
         console.error('Error general en /api/lectura:', error);
         console.error('Stack:', error?.stack);
+
+        // Detectar error de cuota de Gemini (429)
+        if (error?.message?.includes('429') || error?.message?.includes('quota')) {
+            return NextResponse.json({
+                error: 'Sobrecarga Cósmica: Se ha superado el límite de consultas gratuitas. Intenta de nuevo en un momento.'
+            }, { status: 429 });
+        }
+
         return NextResponse.json({ error: 'Error del sistema: ' + (error?.message || 'Unknown') }, { status: 500 });
     }
 }
