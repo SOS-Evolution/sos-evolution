@@ -490,6 +490,7 @@
         "error_quota": "Cosmic Overload",
         "error_quota_desc": "The energies are very intense right now. Please wait a moment and try again.",
         "error_generic": "Connection Interrupted",
-        "error_generic_desc": "There was a problem connecting with the oracle. Please try again."
+        "error_generic_desc": "There was a problem connecting with the oracle. Please try again.",
+        "loading_energies": "Channelling energies... please wait a moment"
     }
 }

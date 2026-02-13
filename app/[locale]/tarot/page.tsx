@@ -37,38 +37,35 @@ export default function ReadingPage() {
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
 
   // New states for Insufficient AURA
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number | null>(null);
   const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
-  const [isCostsLoading, setIsCostsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
-  const [neededAmount, setNeededAmount] = useState(50);
+  const [neededAmount, setNeededAmount] = useState(20);
 
   useEffect(() => {
     async function loadInitialData() {
-      setIsCostsLoading(true);
-      // 1. Fetch costs
+      setIsDataLoading(true);
       try {
+        // 1. Fetch costs
         const costs = await getReadingTypes();
         const costMap = costs.reduce((acc: any, curr: any) => {
           acc[curr.code] = curr.credit_cost;
           return acc;
         }, {});
         setReadingCosts(costMap);
-      } catch (err) {
-        console.error("Error loading costs:", err);
-      } finally {
-        setIsCostsLoading(false);
-      }
 
-      // 2. Fetch initial balance via API (more reliable)
-      fetch('/api/credits')
-        .then(res => res.json())
-        .then(data => {
-          if (data && typeof data.balance === 'number') {
-            setBalance(data.balance);
-          }
-        })
-        .catch(err => console.error("Error fetching credits:", err));
+        // 2. Fetch initial balance via API (awaiting to avoid race conditions)
+        const res = await fetch('/api/credits');
+        const data = await res.json();
+        if (data && typeof data.balance === 'number') {
+          setBalance(data.balance);
+        }
+      } catch (err) {
+        console.error("Error loading initial data:", err);
+      } finally {
+        setIsDataLoading(false);
+      }
     }
 
     loadInitialData();
@@ -96,6 +93,12 @@ export default function ReadingPage() {
 
   // 1. SELECCIONAR MODO
   const selectMode = (mode: ReadingMode) => {
+    // Si aún se están cargando los datos, no permitir la selección
+    if (isDataLoading || balance === null) {
+      toast.info(t('loading_energies') || "Canalizando energías... espera un momento");
+      return;
+    }
+
     // Determine cost based on mode
     let costCode = "general"; // Default fallback
     if (mode === "classic") costCode = "classic";
@@ -595,7 +598,7 @@ export default function ReadingPage() {
           isOpen={insufficientAuraModalOpen}
           onClose={() => setInsufficientAuraModalOpen(false)}
           requiredAmount={neededAmount}
-          currentBalance={balance}
+          currentBalance={balance ?? 0}
         />
       </div>
     </LayoutGroup>
