@@ -12,12 +12,12 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
         }
 
-        // Obtener balance
+        // Obtener balance v2 (robusto)
         const { data: balanceData, error: balanceError } = await supabase
-            .rpc('get_user_balance', { user_uuid: user.id });
+            .rpc('get_user_balance_v2', { p_user_id: user.id });
 
         if (balanceError) {
-            console.error('Error getting balance:', balanceError);
+            console.error('Error getting balance v2:', balanceError);
             return NextResponse.json({ error: 'Error al obtener balance' }, { status: 500 });
         }
 

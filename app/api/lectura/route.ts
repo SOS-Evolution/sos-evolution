@@ -105,21 +105,16 @@ export async function POST(req: Request) {
 
         // Verificación optimista de saldo
         if (cost > 0) {
-            let balance = 0;
-            const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+            // Use rigorous v2 function that bypasses RLS
+            const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance_v2', { p_user_id: user.id });
 
             if (balanceError) {
-                console.error("RPC get_user_balance failed, using fallback query:", balanceError);
-                // Fallback: query directa a user_credits
-                const { data: creditsData } = await supabase
-                    .from('user_credits')
-                    .select('amount')
-                    .eq('user_id', user.id);
-
-                balance = creditsData?.reduce((sum: number, row: any) => sum + (row.amount || 0), 0) || 0;
-            } else {
-                balance = balanceData || 0;
+                console.error("Critical: get_user_balance_v2 failed:", balanceError);
+                return NextResponse.json({ error: 'Error verificando saldo. Por favor contacta soporte.' }, { status: 500 });
             }
+
+            const balance = balanceData || 0;
+            console.log(`User ${user.id} balance: ${balance}, Cost: ${cost}`);
 
             if (balance < cost) {
                 return NextResponse.json({ error: 'Aura de Evolución insuficiente para esta lectura.' }, { status: 402 });
@@ -262,7 +257,8 @@ export async function POST(req: Request) {
         } else {
             // 5. DESCONTAR CRÉDITOS (Si se guardó bien)
             if (cost > 0) {
-                const { error: spendError } = await supabase.rpc('spend_credits', {
+                // Use rigorous v2 function
+                const { error: spendError } = await supabase.rpc('spend_credits_v2', {
                     p_user_id: user.id,
                     p_amount: cost,
                     p_description: `Lectura: ${readingType?.name || 'General'}`,
@@ -270,13 +266,15 @@ export async function POST(req: Request) {
                 });
 
                 if (spendError) {
-                    console.error("Error spending credits:", spendError);
+                    console.error("CRITICAL: Error spending credits v2:", spendError);
+                } else {
+                    console.log(`Successfully spent ${cost} credits for user ${user.id}`);
                 }
             }
         }
 
-        // Obtener nuevo saldo para actualizar UI
-        const { data: newBalance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+        // Obtener nuevo saldo para actualizar UI (v2)
+        const { data: newBalance } = await supabase.rpc('get_user_balance_v2', { p_user_id: user.id });
 
         return NextResponse.json({
             ...aiResponse,

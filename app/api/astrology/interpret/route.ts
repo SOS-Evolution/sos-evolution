@@ -62,21 +62,15 @@ export async function POST(req: Request) {
         const cost = readingType?.credit_cost || 20;
 
         // Verificación de saldo (con fallback si RPC falla)
-        let balance = 0;
-        const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+        const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance_v2', { p_user_id: user.id });
 
         if (balanceError) {
-            console.error('RPC get_user_balance failed, using fallback query:', balanceError);
-            // Fallback: query directa a user_credits
-            const { data: creditsData } = await supabase
-                .from('user_credits')
-                .select('amount')
-                .eq('user_id', user.id);
-
-            balance = creditsData?.reduce((sum: number, row: any) => sum + (row.amount || 0), 0) || 0;
-        } else {
-            balance = balanceData || 0;
+            console.error("Critical: get_user_balance_v2 failed:", balanceError);
+            return NextResponse.json({ error: 'Error verificando saldo. Por favor contacta soporte.' }, { status: 500 });
         }
+
+        const balance = balanceData || 0;
+        console.log(`Astrology balance check for ${user.id}: ${balance}, Cost: ${cost}`);
 
         if (balance < cost) {
             return NextResponse.json({
@@ -209,7 +203,7 @@ Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON p
         // 5. DESCONTAR CRÉDITOS
         if (cost > 0) {
             console.log(`Spending ${cost} credits for user ${user.id}...`);
-            const { error: spendError } = await supabase.rpc('spend_credits', {
+            const { error: spendError } = await supabase.rpc('spend_credits_v2', {
                 p_user_id: user.id,
                 p_amount: cost,
                 p_description: 'Interpretación Astral Completa',
@@ -217,11 +211,13 @@ Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON p
             });
 
             if (spendError) {
-                console.error("Error spending credits:", spendError);
+                console.error("CRITICAL: Error spending credits v2:", spendError);
+            } else {
+                console.log(`Successfully spent ${cost} credits for user ${user.id}`);
             }
         }
 
-        const { data: newBalance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+        const { data: newBalance } = await supabase.rpc('get_user_balance_v2', { p_user_id: user.id });
 
         return NextResponse.json({
             ...validatedResponse,
