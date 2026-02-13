@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
+import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const schema: Schema = {
+const schemaJSON = JSON.stringify({
     description: "Astrological natal chart interpretation",
-    type: SchemaType.OBJECT,
+    type: "object",
     properties: {
-        summary: { type: SchemaType.STRING, description: "Mystical and evolutionary summary (2-3 sentences)", nullable: false },
-        core_personality: { type: SchemaType.STRING, description: "Analysis of the personality core (Sun, Moon, Ascendant)", nullable: false },
+        summary: { type: "string", description: "Mystical and evolutionary summary (2-3 sentences)" },
+        core_personality: { type: "string", description: "Analysis of the personality core (Sun, Moon, Ascendant)" },
         strengths: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
+            type: "array",
+            items: { type: "string" },
             description: "3 main strengths based on the chart"
         },
         challenges: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
+            type: "array",
+            items: { type: "string" },
             description: "3 challenges or shadows to integrate"
         },
-        evolutionary_advice: { type: SchemaType.STRING, description: "Advice for soul evolution in this incarnation", nullable: false }
+        evolutionary_advice: { type: "string", description: "Advice for soul evolution in this incarnation" }
     },
     required: ["summary", "core_personality", "strengths", "challenges", "evolutionary_advice"]
-};
+}, null, 2);
 
 export async function POST(req: Request) {
     try {
@@ -57,98 +57,151 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Aura insuficiente para esta interpretación.' }, { status: 402 });
         }
 
-        // 3. IA GENERATIVA
-        const model = genAI.getGenerativeModel({
-            // Note: In some environments gemini-2.0-flash is available, using 1.5-flash for safety as seen in other routes if unsure, 
-            // but the other route used gemini-2.5-flash (which might be a typo in user's code or a specific version they have access to).
-            // Actually, looking back at /api/lectura/route.ts, it uses "gemini-2.5-flash". I will match that.
-            model: "gemini-2.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: schema,
-            },
-        });
+        // 3. IA GENERATIVA (GROQ)
+        console.log("Generating astrological interpretation with Groq...");
 
         const isEn = locale.startsWith('en');
 
-        const prompt = isEn
-            ? `
-          Act as SOS (Soul Operating System), a mystic guide expert in evolutionary and psychological astrology.
-          Analyze the following Natal Chart Data:
-          
-          PLANETS:
-          ${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
-          
-          HOUSES:
-          ${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
-          
-          ASPECTS:
-          ${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
+        const systemPrompt = isEn
+            ? "You are SOS (Soul Operating System), an expert astrologer specializing in evolutionary and psychological astrology. You always respond with valid JSON only, no markdown or extra text."
+            : "Eres SOS (Soul Operating System), un astrólogo experto en astrología evolutiva y psicológica. Siempre respondes únicamente con JSON válido, sin markdown ni texto extra.";
 
-          Purpose: Provide a deep, empowering interpretation oriented towards personal evolution. 
-          Focus heavily on the combination of Sun, Moon, and Ascendant for the core.
-          
-          IMPORTANT: Respond strictly in English.
-          Give me the interpretation in JSON format.
-        `
-            : `
-          Actúa como SOS (Soul Operating System), un guía místico experto en astrología evolutiva y psicológica.
-          Analiza la siguiente Carta Natal (Natal Chart Data):
-          
-          PLANETAS:
-          ${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
-          
-          CASAS:
-          ${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
-          
-          ASPECTS:
-          ${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
+        const userPrompt = isEn
+            ? `Analyze this natal chart and provide a deep, empowering interpretation for personal evolution.
 
-          Propósito: Brindar una interpretación profunda, empoderadora y orientada a la evolución personal. 
-          Enfócate mucho en la combinación de Sol, Luna y Ascendente para el núcleo.
-          
-          IMPORTANT: Respond strictly in Spanish.
-          Dame la interpretación en formato JSON.
-        `;
+PLANETS:
+${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
 
-        const result = await model.generateContent(prompt);
-        const aiResponse = JSON.parse(result.response.text());
+HOUSES:
+${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
+
+ASPECTS (top 10):
+${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
+
+Provide your interpretation in this EXACT JSON format (no markdown, pure JSON):
+{
+  "summary": "2-3 sentence mystical summary of their soul's journey",
+  "core_personality": "Deep analysis of Sun, Moon, and Ascendant combination",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "challenges": ["challenge 1", "challenge 2", "challenge 3"],
+  "evolutionary_advice": "Guidance for soul evolution in this incarnation"
+}`
+            : `Analiza esta carta natal y proporciona una interpretación profunda y empoderadora para la evolución personal.
+
+PLANETAS:
+${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
+
+CASAS:
+${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
+
+ASPECTOS (top 10):
+${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
+
+Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON puro):
+{
+  "summary": "Resumen místico de 2-3 oraciones sobre el viaje del alma",
+  "core_personality": "Análisis profundo de la combinación Sol, Luna y Ascendente",
+  "strengths": ["fortaleza 1", "fortaleza 2", "fortaleza 3"],
+  "challenges": ["desafío 1", "desafío 2", "desafío 3"],
+  "evolutionary_advice": "Consejos para la evolución del alma en esta encarnación"
+}`;
+
+        console.log("Calling Groq API...");
+
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            response_format: { type: "json_object" }
+        });
+
+        console.log("Groq API call completed.");
+
+        const resultText = completion.choices[0]?.message?.content || "{}";
+        console.log("Raw Groq response:", resultText);
+
+        let aiResponse;
+        try {
+            aiResponse = JSON.parse(resultText);
+            console.log("Parsed AI response:", JSON.stringify(aiResponse, null, 2));
+        } catch (parseError) {
+            console.error("Error parsing Groq response:", parseError);
+            console.error("Raw response:", resultText);
+            return NextResponse.json({ error: 'Error procesando respuesta de IA' }, { status: 500 });
+        }
+
+        // Validar y proporcionar valores por defecto si es necesario
+        const validatedResponse = {
+            summary: aiResponse.summary || "Tu carta natal revela un camino único de evolución espiritual.",
+            core_personality: aiResponse.core_personality || "Tu esencia combina múltiples energías planetarias que definen tu camino.",
+            strengths: Array.isArray(aiResponse.strengths) && aiResponse.strengths.length > 0
+                ? aiResponse.strengths
+                : ["Capacidad de transformación", "Intuición desarrollada", "Voluntad evolutiva"],
+            challenges: Array.isArray(aiResponse.challenges) && aiResponse.challenges.length > 0
+                ? aiResponse.challenges
+                : ["Integración de dualidades", "Superar patrones heredados", "Aceptación del destino"],
+            evolutionary_advice: aiResponse.evolutionary_advice || "Confía en el proceso de tu evolución, cada desafío es una oportunidad de crecimiento."
+        };
+
+        console.log("Validated response:", JSON.stringify(validatedResponse, null, 2));
 
         // 4. GUARDAR EN DB
+        console.log("Saving astrology interpretation to DB...");
+
+        const insertData = {
+            user_id: user.id,
+            summary: validatedResponse.summary,
+            core_personality: validatedResponse.core_personality,
+            strengths: validatedResponse.strengths,
+            challenges: validatedResponse.challenges,
+            evolutionary_advice: validatedResponse.evolutionary_advice,
+            chart_snapshot: chartData,
+            language: locale
+        };
+
+        console.log("Insert payload:", JSON.stringify(insertData, null, 2));
+
         const { data: savedInterpretation, error: dbError } = await supabase
             .from('astrology_interpretations')
-            .insert([
-                {
-                    user_id: user.id,
-                    summary: aiResponse.summary,
-                    core_personality: aiResponse.core_personality,
-                    strengths: aiResponse.strengths,
-                    challenges: aiResponse.challenges,
-                    evolutionary_advice: aiResponse.evolutionary_advice,
-                    chart_snapshot: chartData,
-                    language: locale
-                }
-            ])
+            .insert([insertData])
             .select()
             .single();
 
         if (dbError) {
-            console.error("Error BD saving astrology interpretation:", dbError);
-            return NextResponse.json({ error: 'Error guardando interpretación en BD', details: dbError }, { status: 500 });
-        } else {
-            // 5. DESCONTAR CRÉDITOS
-            await supabase.rpc('spend_credits', {
+            console.error("Error saving astrology interpretation:", dbError);
+            console.error("Error details:", JSON.stringify(dbError, null, 2));
+            return NextResponse.json({
+                error: 'Error guardando interpretación en BD',
+                details: dbError.message || dbError
+            }, { status: 500 });
+        }
+
+        console.log("Interpretation saved successfully, ID:", savedInterpretation.id);
+
+        // 5. DESCONTAR CRÉDITOS
+        if (cost > 0) {
+            console.log(`Spending ${cost} credits for user ${user.id}...`);
+            const { error: spendError } = await supabase.rpc('spend_credits', {
                 p_user_id: user.id,
                 p_amount: cost,
-                p_description: `Interpretación Astral Completa`,
+                p_description: 'Interpretación Astral Completa',
                 p_reference_id: savedInterpretation.id
             });
+
+            if (spendError) {
+                console.error("Error spending credits:", spendError);
+            } else {
+                console.log("Credits deducted successfully.");
+            }
         }
 
         const { data: newBalance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
 
         return NextResponse.json({
-            ...aiResponse,
+            ...validatedResponse,
             id: savedInterpretation?.id,
             creditsUsed: cost,
             newBalance: newBalance || 0

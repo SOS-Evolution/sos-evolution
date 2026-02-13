@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
+import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DECK = [
     "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
@@ -12,21 +12,22 @@ const DECK = [
     "El Sol", "El Juicio", "El Mundo"
 ];
 
-const schema: Schema = {
+// Schema definition kept for reference in prompt, though Groq uses JSON mode differently
+const schemaJSON = JSON.stringify({
     description: "Lectura de tarot",
-    type: SchemaType.OBJECT,
+    type: "object",
     properties: {
-        cardName: { type: SchemaType.STRING, description: "Nombre de la carta elegida", nullable: false },
+        cardName: { type: "string", description: "Nombre de la carta elegida" },
         keywords: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
+            type: "array",
+            items: { type: "string" },
             description: "3 palabras clave"
         },
-        description: { type: SchemaType.STRING, description: "Interpretación mística profunda", nullable: false },
-        action: { type: SchemaType.STRING, description: "Acción o ritual sugerido", nullable: false }
+        description: { type: "string", description: "Interpretación mística profunda" },
+        action: { type: "string", description: "Acción o ritual sugerido" }
     },
     required: ["cardName", "keywords", "description", "action"]
-};
+}, null, 2);
 
 export async function POST(req: Request) {
     try {
@@ -47,6 +48,13 @@ export async function POST(req: Request) {
         // 2. VALIDAR TIPO Y CRÉDITOS
         console.log("Processing reading request:", { readingTypeCode, position });
 
+        // Fallback costs in case DB is misconfigured
+        const READING_COSTS: Record<string, number> = {
+            'daily': 20,
+            'general': 20,
+            'classic': 100
+        };
+
         let { data: readingType } = await supabase
             .from('reading_types')
             .select('*')
@@ -55,7 +63,6 @@ export async function POST(req: Request) {
 
         if (!readingType) {
             console.log(`Reading type '${readingTypeCode}' not found. Falling back to 'general'.`);
-            // Guardamos en la misma variable
             const { data: generalType } = await supabase
                 .from('reading_types')
                 .select('*')
@@ -65,31 +72,43 @@ export async function POST(req: Request) {
             readingType = generalType;
 
             if (!readingType) {
-                console.error("Critical: 'general' reading type not found in DB.");
-                return NextResponse.json({ error: 'Tipo de lectura no válido' }, { status: 400 });
+                console.error("Critical: 'general' reading type not found in DB. Constructing fallback object.");
+                // Emergency fallback object
+                readingType = {
+                    id: '00000000-0000-0000-0000-000000000000', // Placeholder
+                    code: readingTypeCode,
+                    name: readingTypeCode === 'daily' ? 'Oráculo Diario' : 'Consulta General',
+                    description: 'Lectura de tarot',
+                    credit_cost: READING_COSTS[readingTypeCode] || 20
+                };
             }
         }
 
-        const cost = readingType.credit_cost;
-        console.log("Reading Type Resolved:", readingType.name, "Cost:", cost);
+        // Ensure we have a valid cost
+        let cost = readingType.credit_cost;
+        if ((!cost || cost <= 0) && READING_COSTS[readingType.code]) {
+            console.warn(`Database cost for ${readingType.code} is ${cost}. Using fallback cost: ${READING_COSTS[readingType.code]}`);
+            cost = READING_COSTS[readingType.code];
+        }
 
-        // Verificación optimista de saldo (para no gastar IA si no alcanza)
+        console.log("Reading Type Resolved:", readingType.name, "Final Cost:", cost);
+
+        // Verificación optimista de saldo
         if (cost > 0) {
-            const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+            const { data: balance, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+
+            if (balanceError) {
+                console.error("Error checking balance:", balanceError);
+                return NextResponse.json({ error: 'Error verificando saldo de aura.' }, { status: 500 });
+            }
+
             if ((balance || 0) < cost) {
                 return NextResponse.json({ error: 'Aura de Evolución insuficiente para esta lectura.' }, { status: 402 });
             }
         }
 
-        // 3. IA GENERATIVA
-        console.log("Generating content with Gemini...");
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: schema,
-            },
-        });
+        // 3. IA GENERATIVA (GROQ)
+        console.log("Generating content with Groq (Llama 3.3 70B)...");
 
         // Elegir carta
         const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < DECK.length)
@@ -103,7 +122,7 @@ export async function POST(req: Request) {
 
         let typeContext = `Tipo de lectura: ${readingType.name}. ${readingType.description}`;
 
-        // Contexto especial para tiradas de posición (Pasado/Presente/Futuro)
+        // Contexto especial para tiradas de posición
         let positionContext = "";
         if (position) {
             positionContext = `
@@ -121,21 +140,31 @@ export async function POST(req: Request) {
           Contexto del usuario: ${userContext}
           
           IMPORTANT: Respond strictly in ${locale === 'en' ? 'English' : 'Spanish'}.
-          Dame lectura JSON.
+          Provide the output in JSON format adhering to this schema:
+          ${schemaJSON}
+          
+          Ensure the 'cardName' field matches exactly: "${selectedCard}".
         `;
 
-        const result = await model.generateContent(prompt);
-        console.log("Gemini response received.");
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a mystical tarot reader. Output only valid JSON." },
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            response_format: { type: "json_object" }
+        });
 
-        const dirtyText = result.response.text();
-        const cleanText = dirtyText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const resultText = completion.choices[0]?.message?.content || "{}";
+        console.log("Groq response received.");
 
         let aiResponse;
         try {
-            aiResponse = JSON.parse(cleanText);
+            aiResponse = JSON.parse(resultText);
         } catch (e) {
             console.error("JSON Parse Error:", e);
-            console.error("Raw Text:", dirtyText);
+            console.error("Raw Text:", resultText);
             return NextResponse.json({ error: 'Error procesando respuesta de la IA' }, { status: 500 });
         }
 
