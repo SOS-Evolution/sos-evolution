@@ -166,18 +166,32 @@ export async function POST(req: Request) {
             .single();
 
         if (dbError) {
-            console.error("Error BD:", dbError);
-            // Si la IA funcionó pero falló la BD, devolvemos resultado pero advertimos
-            // No cobramos créditos si falla el guardado
+            console.error("CRITICAL DB ERROR during reading insert:", dbError);
+            console.error("Payload attempted:", {
+                card_name: aiResponse.cardName,
+                keywords: aiResponse.keywords,
+                description: aiResponse.description,
+                action: aiResponse.action,
+                user_id: user.id
+            });
+            // if insertion fails, we don't charge credits
         } else {
+            console.log("Reading saved successfully. ID:", savedReading.id);
             // 5. DESCONTAR CRÉDITOS (Si se guardó bien)
             if (cost > 0) {
-                await supabase.rpc('spend_credits', {
+                console.log(`Spending ${cost} credits for user ${user.id}...`);
+                const { error: spendError } = await supabase.rpc('spend_credits', {
                     p_user_id: user.id,
                     p_amount: cost,
                     p_description: `Lectura: ${readingType?.name || 'General'}`,
                     p_reference_id: savedReading.id
                 });
+
+                if (spendError) {
+                    console.error("Error spending credits:", spendError);
+                } else {
+                    console.log("Credits deducted successfully.");
+                }
             }
         }
 
