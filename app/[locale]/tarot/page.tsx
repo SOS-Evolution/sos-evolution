@@ -242,10 +242,24 @@ export default function ReadingPage() {
         // Update balance if returned
         if (data.newBalance !== undefined) {
           setBalance(data.newBalance);
+          // Dispatch event so CreditsDisplay in Navbar updates too
+          window.dispatchEvent(new CustomEvent('credits-updated', {
+            detail: { newBalance: data.newBalance }
+          }));
         }
       }
 
       setReadingData(readings);
+
+      // Preload card images so they're cached before reveal flip
+      readings.forEach((reading: any) => {
+        const idx = DECK.indexOf(reading.cardName);
+        if (idx >= 0) {
+          const img = new Image();
+          img.src = `/assets/tarot/arcano-${idx}.jpg`;
+        }
+      });
+
       clearLoadingTimers();
 
       // Smooth transition: brief pause then reveal
@@ -601,8 +615,8 @@ export default function ReadingPage() {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.4 }}
                         className={`text-center font-serif text-lg ${loadingPhase >= 3
-                            ? 'text-purple-200'
-                            : 'text-purple-300/80'
+                          ? 'text-purple-200'
+                          : 'text-purple-300/80'
                           }`}
                       >
                         {getLoadingMessage()}
@@ -674,7 +688,7 @@ export default function ReadingPage() {
                         transition={{ duration: 0.3 }}
                       >
                         <TarotCard
-                          cardName={revealedCards[index] ? reading.cardName : undefined}
+                          cardName={reading.cardName}
                           isRevealed={revealedCards[index]}
                           onClick={() => !revealedCards[index] && handleRevealCard(index)}
                           className={`w-64 h-96 cursor-pointer transition-shadow duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}

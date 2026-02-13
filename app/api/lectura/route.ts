@@ -11,18 +11,18 @@ const DECK = [
 ];
 
 // Schema definition kept for reference in prompt, though Groq uses JSON mode differently
+// NOTE: Removed top-level "description" to avoid AI confusing schema metadata with the response field
 const schemaJSON = JSON.stringify({
-    description: "Lectura de tarot",
     type: "object",
     properties: {
-        cardName: { type: "string", description: "Nombre de la carta elegida" },
+        cardName: { type: "string", description: "Nombre exacto de la carta elegida" },
         keywords: {
             type: "array",
             items: { type: "string" },
-            description: "3 palabras clave"
+            description: "Exactamente 3 palabras clave temáticas de la carta"
         },
-        description: { type: "string", description: "Interpretación mística profunda" },
-        action: { type: "string", description: "Acción o ritual sugerido" }
+        description: { type: "string", description: "Interpretación mística profunda de mínimo 50 palabras" },
+        action: { type: "string", description: "Acción o ritual sugerido de mínimo 15 palabras" }
     },
     required: ["cardName", "keywords", "description", "action"]
 }, null, 2);
@@ -157,10 +157,18 @@ export async function POST(req: Request) {
           Contexto del usuario: ${userContext}
           
           IMPORTANT: Respond strictly in ${locale === 'en' ? 'English' : 'Spanish'}.
-          Provide the output in JSON format adhering to this schema:
+          
+          Return a JSON object with these FOUR fields (all are required):
+          - "cardName": exactly "${selectedCard}"
+          - "keywords": an array of exactly 3 mystical keywords related to the card's energy and meaning (each keyword should be 1-3 words)
+          - "description": a deep, mystical interpretation of the card (minimum 50 words, be poetic and insightful)
+          - "action": a specific ritual, action or practice the user should do based on this card (minimum 15 words)
+          
+          Schema for reference:
           ${schemaJSON}
           
-          Ensure the 'cardName' field matches exactly: "${selectedCard}".
+          CRITICAL: The "description" field must be a FULL mystical interpretation, NOT a label or title. It must be at least 50 words long.
+          The "action" field must be a specific actionable suggestion, NOT empty or generic.
         `;
 
         const completion = await groq.chat.completions.create({
@@ -185,6 +193,43 @@ export async function POST(req: Request) {
         }
 
         aiResponse.cardName = selectedCard;
+
+        // Validate response quality — if AI returned schema metadata or empty fields, log and provide fallbacks
+        if (!aiResponse.description || typeof aiResponse.description !== 'string' || aiResponse.description.length < 20 || aiResponse.description.toLowerCase() === 'lectura de tarot') {
+            console.warn('AI returned incomplete description, attempting retry...');
+            // Quick retry with a more explicit prompt
+            try {
+                const retryCompletion = await groq.chat.completions.create({
+                    messages: [
+                        { role: "system", content: "You are a mystical tarot reader. Output only valid JSON. Every field must contain meaningful content." },
+                        { role: "user", content: `Interpret the tarot card "${selectedCard}" in ${locale === 'en' ? 'English' : 'Spanish'}. Return JSON: {"cardName": "${selectedCard}", "keywords": ["word1", "word2", "word3"], "description": "A deep mystical interpretation of at least 50 words", "action": "A specific ritual or action suggestion of at least 15 words"}` }
+                    ],
+                    model: "llama-3.3-70b-versatile",
+                    temperature: 0.8,
+                    response_format: { type: "json_object" }
+                });
+                const retryText = retryCompletion.choices[0]?.message?.content || "{}";
+                const retryResponse = JSON.parse(retryText);
+                retryResponse.cardName = selectedCard;
+                if (retryResponse.description && retryResponse.description.length >= 20) {
+                    aiResponse = retryResponse;
+                    console.log('Retry succeeded with valid content');
+                }
+            } catch (retryErr) {
+                console.error('Retry also failed:', retryErr);
+            }
+        }
+
+        // Final safety: ensure all fields exist with meaningful defaults
+        if (!Array.isArray(aiResponse.keywords) || aiResponse.keywords.length === 0) {
+            aiResponse.keywords = ['Misterio', 'Transformación', 'Revelación'];
+        }
+        if (!aiResponse.description || aiResponse.description.length < 20) {
+            aiResponse.description = `La carta ${selectedCard} se manifiesta en tu lectura como una señal del universo. Su energía te invita a reflexionar profundamente sobre tu camino actual y las fuerzas que te rodean.`;
+        }
+        if (!aiResponse.action || aiResponse.action.length < 10) {
+            aiResponse.action = 'Tómate un momento de silencio hoy para meditar sobre el mensaje de esta carta. Deja que su energía te guíe.';
+        }
 
         // 4. GUARDAR EN DB
         const { data: savedReading, error: dbError } = await supabase
