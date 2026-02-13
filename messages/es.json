@@ -491,6 +491,10 @@
         "error_quota_desc": "Las energías están muy intensas en este momento. Por favor espera un instante y vuelve a intentar.",
         "error_generic": "Conexión Interrumpida",
         "error_generic_desc": "Hubo un problema al conectar con el oráculo. Por favor intenta nuevamente.",
-        "loading_energies": "Canalizando energías... espera un momento"
+        "loading_energies": "Canalizando energías... espera un momento",
+        "loading_phase_1": "Conectando con el cosmos...",
+        "loading_phase_2": "Canalizando la energía de tu carta...",
+        "loading_phase_3": "Interpretando los símbolos...",
+        "loading_phase_ready": "Tu mensaje está listo..."
     }
 }

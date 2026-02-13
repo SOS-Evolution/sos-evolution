@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { TarotCard, DECK } from "@/components/features/tarot/TarotCard";
 import TarotDeck from "@/components/features/tarot/TarotDeck";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Sparkles, RotateCcw, Home, MessageCircleQuestion, ScanEye, Clock } from "lucide-react";
+import { Sparkles, RotateCcw, Home, MessageCircleQuestion, ScanEye, Clock, Moon, Star } from "lucide-react";
 import { ReadingData } from "@/types";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { Link } from "@/i18n/routing";
@@ -35,6 +35,9 @@ export default function ReadingPage() {
   const [readingData, setReadingData] = useState<CardReadingData[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
+  const [loadingPhase, setLoadingPhase] = useState(0);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [pendingMode, setPendingMode] = useState<ReadingMode | null>(null);
 
   // New states for Insufficient AURA
   const [balance, setBalance] = useState<number | null>(null);
@@ -91,23 +94,24 @@ export default function ReadingPage() {
     }
   }, [selectedMode]);
 
-  // 1. SELECCIONAR MODO
-  const selectMode = (mode: ReadingMode) => {
-    // Si aún se están cargando los datos, no permitir la selección
-    if (isDataLoading || balance === null) {
-      toast.info(t('loading_energies') || "Canalizando energías... espera un momento");
-      return;
+  // Queue pending mode if data still loading — auto-enter once loaded
+  useEffect(() => {
+    if (pendingMode && !isDataLoading && balance !== null) {
+      enterMode(pendingMode);
+      setPendingMode(null);
     }
+  }, [isDataLoading, balance, pendingMode]);
 
-    // Determine cost based on mode
-    let costCode = "general"; // Default fallback
+  // Actually enter the mode (check credits and navigate)
+  const enterMode = (mode: ReadingMode) => {
+    let costCode = "general";
     if (mode === "classic") costCode = "classic";
     else if (mode === "daily") costCode = "daily";
     else if (mode === "question") costCode = "general";
 
     const cost = readingCosts[costCode] ?? 20;
 
-    if (balance < cost) {
+    if (balance !== null && balance < cost) {
       setNeededAmount(cost);
       setInsufficientAuraModalOpen(true);
       return;
@@ -119,6 +123,16 @@ export default function ReadingPage() {
     } else {
       setStep("card_selection");
     }
+  };
+
+  // 1. SELECCIONAR MODO
+  const selectMode = (mode: ReadingMode) => {
+    if (isDataLoading || balance === null) {
+      // Queue the mode — it will auto-enter when data loads
+      setPendingMode(mode);
+      return;
+    }
+    enterMode(mode);
   };
 
   // 2. CONFIRMAR PREGUNTA -> IR A SELECCIÓN DE CARTA
@@ -134,9 +148,30 @@ export default function ReadingPage() {
     setSelectedCards(newSelected);
   };
 
+  // Start loading phase animation
+  const startLoadingPhases = () => {
+    setLoadingPhase(0);
+    // Phase 1 -> 2 after 2s
+    loadingTimerRef.current = setTimeout(() => {
+      setLoadingPhase(1);
+      // Phase 2 -> 3 after 2 more seconds
+      loadingTimerRef.current = setTimeout(() => {
+        setLoadingPhase(2);
+      }, 2000);
+    }, 2000);
+  };
+
+  const clearLoadingTimers = () => {
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+  };
+
   // 4. CUANDO SE COMPLETA LA SELECCIÓN DE CARTAS
   const handleSelectionComplete = async (cards: number[]) => {
     setIsLoading(true);
+    startLoadingPhases();
     setRevealedCards(new Array(cards.length).fill(false));
 
     try {
@@ -166,7 +201,6 @@ export default function ReadingPage() {
 
         if (!response.ok) {
           if (response.status === 402) {
-            // Determine cost again for error handling
             let costCode = "general";
             if (selectedMode === "classic") costCode = "classic";
             else if (selectedMode === "daily") costCode = "daily";
@@ -176,6 +210,7 @@ export default function ReadingPage() {
             setInsufficientAuraModalOpen(true);
             setStep("selection");
             setIsLoading(false);
+            clearLoadingTimers();
             return;
           }
 
@@ -186,14 +221,21 @@ export default function ReadingPage() {
             });
             setStep("selection");
             setIsLoading(false);
+            clearLoadingTimers();
             return;
           }
 
           throw new Error(data.error || "Error in session");
         }
 
+        // Defensive: ensure keywords is always an array
+        const safeKeywords = Array.isArray(data.keywords) ? data.keywords : [];
+
         readings.push({
           ...data,
+          keywords: safeKeywords,
+          description: data.description || '',
+          action: data.action || '',
           position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[i]}`) : undefined
         });
 
@@ -204,11 +246,15 @@ export default function ReadingPage() {
       }
 
       setReadingData(readings);
+      clearLoadingTimers();
 
+      // Smooth transition: brief pause then reveal
+      setLoadingPhase(3); // "ready" phase
       setTimeout(() => {
         setStep("reveal");
         setIsLoading(false);
-      }, 500);
+        setLoadingPhase(0);
+      }, 1200);
 
     } catch (error: any) {
       console.error("Error conectando con el alma:", error);
@@ -217,6 +263,7 @@ export default function ReadingPage() {
       });
       setStep("selection");
       setIsLoading(false);
+      clearLoadingTimers();
     }
   };
 
@@ -250,6 +297,19 @@ export default function ReadingPage() {
     setReadingData(null);
     setCurrentRevealIndex(0);
     setIsLoading(false);
+    setLoadingPhase(0);
+    clearLoadingTimers();
+  };
+
+  // Loading phase messages
+  const getLoadingMessage = () => {
+    switch (loadingPhase) {
+      case 0: return t('loading_phase_1') || "Conectando con el cosmos...";
+      case 1: return t('loading_phase_2') || "Canalizando la energía de tu carta...";
+      case 2: return t('loading_phase_3') || "Interpretando los símbolos...";
+      case 3: return t('loading_phase_ready') || "Tu mensaje está listo...";
+      default: return t('loading_phase_1') || "Conectando con el cosmos...";
+    }
   };
 
   return (
@@ -287,24 +347,30 @@ export default function ReadingPage() {
                 <div className="grid md:grid-cols-3 gap-6 w-full max-w-3xl mx-auto">
 
                   {/* Opción 1: Oráculo Diario (1 carta) */}
-                  <div onClick={() => selectMode("daily")} className="cursor-pointer group">
-                    <GlowingBorderCard className="h-full hover:scale-[1.02] transition-transform" glowColor="purple">
+                  <div onClick={() => selectMode("daily")} className="cursor-pointer group relative">
+                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'daily' ? 'ring-2 ring-purple-400/50' : ''}`} glowColor="purple">
                       <div className="p-6 flex flex-col items-center text-center h-full">
                         <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          <ScanEye className="w-7 h-7 text-purple-400" />
+                          {pendingMode === 'daily' ? (
+                            <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" />
+                          ) : (
+                            <ScanEye className="w-7 h-7 text-purple-400" />
+                          )}
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
                           {t('mode_oracle_title')}
                         </h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {t('mode_oracle_desc')}
+                          {pendingMode === 'daily'
+                            ? (t('loading_energies') || 'Canalizando energías...')
+                            : t('mode_oracle_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-purple-400 text-xs font-bold">{t('one_card')}</span>
                           <div className="flex items-center gap-1.5 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">
                             <Sparkles className="w-3 h-3 text-purple-400" />
                             <span className="text-[10px] font-bold text-purple-300">
-                              {t('aura_cost', { cost: readingCosts['daily'] ?? 20 })}
+                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['daily'] ?? 20 })}
                             </span>
                           </div>
                         </div>
@@ -313,24 +379,30 @@ export default function ReadingPage() {
                   </div>
 
                   {/* Opción 2: Pregunta (1 carta) */}
-                  <div onClick={() => selectMode("question")} className="cursor-pointer group">
-                    <GlowingBorderCard className="h-full hover:scale-[1.02] transition-transform" glowColor="cyan">
+                  <div onClick={() => selectMode("question")} className="cursor-pointer group relative">
+                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'question' ? 'ring-2 ring-cyan-400/50' : ''}`} glowColor="cyan">
                       <div className="p-6 flex flex-col items-center text-center h-full">
                         <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          <MessageCircleQuestion className="w-7 h-7 text-cyan-400" />
+                          {pendingMode === 'question' ? (
+                            <Sparkles className="w-7 h-7 text-cyan-400 animate-pulse" />
+                          ) : (
+                            <MessageCircleQuestion className="w-7 h-7 text-cyan-400" />
+                          )}
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
                           {t('mode_question_title')}
                         </h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {t('mode_question_desc')}
+                          {pendingMode === 'question'
+                            ? (t('loading_energies') || 'Canalizando energías...')
+                            : t('mode_question_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-cyan-400 text-xs font-bold">{t('one_card')}</span>
                           <div className="flex items-center gap-1.5 bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/20">
                             <Sparkles className="w-3 h-3 text-cyan-400" />
                             <span className="text-[10px] font-bold text-cyan-300">
-                              {t('aura_cost', { cost: readingCosts['general'] ?? 20 })}
+                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['general'] ?? 20 })}
                             </span>
                           </div>
                         </div>
@@ -339,28 +411,34 @@ export default function ReadingPage() {
                   </div>
 
                   {/* Opción 3: Evolución Temporal (3 cartas) */}
-                  <div onClick={() => selectMode("classic")} className="cursor-pointer group">
-                    <GlowingBorderCard className="h-full hover:scale-[1.02] transition-transform" glowColor="amber">
+                  <div onClick={() => selectMode("classic")} className="cursor-pointer group relative">
+                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'classic' ? 'ring-2 ring-amber-400/50' : ''}`} glowColor="amber">
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
                         {/* Badge NEW */}
                         <div className="absolute top-2 right-2 bg-amber-500 text-[10px] text-black font-bold px-2 py-0.5 rounded-full uppercase">
                           {t('new_badge')}
                         </div>
                         <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          <Clock className="w-7 h-7 text-amber-400" />
+                          {pendingMode === 'classic' ? (
+                            <Sparkles className="w-7 h-7 text-amber-400 animate-pulse" />
+                          ) : (
+                            <Clock className="w-7 h-7 text-amber-400" />
+                          )}
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
                           {t('mode_classic_title')}
                         </h3>
                         <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {t('mode_classic_desc')}
+                          {pendingMode === 'classic'
+                            ? (t('loading_energies') || 'Canalizando energías...')
+                            : t('mode_classic_desc')}
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
                           <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
                           <div className="flex items-center gap-1.5 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
                             <Sparkles className="w-3 h-3 text-amber-400" />
                             <span className="text-[10px] font-bold text-amber-300">
-                              {t('aura_cost', { cost: readingCosts['classic'] ?? 100 })}
+                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['classic'] ?? 100 })}
                             </span>
                           </div>
                         </div>
@@ -440,10 +518,112 @@ export default function ReadingPage() {
                     />
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mb-4" />
-                    <p className="text-purple-300 animate-pulse">{t('consulting')}</p>
-                  </div>
+                  <motion.div
+                    className="flex flex-col items-center justify-center py-20"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {/* Mystical loading orb */}
+                    <div className="relative w-32 h-32 mb-8">
+                      {/* Outer glow ring */}
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-purple-500/30"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.3, 0.6, 0.3],
+                          borderColor: loadingPhase >= 2
+                            ? ['rgba(168,85,247,0.5)', 'rgba(129,140,248,0.5)', 'rgba(168,85,247,0.5)']
+                            : ['rgba(168,85,247,0.3)', 'rgba(168,85,247,0.5)', 'rgba(168,85,247,0.3)']
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      {/* Middle ring */}
+                      <motion.div
+                        className="absolute inset-3 rounded-full border border-indigo-400/20"
+                        animate={{
+                          rotate: 360,
+                          scale: [1, 1.05, 1]
+                        }}
+                        transition={{
+                          rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+                          scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                        }}
+                      />
+                      {/* Core sparkle */}
+                      <motion.div
+                        className="absolute inset-0 flex items-center justify-center"
+                        animate={{
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 15, -15, 0]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        {loadingPhase >= 3 ? (
+                          <Star className="w-10 h-10 text-purple-300" />
+                        ) : loadingPhase >= 1 ? (
+                          <Moon className="w-10 h-10 text-purple-400" />
+                        ) : (
+                          <Sparkles className="w-10 h-10 text-purple-400" />
+                        )}
+                      </motion.div>
+                      {/* Floating particles */}
+                      {[...Array(6)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-1.5 h-1.5 bg-purple-400/60 rounded-full"
+                          style={{
+                            top: '50%',
+                            left: '50%',
+                          }}
+                          animate={{
+                            x: [0, Math.cos((i * 60) * Math.PI / 180) * 50, 0],
+                            y: [0, Math.sin((i * 60) * Math.PI / 180) * 50, 0],
+                            opacity: [0, 0.8, 0],
+                            scale: [0, 1, 0]
+                          }}
+                          transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            delay: i * 0.4,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Phase text with crossfade */}
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={loadingPhase}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4 }}
+                        className={`text-center font-serif text-lg ${loadingPhase >= 3
+                            ? 'text-purple-200'
+                            : 'text-purple-300/80'
+                          }`}
+                      >
+                        {getLoadingMessage()}
+                      </motion.p>
+                    </AnimatePresence>
+
+                    {/* Subtle progress dots */}
+                    <div className="flex gap-2 mt-6">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className={`w-2 h-2 rounded-full ${loadingPhase >= i + 1 ? 'bg-purple-400' : 'bg-purple-400/20'
+                            }`}
+                          animate={loadingPhase >= i + 1 ? {
+                            scale: [1, 1.3, 1],
+                          } : {}}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
               </motion.div>
             )}
@@ -466,22 +646,41 @@ export default function ReadingPage() {
 
                 <div className="flex flex-wrap justify-center gap-8 md:gap-12">
                   {readingData.map((reading, index) => (
-                    <div key={index} className="flex flex-col items-center gap-4">
+                    <motion.div
+                      key={index}
+                      className="flex flex-col items-center gap-4"
+                      initial={{ opacity: 0, y: 40, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: index * 0.2,
+                        ease: [0.22, 1, 0.36, 1]
+                      }}
+                    >
                       {reading.position && (
-                        <span className="text-purple-300 text-sm font-bold uppercase tracking-widest">
+                        <motion.span
+                          className="text-purple-300 text-sm font-bold uppercase tracking-widest"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: index * 0.2 + 0.3 }}
+                        >
                           {reading.position}
-                        </span>
+                        </motion.span>
                       )}
 
-                      <div onClick={() => !revealedCards[index] && handleRevealCard(index)}>
+                      <motion.div
+                        onClick={() => !revealedCards[index] && handleRevealCard(index)}
+                        whileHover={!revealedCards[index] ? { scale: 1.05, y: -5 } : {}}
+                        transition={{ duration: 0.3 }}
+                      >
                         <TarotCard
                           cardName={revealedCards[index] ? reading.cardName : undefined}
                           isRevealed={revealedCards[index]}
                           onClick={() => !revealedCards[index] && handleRevealCard(index)}
-                          className={`w-64 h-96 cursor-pointer hover:scale-105 transition-transform duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}
+                          className={`w-64 h-96 cursor-pointer transition-shadow duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}
                         />
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                   ))}
                 </div>
 
@@ -550,15 +749,17 @@ export default function ReadingPage() {
                       <div>
                         <h3 className="text-3xl font-serif text-white mb-2">{reading.cardName}</h3>
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {reading.keywords.map(k => (
+                          {(Array.isArray(reading.keywords) ? reading.keywords : []).map((k: string) => (
                             <span key={k} className="px-3 py-1 bg-white/5 rounded-full text-xs text-slate-300 border border-white/10">
                               {k}
                             </span>
                           ))}
                         </div>
-                        <p className="text-lg text-slate-300 leading-relaxed italic border-l-2 border-purple-500/50 pl-4">
-                          "{reading.description}"
-                        </p>
+                        {reading.description ? (
+                          <p className="text-lg text-slate-300 leading-relaxed italic border-l-2 border-purple-500/50 pl-4">
+                            "{reading.description}"
+                          </p>
+                        ) : null}
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-6">
@@ -568,7 +769,7 @@ export default function ReadingPage() {
                             {t('mission')}
                           </h4>
                           <p className="text-sm text-slate-400">
-                            {reading.action}
+                            {reading.action || ''}
                           </p>
                         </div>
                       </div>

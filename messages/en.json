@@ -491,6 +491,10 @@
         "error_quota_desc": "The energies are very intense right now. Please wait a moment and try again.",
         "error_generic": "Connection Interrupted",
         "error_generic_desc": "There was a problem connecting with the oracle. Please try again.",
-        "loading_energies": "Channelling energies... please wait a moment"
+        "loading_energies": "Channelling energies... please wait a moment",
+        "loading_phase_1": "Connecting with the cosmos...",
+        "loading_phase_2": "Channeling your card's energy...",
+        "loading_phase_3": "Interpreting the symbols...",
+        "loading_phase_ready": "Your message is ready..."
     }
 }
