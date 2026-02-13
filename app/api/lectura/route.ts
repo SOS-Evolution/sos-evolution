@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const DECK = [
     "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
     "El Hierofante", "Los Enamorados", "El Carro", "La Fuerza", "El Ermitaño",
@@ -31,6 +29,9 @@ const schemaJSON = JSON.stringify({
 
 export async function POST(req: Request) {
     try {
+        // Inicializar Groq (solo en runtime, no en build time)
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
         const body = await req.json().catch(() => ({}));
         const { question, cardIndex, readingTypeCode = 'general', position, locale = 'es' } = body;
 

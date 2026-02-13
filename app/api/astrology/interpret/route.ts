@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const schemaJSON = JSON.stringify({
     description: "Astrological natal chart interpretation",
     type: "object",
@@ -27,6 +25,9 @@ const schemaJSON = JSON.stringify({
 
 export async function POST(req: Request) {
     try {
+        // Inicializar Groq (solo en runtime, no en build time)
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
         const body = await req.json().catch(() => ({}));
         const { chartData, locale = 'es' } = body;
 
