@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "@/i18n/routing";
 import { Button } from "./button";
-import { LogIn, LogOut, User, KeyRound, ChevronDown, Languages } from "lucide-react";
+import { LogIn, LogOut, User, KeyRound, ChevronDown, Globe } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useState, useTransition } from "react";
 import { logout } from "@/app/[locale]/login/actions";
@@ -14,7 +14,11 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
+import { Check } from "lucide-react";
 
 export default function AuthButton({ user, profile }: { user: any, profile?: any }) {
     const [loading, setLoading] = useState(false);
@@ -24,8 +28,8 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
     const pathname = usePathname();
     const ta = useTranslations('Auth');
 
-    const handleLocaleToggle = () => {
-        const nextLocale = locale === 'en' ? 'es' : 'en';
+    const switchLocale = (nextLocale: string) => {
+        if (nextLocale === locale) return;
         startTransition(() => {
             router.replace(pathname, { locale: nextLocale });
         });
@@ -90,21 +94,39 @@ export default function AuthButton({ user, profile }: { user: any, profile?: any
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
 
-                <DropdownMenuItem
-                    onClick={handleLocaleToggle}
-                    disabled={isPending}
-                    className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
-                >
-                    <div className="flex items-center">
-                        <Languages className="mr-2 h-4 w-4 text-purple-400 group-hover:text-purple-300" />
-                        <span>{ta('language_label')}</span>
-                    </div>
-                    <div className="flex items-center gap-1 font-mono text-[10px] font-bold tracking-tighter bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                        <span className={locale === 'en' ? "text-white" : "text-slate-500"}>EN</span>
-                        <span className="text-slate-700">/</span>
-                        <span className={locale === 'es' ? "text-white" : "text-slate-500"}>ES</span>
-                    </div>
-                </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between">
+                        <div className="flex items-center">
+                            <Globe className="mr-2 h-4 w-4 text-purple-400 group-hover:text-purple-300" />
+                            <span>{ta('language_label')}</span>
+                        </div>
+                        <div className="flex items-center gap-1 font-mono text-[10px] font-bold tracking-tighter bg-white/5 px-2 py-0.5 rounded border border-white/5 ml-2">
+                            <span className="text-white uppercase">{locale}</span>
+                        </div>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="bg-black/90 backdrop-blur-xl border-white/10 min-w-[8rem]">
+                        <DropdownMenuItem
+                            onClick={() => switchLocale('es')}
+                            className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
+                        >
+                            <div className="flex items-center">
+                                <span className="mr-2">🇪🇸</span>
+                                <span>{ta('language_es')}</span>
+                            </div>
+                            {locale === 'es' && <Check className="w-4 h-4 text-purple-400" />}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => switchLocale('en')}
+                            className="focus:bg-white/10 focus:text-white cursor-pointer group flex items-center justify-between"
+                        >
+                            <div className="flex items-center">
+                                <span className="mr-2">🇺🇸</span>
+                                <span>{ta('language_en')}</span>
+                            </div>
+                            {locale === 'en' && <Check className="w-4 h-4 text-purple-400" />}
+                        </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
                 <DropdownMenuItem asChild className="focus:bg-white/10 focus:text-white cursor-pointer group">
                     <Link href="/dashboard/profile/reset-password">

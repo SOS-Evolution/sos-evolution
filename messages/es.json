@@ -123,7 +123,9 @@
         "change_password": "Cambiar Contraseña",
         "logout": "Cerrar Sesión",
         "logging_out": "Saliendo...",
-        "language_label": "Idioma"
+        "language_label": "Idioma",
+        "language_es": "Español",
+        "language_en": "Inglés"
     },
     "Navbar": {
         "home": "Inicio",
