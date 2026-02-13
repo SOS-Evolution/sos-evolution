@@ -29,6 +29,15 @@ const schemaJSON = JSON.stringify({
 
 export async function POST(req: Request) {
     try {
+        // Validar que existe la API key
+        if (!process.env.GROQ_API_KEY) {
+            console.error('GROQ_API_KEY is not set in environment variables');
+            return NextResponse.json(
+                { error: 'Error de configuración del servidor: GROQ_API_KEY no configurada' },
+                { status: 500 }
+            );
+        }
+
         // Inicializar Groq (solo en runtime, no en build time)
         const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
