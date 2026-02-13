@@ -105,14 +105,23 @@ export async function POST(req: Request) {
 
         // Verificación optimista de saldo
         if (cost > 0) {
-            const { data: balance, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+            let balance = 0;
+            const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
 
             if (balanceError) {
-                console.error("Error checking balance:", balanceError);
-                return NextResponse.json({ error: 'Error verificando saldo de aura.' }, { status: 500 });
+                console.error("RPC get_user_balance failed, using fallback query:", balanceError);
+                // Fallback: query directa a user_credits
+                const { data: creditsData } = await supabase
+                    .from('user_credits')
+                    .select('amount')
+                    .eq('user_id', user.id);
+
+                balance = creditsData?.reduce((sum: number, row: any) => sum + (row.amount || 0), 0) || 0;
+            } else {
+                balance = balanceData || 0;
             }
 
-            if ((balance || 0) < cost) {
+            if (balance < cost) {
                 return NextResponse.json({ error: 'Aura de Evolución insuficiente para esta lectura.' }, { status: 402 });
             }
         }

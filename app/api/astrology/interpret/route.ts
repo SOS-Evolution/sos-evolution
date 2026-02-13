@@ -61,10 +61,29 @@ export async function POST(req: Request) {
 
         const cost = readingType?.credit_cost || 20;
 
-        // Verificación de saldo
-        const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
-        if ((balance || 0) < cost) {
-            return NextResponse.json({ error: 'Aura insuficiente para esta interpretación.' }, { status: 402 });
+        // Verificación de saldo (con fallback si RPC falla)
+        let balance = 0;
+        const { data: balanceData, error: balanceError } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
+
+        if (balanceError) {
+            console.error('RPC get_user_balance failed, using fallback query:', balanceError);
+            // Fallback: query directa a user_credits
+            const { data: creditsData } = await supabase
+                .from('user_credits')
+                .select('amount')
+                .eq('user_id', user.id);
+
+            balance = creditsData?.reduce((sum: number, row: any) => sum + (row.amount || 0), 0) || 0;
+        } else {
+            balance = balanceData || 0;
+        }
+
+        if (balance < cost) {
+            return NextResponse.json({
+                error: 'Aura insuficiente para esta interpretación.',
+                currentBalance: balance,
+                requiredAmount: cost
+            }, { status: 402 });
         }
 
         // 3. IA GENERATIVA (GROQ)

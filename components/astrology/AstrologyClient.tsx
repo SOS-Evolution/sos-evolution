@@ -47,22 +47,29 @@ export default function AstrologyClient({
 
     useEffect(() => {
         const fetchInitialData = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                // Fetch balance
-                const { data: balanceData } = await supabase.rpc('get_user_balance', { user_uuid: user.id });
-                setBalance(balanceData);
+            try {
+                // Fetch balance via API (more reliable than direct RPC from browser)
+                const creditsRes = await fetch('/api/credits');
+                if (creditsRes.ok) {
+                    const creditsData = await creditsRes.json();
+                    setBalance(creditsData.balance ?? 0);
+                }
 
                 // Fetch dynamic cost for astrology analysis
-                const { data: readingTypes } = await supabase
-                    .from('reading_types')
-                    .select('credit_cost')
-                    .eq('code', 'astrology_full')
-                    .single();
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: readingTypes } = await supabase
+                        .from('reading_types')
+                        .select('credit_cost')
+                        .eq('code', 'astrology_full')
+                        .single();
 
-                if (readingTypes) {
-                    setAuraCost(readingTypes.credit_cost);
+                    if (readingTypes) {
+                        setAuraCost(readingTypes.credit_cost);
+                    }
                 }
+            } catch (err) {
+                console.error('Error fetching initial data:', err);
             }
         };
         fetchInitialData();
