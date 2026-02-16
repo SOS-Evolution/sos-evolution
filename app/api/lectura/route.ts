@@ -81,16 +81,13 @@ export async function POST(req: Request) {
 
             readingType = generalType;
 
+            // CRITICAL FIX: Ensure we have a valid reading type to avoid FK errors
             if (!readingType) {
-                console.error("Critical: 'general' reading type not found in DB. Constructing fallback object.");
-                // Emergency fallback object
-                readingType = {
-                    id: '00000000-0000-0000-0000-000000000000', // Placeholder
-                    code: readingTypeCode,
-                    name: readingTypeCode === 'daily' ? 'Oráculo Diario' : 'Consulta General',
-                    description: 'Lectura de tarot',
-                    credit_cost: READING_COSTS[readingTypeCode] || 20
-                };
+                console.error("Critical: 'general' reading type not found in DB.");
+                return NextResponse.json(
+                    { error: 'Error de configuración del sistema: Tipo de lectura no encontrado.' },
+                    { status: 500 }
+                );
             }
         }
 
@@ -117,7 +114,11 @@ export async function POST(req: Request) {
             console.log(`User ${user.id} balance: ${balance}, Cost: ${cost}`);
 
             if (balance < cost) {
-                return NextResponse.json({ error: 'Aura de Evolución insuficiente para esta lectura.' }, { status: 402 });
+                return NextResponse.json({
+                    error: 'Aura de Evolución insuficiente para esta lectura.',
+                    required: cost,
+                    balance: balance
+                }, { status: 402 });
             }
         }
 
@@ -247,29 +248,33 @@ export async function POST(req: Request) {
         if (dbError) {
             console.error("CRITICAL DB ERROR during reading insert:", dbError);
             console.error("Payload attempted:", {
-                card_name: aiResponse.cardName,
-                keywords: aiResponse.keywords,
-                description: aiResponse.description,
-                action: aiResponse.action,
-                user_id: user.id
+                user_id: user.id,
+                reading_type_id: readingType.id,
+                card_name: aiResponse.cardName
             });
-            // if insertion fails, we don't charge credits
-        } else {
-            // 5. DESCONTAR CRÉDITOS (Si se guardó bien)
-            if (cost > 0) {
-                // Use rigorous v2 function
-                const { error: spendError } = await supabase.rpc('spend_credits_v2', {
-                    p_user_id: user.id,
-                    p_amount: cost,
-                    p_description: `Lectura: ${readingType?.name || 'General'}`,
-                    p_reference_id: savedReading.id
-                });
+            // FIX: If we cannot save the reading, we MUST NOT return it to the user.
+            return NextResponse.json({
+                error: 'Error guardando la lectura en el historial. No se han descontado créditos.',
+                details: dbError.message
+            }, { status: 500 });
+        }
 
-                if (spendError) {
-                    console.error("CRITICAL: Error spending credits v2:", spendError);
-                } else {
-                    console.log(`Successfully spent ${cost} credits for user ${user.id}`);
-                }
+        // 5. DESCONTAR CRÉDITOS (Solo si se guardó bien)
+        if (cost > 0) {
+            // Use rigorous v2 function
+            // FIX: savedReading.id is an Integer (legacy), but p_reference_id expects UUID.
+            // We pass null for reference_id and include the ID in the description for auditability.
+            const { error: spendError } = await supabase.rpc('spend_credits_v2', {
+                p_user_id: user.id,
+                p_amount: cost,
+                p_description: `Lectura: ${readingType?.name || 'General'} (Ref: ${savedReading.id})`,
+                p_reference_id: null
+            });
+
+            if (spendError) {
+                console.error("CRITICAL: Error spending credits v2:", spendError);
+            } else {
+                console.log(`Successfully spent ${cost} credits for user ${user.id}`);
             }
         }
 
