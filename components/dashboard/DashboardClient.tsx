@@ -42,6 +42,7 @@ import OnboardingModal from "@/components/dashboard/OnboardingModal";
 import { useTranslations } from 'next-intl';
 import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
+import DailyHoroscopeCard from "@/components/astrology/DailyHoroscopeCard";
 
 interface DashboardClientProps {
     profile: any;
@@ -347,6 +348,11 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                         </div>
 
                     </div>
+                </AnimatedSection>
+
+                {/* SECCIÓN: HORÓSCOPO DIARIO */}
+                <AnimatedSection delay={0.2}>
+                    <DailyHoroscopeCard />
                 </AnimatedSection>
 
                 {/* SECCIÓN: PANEL DE CONTROL */}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
+import { getPrompt } from '@/lib/prompts';
 
 const DECK = [
     "El Loco", "El Mago", "La Sacerdotisa", "La Emperatriz", "El Emperador",
@@ -122,6 +123,11 @@ export async function POST(req: Request) {
             }
         }
 
+
+        // ... imports
+
+        // ... inside POST function ... 
+
         // 3. IA GENERATIVA (GROQ)
         // Elegir carta
         const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < DECK.length)
@@ -146,32 +152,23 @@ export async function POST(req: Request) {
             `;
         }
 
-        const prompt = `
-          Actúa como SOS (Soul Operating System). Carta: ${selectedCard}.
-          ${typeContext}
-          ${positionContext}
-          Contexto del usuario: ${userContext}
-          
-          IMPORTANT: Respond strictly in ${locale === 'en' ? 'English' : 'Spanish'}.
-          
-          Return a JSON object with these FOUR fields (all are required):
-          - "cardName": exactly "${selectedCard}"
-          - "keywords": an array of exactly 3 mystical keywords related to the card's energy and meaning (each keyword should be 1-3 words)
-          - "description": a deep, mystical interpretation of the card (minimum 50 words, be poetic and insightful)
-          - "action": a specific ritual, action or practice the user should do based on this card (minimum 15 words)
-          
-          Schema for reference:
-          ${schemaJSON}
-          
-          CRITICAL: The "description" field must be a FULL mystical interpretation, NOT a label or title. It must be at least 50 words long.
-          The "action" field must be a specific actionable suggestion, NOT empty or generic.
-        `;
+        // DYNAMIC PROMPTS
+        const systemAttributes = await getPrompt('tarot_system');
+        const userAttributes = await getPrompt('tarot_user', {
+            selectedCard,
+            typeContext,
+            positionContext,
+            userContext,
+            language: locale === 'en' ? 'English' : 'Spanish',
+            schemaJSON: schemaJSON
+        });
 
         const completion = await groq.chat.completions.create({
             messages: [
-                { role: "system", content: "You are a mystical tarot reader. Output only valid JSON." },
-                { role: "user", content: prompt }
+                { role: "system", content: systemAttributes },
+                { role: "user", content: userAttributes }
             ],
+            // ... rest of config
             model: "llama-3.3-70b-versatile",
             temperature: 0.7,
             response_format: { type: "json_object" }
@@ -195,10 +192,15 @@ export async function POST(req: Request) {
             console.warn('AI returned incomplete description, attempting retry...');
             // Quick retry with a more explicit prompt
             try {
+                const retryPrompt = await getPrompt('tarot_retry', {
+                    selectedCard,
+                    language: locale === 'en' ? 'English' : 'Spanish'
+                });
+
                 const retryCompletion = await groq.chat.completions.create({
                     messages: [
                         { role: "system", content: "You are a mystical tarot reader. Output only valid JSON. Every field must contain meaningful content." },
-                        { role: "user", content: `Interpret the tarot card "${selectedCard}" in ${locale === 'en' ? 'English' : 'Spanish'}. Return JSON: {"cardName": "${selectedCard}", "keywords": ["word1", "word2", "word3"], "description": "A deep mystical interpretation of at least 50 words", "action": "A specific ritual or action suggestion of at least 15 words"}` }
+                        { role: "user", content: retryPrompt }
                     ],
                     model: "llama-3.3-70b-versatile",
                     temperature: 0.8,

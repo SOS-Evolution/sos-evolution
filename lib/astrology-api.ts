@@ -197,6 +197,53 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
     }
 }
 
+export async function fetchDailyTransits(date = new Date()): Promise<any> {
+    try {
+        // Format date as DD-MM-YYYY as required by some endpoints, or standard ISO
+        // The endpoint 'natal_transits/daily' usually takes current time if not specified, 
+        // or we might need to pass specific parameters. 
+        // Based on documentation, we'll try to POST with specific date.
+
+        const payload = {
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            date: date.getDate(),
+            hours: 12, // Noon is a good standard for daily transits
+            minutes: 0,
+            seconds: 0,
+            latitude: 40.7128, // Default to a neutral location (e.g. NYC/Greenwich) as transits are geocentric roughly
+            longitude: -74.0060,
+            timezone: 0,
+            config: {
+                observation_point: "geocentric", // Transits are usually geocentric
+                ayanamsha: "tropical"
+            }
+        };
+
+        const response = await fetch(`${API_BASE_URL}/planets`, { // Using /planets for transits as it gives raw positions
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.FREE_ASTRO_API_KEY || ''
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            console.error("Error fetching daily transits:", await response.text());
+            return null;
+        }
+
+        const data = await response.json();
+        // Return just the planetary positions
+        return data?.output?.[0] || null;
+
+    } catch (error) {
+        console.error("Fetch Daily Transits Error:", error);
+        return null;
+    }
+}
+
 // Helper to get dummy data for dev/visual testing if API fails
 export function getMockChartData(details?: BirthDetails): WesternChartData {
     const sunSignES = details ? getZodiacSign(details.date, details.month) : "Aries";

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Groq } from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
+import { getPrompt } from '@/lib/prompts';
 
 const schemaJSON = JSON.stringify({
     description: "Astrological natal chart interpretation",
@@ -82,50 +83,20 @@ export async function POST(req: Request) {
 
         // 3. IA GENERATIVA (GROQ)
         const isEn = locale.startsWith('en');
+        const sysKey = isEn ? 'astro_natal_system_en' : 'astro_natal_system_es';
+        const userKey = isEn ? 'astro_natal_user_en' : 'astro_natal_user_es';
 
-        const systemPrompt = isEn
-            ? "You are SOS (Soul Operating System), an expert astrologer specializing in evolutionary and psychological astrology. You always respond with valid JSON only, no markdown or extra text."
-            : "Eres SOS (Soul Operating System), un astrólogo experto en astrología evolutiva y psicológica. Siempre respondes únicamente con JSON válido, sin markdown ni texto extra.";
+        const systemPrompt = await getPrompt(sysKey);
 
-        const userPrompt = isEn
-            ? `Analyze this natal chart and provide a deep, empowering interpretation for personal evolution.
+        const planetsData = JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2);
+        const housesData = JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2);
+        const aspectsData = JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2);
 
-PLANETS:
-${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
-
-HOUSES:
-${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
-
-ASPECTS (top 10):
-${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
-
-Provide your interpretation in this EXACT JSON format (no markdown, pure JSON):
-{
-  "summary": "2-3 sentence mystical summary of their soul's journey",
-  "core_personality": "Deep analysis of Sun, Moon, and Ascendant combination",
-  "strengths": ["strength 1", "strength 2", "strength 3"],
-  "challenges": ["challenge 1", "challenge 2", "challenge 3"],
-  "evolutionary_advice": "Guidance for soul evolution in this incarnation"
-}`
-            : `Analiza esta carta natal y proporciona una interpretación profunda y empoderadora para la evolución personal.
-
-PLANETAS:
-${JSON.stringify(chartData.planets.map((p: any) => ({ name: p.name, sign: p.sign, house: p.house })), null, 2)}
-
-CASAS:
-${JSON.stringify(chartData.houses.map((h: any) => ({ house: h.house, sign: h.sign })), null, 2)}
-
-ASPECTOS (top 10):
-${JSON.stringify(chartData.aspects?.slice(0, 10).map((a: any) => ({ p1: a.planet1, p2: a.planet2, type: a.type })), null, 2)}
-
-Proporciona tu interpretación en este formato JSON EXACTO (sin markdown, JSON puro):
-{
-  "summary": "Resumen místico de 2-3 oraciones sobre el viaje del alma",
-  "core_personality": "Análisis profundo de la combinación Sol, Luna y Ascendente",
-  "strengths": ["fortaleza 1", "fortaleza 2", "fortaleza 3"],
-  "challenges": ["desafío 1", "desafío 2", "desafío 3"],
-  "evolutionary_advice": "Consejos para la evolución del alma en esta encarnación"
-}`;
+        const userPrompt = await getPrompt(userKey, {
+            planetsData,
+            housesData,
+            aspectsData
+        });
 
         const completion = await groq.chat.completions.create({
             messages: [
