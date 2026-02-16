@@ -15,6 +15,7 @@ import { notFound } from 'next/navigation';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://sos-evolution.com'),
     title: {
         default: "SOS Evolution | Soul Operating System",
         template: "%s | SOS Evolution"
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
         description: "Descubre tu mapa evolutivo con Tarot e Inteligencia Artificial.",
         url: "https://sos-evolution.com",
         siteName: "SOS Evolution",
-        locale: "es_ES", // Esto podría ser dinámico
+        locale: "es_ES",
         type: "website",
     },
 };
