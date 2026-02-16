@@ -90,7 +90,7 @@
             "unknown_place": "Lugar desconocido",
             "edit": "Editar"
         },
-        "unlock_button": "Desbloquear Acceso",
+        "unlock_button": "Revelar",
         "unlock_cost": "{cost} AURA",
         "unlock_confirm": "¿Desbloquear {feature} por {cost} AURA?",
         "transaction": {
@@ -100,6 +100,24 @@
             "cancel": "Cancelar",
             "processing": "Procesando...",
             "success": "¡Has desbloqueado el acceso a {feature}!"
+        },
+        "DailyHoroscope": {
+            "title": "Tu Guía Evolutiva de Hoy",
+            "subtitle": "Horóscopo Evolutivo Diario",
+            "description": "Descubre cómo los tránsitos planetarios de hoy afectan tu carta natal única.",
+            "loading": "Consultando Astros...",
+            "reveal_button": "Revelar",
+            "power_action": "Acción de Poder",
+            "color": "Color",
+            "number": "Número",
+            "recovered": "Horóscopo Recuperado",
+            "recovered_desc": "Aquí tienes tu guía de hoy nuevamente.",
+            "revealed": "¡Horóscopo Revelado!",
+            "revealed_desc": "Has usado {cost} de Aura.",
+            "insufficient_aura": "Aura insuficiente",
+            "insufficient_aura_desc": "Necesitas recargar tu Aura para ver el horóscopo diario.",
+            "error_title": "Error",
+            "error_desc": "No se pudo generar el horóscopo."
         }
     },
     "Zodiac": {

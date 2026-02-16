@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkle, Calendar, ArrowLeft, Sparkles, Zap, CreditCard, Check, Star } from "lucide-react";
+import { Sparkles, Calendar, ArrowLeft, Zap, CreditCard, Check, Star } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { useTranslations } from 'next-intl';
@@ -48,7 +48,7 @@ export default function PurchasePage() {
             gradient: "from-blue-950 via-slate-900 to-slate-900",
             borderColor: "border-blue-500/30",
             glowColor: "blue",
-            icon: <Sparkle className="w-4 h-4 text-blue-400" />
+            icon: <Sparkles className="w-4 h-4 text-blue-400" />
         },
         {
             id: "iniciado",
@@ -65,7 +65,7 @@ export default function PurchasePage() {
             gradient: "from-slate-900 via-slate-800 to-slate-900",
             borderColor: "border-slate-700",
             glowColor: "slate",
-            icon: <Sparkle className="w-4 h-4 text-amber-500/80" />
+            icon: <Sparkles className="w-4 h-4 text-amber-500/80" />
         },
         {
             id: "adepto",
@@ -217,7 +217,7 @@ export default function PurchasePage() {
                                     </div>
                                     {tier.credits ? (
                                         <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
-                                            <Sparkle className={`w-4 h-4 text-${tier.glowColor}-400`} />
+                                            <Sparkles className={`w-4 h-4 text-${tier.glowColor}-400`} />
                                             <span>{tier.credits.toLocaleString()} {t('aura')}</span>
                                         </div>
                                     ) : (

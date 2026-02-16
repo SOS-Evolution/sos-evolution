@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkle, X } from "lucide-react";
+import { Loader2, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TransactionModalProps {
@@ -54,7 +54,7 @@ export default function TransactionModal({
                         {/* Icon Container */}
                         <div className="w-16 h-16 rounded-full bg-slate-800/50 border border-purple-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.15)] relative group">
                             <div className="absolute inset-0 rounded-full bg-amber-500/10 animate-pulse" />
-                            {icon || <Sparkle className="w-8 h-8 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" />}
+                            {icon || <Sparkles className="w-8 h-8 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" />}
                         </div>
 
                         <DialogHeader className="space-y-2">
@@ -73,7 +73,7 @@ export default function TransactionModal({
                     <div className="flex flex-col items-center gap-1 bg-slate-950/40 px-6 py-2 rounded-xl border border-white/5">
                         <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Costo de la Transacción</span>
                         <div className="flex items-center gap-2 text-amber-400 font-mono text-lg font-bold">
-                            <Sparkle className="w-4 h-4 fill-amber-400/20" />
+                            <Sparkles className="w-4 h-4 text-amber-400/80" />
                             <span>{cost} AURA</span>
                         </div>
                     </div>

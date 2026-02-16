@@ -15,6 +15,7 @@ import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
+import AuraActionButton from "@/components/ui/AuraActionButton";
 
 interface AstrologyClientProps {
     profile: any;
@@ -184,21 +185,13 @@ export default function AstrologyClient({
                             <AstrologyWheel planets={initialChartData.planets} houses={initialChartData.houses} size={400} />
 
                             {!interpretation && (
-                                <Button
+                                <AuraActionButton
                                     onClick={handleInterpret}
-                                    disabled={isLoading}
-                                    className="relative group px-8 py-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold shadow-xl shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95"
-                                >
-                                    {isLoading ? (
-                                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                    ) : (
-                                        <Wand2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                                    )}
-                                    {t_interp('generate_button')}
-                                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-black flex items-center gap-1 shadow-lg">
-                                        <Sparkles className="w-2.5 h-2.5" /> {t_interp('aura_cost_badge', { cost: auraCost })}
-                                    </div>
-                                </Button>
+                                    loading={isLoading}
+                                    cost={auraCost}
+                                    label={t_interp('generate_button')}
+                                    icon={<Wand2 className="w-5 h-5" />}
+                                />
                             )}
                         </div>
                     </AnimatedSection>

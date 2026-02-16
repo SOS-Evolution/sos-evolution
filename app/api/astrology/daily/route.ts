@@ -5,6 +5,39 @@ import { getZodiacSign } from '@/lib/soul-math';
 import { getPrompt } from '@/lib/prompts';
 import { Groq } from 'groq-sdk';
 
+export async function GET(req: Request) {
+    try {
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(req.url);
+        const locale = searchParams.get('locale') || 'es';
+
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0];
+
+        const { data: existingHoroscope } = await supabase
+            .from('daily_horoscopes')
+            .select('content')
+            .eq('user_id', user.id)
+            .eq('date', dateStr)
+            .eq('language', locale)
+            .single();
+
+        if (existingHoroscope) {
+            return NextResponse.json(existingHoroscope.content);
+        }
+
+        return NextResponse.json(null, { status: 404 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const supabase = await createClient();
@@ -17,7 +50,7 @@ export async function POST(req: Request) {
         const body = await req.json().catch(() => ({}));
         const { locale = 'es' } = body;
 
-        // 1. VERIFICAR SI YA TIENE HORÓSCOPO HOY
+        // 1. VERIFICAR SI YA TIENE HORÓSCOPO HOY (EN ESTE IDIOMA)
         // Usamos la fecha del servidor para consistencia
         const today = new Date();
         const dateStr = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
@@ -27,12 +60,13 @@ export async function POST(req: Request) {
             .select('*')
             .eq('user_id', user.id)
             .eq('date', dateStr)
+            .eq('language', locale)
             .single();
 
         if (existingHoroscope) {
             return NextResponse.json({
                 alreadyExists: true,
-                ...existingHoroscope
+                ...existingHoroscope.content
             });
         }
 
@@ -143,14 +177,14 @@ export async function POST(req: Request) {
             .join(', ');
 
         // DYNAMIC PROMPTS
-        const systemPrompt = await getPrompt('astro_daily_system');
+        const suffix = isEn ? 'en' : 'es';
+        const systemPrompt = await getPrompt(`astro_daily_system_${suffix}`);
 
-        const userPrompt = await getPrompt('astro_daily_user', {
+        const userPrompt = await getPrompt(`astro_daily_user_${suffix}`, {
             dateStr,
             calculatedSunSign,
             simpleNatal,
-            simpleTransits,
-            language: isEn ? 'English' : 'Spanish'
+            simpleTransits
         });
 
         const completion = await groq.chat.completions.create({
@@ -173,7 +207,8 @@ export async function POST(req: Request) {
                 user_id: user.id,
                 date: dateStr,
                 content: content,
-                transits_snapshot: transitsData
+                transits_snapshot: transitsData,
+                language: locale
             }])
             .select()
             .single();

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Sparkles, Sparkle, Trophy, Coins } from "lucide-react";
+import { Sparkles, Trophy, Coins } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { UserBalance } from "@/types";
@@ -37,7 +37,7 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
     if (minimal) {
         return (
             <div className="flex items-center gap-2 bg-purple-900/40 border border-purple-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-purple-200">
-                <Sparkle className="w-4 h-4 text-yellow-400" />
+                <Sparkles className="w-4 h-4 text-yellow-400" />
                 <span>{balance !== null ? balance : "..."}</span>
             </div>
         );
@@ -47,12 +47,12 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
         <Link href="/purchase" className="block group h-full">
             <Card className="h-full bg-gradient-to-br from-indigo-950 to-purple-950 border-purple-500/20 p-4 relative overflow-hidden group-hover:border-purple-500/40 transition-all group-hover:scale-[1.01] cursor-pointer">
                 <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 duration-500">
-                    <Sparkle className="w-16 h-16 text-yellow-500" />
+                    <Sparkles className="w-16 h-16 text-yellow-500" />
                 </div>
 
                 <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-1 text-purple-300">
-                        <Sparkle className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5" />
                         <span className="text-[10px] uppercase tracking-wider font-bold">{t('aura')}</span>
                     </div>
 

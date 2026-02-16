@@ -18,13 +18,15 @@ import {
     History,
     HelpCircle,
     Palette,
-    Sparkle,
+
     LayoutDashboard,
     ChevronRight,
     Hash,
     Layers,
     ArrowRight,
     Lock,
+    LockOpen,
+    Wand2,
     Loader2
 } from "lucide-react";
 
@@ -219,13 +221,16 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                                     handleUnlockClick(feature);
                                 }}
                                 variant="secondary"
-                                className="bg-purple-600 hover:bg-purple-500 text-white border-none shadow-2xl h-8 px-3 font-bold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                                className="bg-purple-600 hover:bg-purple-500 text-white border-none shadow-2xl h-10 px-4 font-bold rounded-full transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
                             >
-                                <Sparkle className="w-3 h-3" />
-                                <span className="text-[10px] uppercase tracking-wider">{t('unlock_button')}</span>
-                                <span className="text-[9px] opacity-70 bg-black/20 px-1 py-0.5 rounded ml-1 font-mono">
-                                    {readingCosts[`unlock_${feature}`] ?? 50} AURA
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <Wand2 className="w-3.5 h-3.5 text-purple-200" />
+                                    <span className="text-xs uppercase tracking-wider font-bold">{t('unlock_button')}</span>
+                                </div>
+                                <div className="bg-yellow-500 text-black text-xs px-3 py-1 rounded-full font-black flex items-center justify-center gap-1.5 border border-yellow-400 shadow-[0_2px_5px_rgba(234,179,8,0.2)]">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span className="leading-none pt-[1px]">{readingCosts[`unlock_${feature}`] ?? 50}</span>
+                                </div>
                             </Button>
                         </div>
                     </>

@@ -90,7 +90,7 @@
             "unknown_place": "Unknown place",
             "edit": "Edit"
         },
-        "unlock_button": "Unlock Access",
+        "unlock_button": "Reveal",
         "unlock_cost": "{cost} AURA",
         "unlock_confirm": "Unlock {feature} for {cost} AURA?",
         "transaction": {
@@ -100,6 +100,24 @@
             "cancel": "Cancel",
             "processing": "Processing...",
             "success": "You have unlocked access to {feature}!"
+        },
+        "DailyHoroscope": {
+            "title": "Your Daily Evolutionary Guide",
+            "subtitle": "Daily Evolutionary Horoscope",
+            "description": "Discover how today's planetary transits affect your unique birth chart.",
+            "loading": "Consulting Stars...",
+            "reveal_button": "Reveal",
+            "power_action": "Power Action",
+            "color": "Color",
+            "number": "Number",
+            "recovered": "Horoscope Recovered",
+            "recovered_desc": "Here is your guide for today again.",
+            "revealed": "Horoscope Revealed!",
+            "revealed_desc": "You used {cost} Aura.",
+            "insufficient_aura": "Insufficient Aura",
+            "insufficient_aura_desc": "You need to recharge your Aura to see the daily horoscope.",
+            "error_title": "Error",
+            "error_desc": "Could not generate horoscope."
         }
     },
     "Zodiac": {

@@ -363,7 +363,14 @@ export default function ReadingPage() {
                   {/* Opción 1: Oráculo Diario (1 carta) */}
                   <div onClick={() => selectMode("daily")} className="cursor-pointer group relative">
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'daily' ? 'ring-2 ring-purple-400/50' : ''}`} glowColor="purple">
-                      <div className="p-6 flex flex-col items-center text-center h-full">
+                      <div className="p-6 flex flex-col items-center text-center h-full relative">
+                        {/* Price Badge */}
+                        {/* Price Badge */}
+                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['daily'] ?? 20)}</span>
+                        </div>
+
                         <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           {pendingMode === 'daily' ? (
                             <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" />
@@ -379,14 +386,8 @@ export default function ReadingPage() {
                             ? (t('loading_energies') || 'Canalizando energías...')
                             : t('mode_oracle_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
+                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
                           <span className="text-purple-400 text-xs font-bold">{t('one_card')}</span>
-                          <div className="flex items-center gap-1.5 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">
-                            <Sparkles className="w-3 h-3 text-purple-400" />
-                            <span className="text-[10px] font-bold text-purple-300">
-                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['daily'] ?? 20 })}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
@@ -395,7 +396,14 @@ export default function ReadingPage() {
                   {/* Opción 2: Pregunta (1 carta) */}
                   <div onClick={() => selectMode("question")} className="cursor-pointer group relative">
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'question' ? 'ring-2 ring-cyan-400/50' : ''}`} glowColor="cyan">
-                      <div className="p-6 flex flex-col items-center text-center h-full">
+                      <div className="p-6 flex flex-col items-center text-center h-full relative">
+                        {/* Price Badge */}
+                        {/* Price Badge */}
+                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['general'] ?? 20)}</span>
+                        </div>
+
                         <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           {pendingMode === 'question' ? (
                             <Sparkles className="w-7 h-7 text-cyan-400 animate-pulse" />
@@ -411,14 +419,8 @@ export default function ReadingPage() {
                             ? (t('loading_energies') || 'Canalizando energías...')
                             : t('mode_question_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
+                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
                           <span className="text-cyan-400 text-xs font-bold">{t('one_card')}</span>
-                          <div className="flex items-center gap-1.5 bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/20">
-                            <Sparkles className="w-3 h-3 text-cyan-400" />
-                            <span className="text-[10px] font-bold text-cyan-300">
-                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['general'] ?? 20 })}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
@@ -428,10 +430,13 @@ export default function ReadingPage() {
                   <div onClick={() => selectMode("classic")} className="cursor-pointer group relative">
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'classic' ? 'ring-2 ring-amber-400/50' : ''}`} glowColor="amber">
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Badge NEW */}
-                        <div className="absolute top-2 right-2 bg-amber-500 text-[10px] text-black font-bold px-2 py-0.5 rounded-full uppercase">
-                          {t('new_badge')}
+                        {/* Price Badge - Replaces NEW badge */}
+                        {/* Price Badge - Replaces NEW badge */}
+                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['classic'] ?? 100)}</span>
                         </div>
+
                         <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                           {pendingMode === 'classic' ? (
                             <Sparkles className="w-7 h-7 text-amber-400 animate-pulse" />
@@ -447,14 +452,8 @@ export default function ReadingPage() {
                             ? (t('loading_energies') || 'Canalizando energías...')
                             : t('mode_classic_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-between">
+                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
                           <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
-                          <div className="flex items-center gap-1.5 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
-                            <Sparkles className="w-3 h-3 text-amber-400" />
-                            <span className="text-[10px] font-bold text-amber-300">
-                              {isDataLoading ? '...' : t('aura_cost', { cost: readingCosts['classic'] ?? 100 })}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </GlowingBorderCard>
