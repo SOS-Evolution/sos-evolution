@@ -90,7 +90,7 @@
             "unknown_place": "Lugar desconocido",
             "edit": "Editar"
         },
-        "unlock_button": "Revelar",
+        "unlock_button": "Desvelar",
         "unlock_cost": "{cost} AURA",
         "unlock_confirm": "¿Desbloquear {feature} por {cost} AURA?",
         "transaction": {
@@ -106,7 +106,7 @@
             "subtitle": "Horóscopo Evolutivo Diario",
             "description": "Descubre cómo los tránsitos planetarios de hoy afectan tu carta natal única.",
             "loading": "Consultando Astros...",
-            "reveal_button": "Revelar",
+            "reveal_button": "Desvelar",
             "power_action": "Acción de Poder",
             "color": "Color",
             "number": "Número",

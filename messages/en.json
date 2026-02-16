@@ -90,7 +90,7 @@
             "unknown_place": "Unknown place",
             "edit": "Edit"
         },
-        "unlock_button": "Reveal",
+        "unlock_button": "Unveil",
         "unlock_cost": "{cost} AURA",
         "unlock_confirm": "Unlock {feature} for {cost} AURA?",
         "transaction": {
@@ -106,7 +106,7 @@
             "subtitle": "Daily Evolutionary Horoscope",
             "description": "Discover how today's planetary transits affect your unique birth chart.",
             "loading": "Consulting Stars...",
-            "reveal_button": "Reveal",
+            "reveal_button": "Unveil",
             "power_action": "Power Action",
             "color": "Color",
             "number": "Number",

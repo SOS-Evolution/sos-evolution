@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Star, Sun, Moon } from "lucide-react";
+import { Sparkles, Loader2, Star, Sun, Moon, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -155,7 +155,7 @@ export default function DailyHoroscopeCard() {
                     loading={loading}
                     cost={10}
                     label={t('reveal_button')}
-                    icon={<Sparkles className="w-4 h-4 text-yellow-400" />}
+                    icon={<Wand2 className="w-4 h-4 text-yellow-400" />}
                     className="min-w-[160px]"
                 />
             </CardContent>
