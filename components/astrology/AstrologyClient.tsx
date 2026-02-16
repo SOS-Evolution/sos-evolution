@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 import AuraActionButton from "@/components/ui/AuraActionButton";
+import DailyHoroscopeCard from "@/components/astrology/DailyHoroscopeCard";
 
 interface AstrologyClientProps {
     profile: any;
@@ -157,7 +158,7 @@ export default function AstrologyClient({
                                 <div className="text-center px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
                                     <div className="text-xs text-slate-500 uppercase tracking-wider">{t.moon}</div>
                                     <div className="font-serif text-xl text-slate-300">
-                                        {tz[initialChartData.planets.find(p => p.name === "Moon")?.sign || ""] || "--"}
+                                        {tz[initialChartData.planets.find(p => p.name === "Moon" || p.name === "Luna" || p.name === "moon")?.sign || ""] || "--"}
                                     </div>
                                 </div>
                                 <div className="text-center px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
@@ -167,11 +168,6 @@ export default function AstrologyClient({
                                     </div>
                                 </div>
                             </div>
-                            {balance !== null && (
-                                <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mr-1 opacity-60">
-                                    {t_interp('aura_label', { balance })}
-                                </div>
-                            )}
                         </div>
                     )}
                 </div>
@@ -182,6 +178,11 @@ export default function AstrologyClient({
                     {/* CHART VISUALIZATION */}
                     <AnimatedSection delay={0.1}>
                         <div className="flex flex-col items-center gap-8 py-8">
+                            {/* Daily Horoscope moved here */}
+                            <div className="w-full max-w-lg mb-8">
+                                <DailyHoroscopeCard />
+                            </div>
+
                             <AstrologyWheel planets={initialChartData.planets} houses={initialChartData.houses} size={400} />
 
                             {!interpretation && (

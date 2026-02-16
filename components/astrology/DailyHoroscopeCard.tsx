@@ -43,9 +43,12 @@ export default function DailyHoroscopeCard() {
                     if (data) {
                         setData(data);
                     }
+                } else if (res.status === 404) {
+                    // No horoscope found, this is normal for first visit/day
+                    setData(null);
                 }
             } catch (e) {
-                console.error("Error fetching daily horoscope:", e);
+                // Ignore fetch errors for cleaner console
             }
         };
 

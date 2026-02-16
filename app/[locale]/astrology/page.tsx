@@ -80,11 +80,28 @@ export default async function AstrologyPage({ params }: { params: Promise<{ loca
             timezone: profile.timezone || 0
         };
 
-        // Check Cache first
+        // Check Cache first, but VALIDATE IT
+        let isValidCache = false;
         if (profile?.astrology_chart && Object.keys(profile.astrology_chart).length > 0) {
-            console.log("Using cached astrology chart");
+            const cachedPlanets = (profile.astrology_chart as WesternChartData).planets;
+            const sun = cachedPlanets.find(p => p.name === "Sun");
+            const moon = cachedPlanets.find(p => p.name === "Moon");
+            const asc = cachedPlanets.find(p => p.name === "Ascendant");
+
+            // Only consider cache valid if key planets have valid signs
+            if (sun && sun.sign !== "---" && moon && moon.sign !== "---" && asc && asc.sign !== "---") {
+                isValidCache = true;
+            }
+        }
+
+        if (isValidCache) {
+            console.log("Using validated cached astrology chart");
             chartData = profile.astrology_chart as WesternChartData;
         } else {
+            // Cache missing or invalid (e.g. Moon was "---"), so refetch
+            if (profile?.astrology_chart) {
+                console.log("Cached chart found but invalid (missing signs). Refetching...");
+            }
             // Try Real API
             console.log("Fetching new astrology chart from API...");
             chartData = await getWesternChartData(details);

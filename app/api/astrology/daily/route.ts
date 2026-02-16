@@ -32,7 +32,8 @@ export async function GET(req: Request) {
             return NextResponse.json(existingHoroscope.content);
         }
 
-        return NextResponse.json(null, { status: 404 });
+        // Return null with 200 OK so client doesn't log 404 error
+        return NextResponse.json(null, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -114,41 +115,42 @@ export async function POST(req: Request) {
         }
 
         // 4. OBTENER CARTA NATAL DEL USUARIO
-        // Necesitamos la carta natal guardada previamente. Asumimos que si pide horóscopo ya tiene perfil.
-        // Buscamos 'astrology_interpretations' más reciente para sacar el snapshot, O recalculamos si tenemos birth data en profile.
-        // Mejor opción: Perfil -> Birth Data. Si no tiene, error.
+        // Estrategia "Perfil Primero": Usar datos calculados del perfil si existen.
         const { data: profile } = await supabase
             .from('profiles')
-            .select('*')
+            .select('astrology_chart, birth_date')
             .eq('id', user.id)
             .single();
 
-        if (!profile || !profile.birth_date || !profile.birth_time || !profile.birth_place) {
-            return NextResponse.json({ error: 'Faltan datos de nacimiento en tu perfil' }, { status: 400 });
+        let userPlanets;
+
+        // Intentar usar chart del perfil
+        if (profile?.astrology_chart && (profile.astrology_chart as any).planets) {
+            userPlanets = (profile.astrology_chart as any).planets;
+            console.log("Using cached profile chart for daily horoscope");
         }
 
-        // Simplificación: Para no recalcular toda la carta natal aquí (que es pesado), 
-        // usamos el snapshot de la última interpretación si existe, o pedimos al front que la mande.
-        // PERO el front llama este endpoint simple.
-        // Opción B: Usar solo el Signo Solar Guardado en 'profiles' (si agregamos esa columna) o recalcular simple.
-        // Vamos a asumir que el signo solar es suficiente para una versión v1, O si queremos "Evolutivo real", necesitamos los planetas.
+        // Fallback: Buscar última interpretación si no hay datos en perfil (Legacy)
+        if (!userPlanets) {
+            const { data: lastInterpretation } = await supabase
+                .from('astrology_interpretations')
+                .select('chart_snapshot')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle(); // Use maybeSingle to avoid 406 error if no rows
 
-        // RECUPERANDO CARTA COMPLETA:
-        // Buscamos la última interpretación guardada que tiene el 'chart_snapshot'
-        const { data: lastInterpretation } = await supabase
-            .from('astrology_interpretations')
-            .select('chart_snapshot')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-        let userPlanets = lastInterpretation?.chart_snapshot?.planets;
+            if (lastInterpretation?.chart_snapshot?.planets) {
+                userPlanets = lastInterpretation.chart_snapshot.planets;
+                console.log("Using legacy interpretation chart for daily horoscope");
+            }
+        }
 
         if (!userPlanets) {
-            // Fallback: Si no tiene carta calculada, no podemos hacer horóscopo PERSONALIZADO real.
-            // Le pedimos que primero calcule su carta.
-            return NextResponse.json({ error: 'Primero debes generar tu Carta Astral para activar el Horóscopo' }, { status: 400 });
+            // Si no hay datos en ninguna parte, bloquear.
+            return NextResponse.json({
+                error: 'Primero debes inicializar tu Carta Astral en la sección de Astrología (es gratis calcularla, solo entra).'
+            }, { status: 400 });
         }
 
 
@@ -160,9 +162,17 @@ export async function POST(req: Request) {
 
         const isEn = locale === 'en';
 
-        // CALCULAR SIGNO SOLAR REAL (Source of Truth: Profile)
-        const [y, m, d] = profile.birth_date.split('-').map(Number);
-        const calculatedSunSign = getZodiacSign(d, m); // e.g. "Sagittarius"
+        // CALCULAR SIGNO SOLAR REAL (Source of Truth: Profile or calculated)
+        let calculatedSunSign = "Aries";
+
+        if (profile?.birth_date) {
+            const [y, m, d] = profile.birth_date.split('-').map(Number);
+            calculatedSunSign = getZodiacSign(d, m);
+        } else {
+            // Fallback if no profile date (should be caught above, but safety first)
+            const sunPlanet = userPlanets.find((p: any) => p.name === "Sun");
+            if (sunPlanet) calculatedSunSign = sunPlanet.sign;
+        }
 
         // Simplificar datos para el prompt
         // Si tenemos carta completa, la usamos. Si no, usamos el Signo Solar calculado.

@@ -141,13 +141,26 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
         for (let i = 0; i <= 12; i++) {
             const planetData = planetsObject[i.toString()];
             if (planetData && planetData.name && planetData.name !== 'ayanamsa') {
+                const fullDegree = planetData.fullDegree || 0;
+
+                // FALLBACK: Calculate sign index locally if API index is missing or out of bounds
+                let signName = "---";
+                if (zodiacs[planetData.current_sign]) {
+                    signName = zodiacs[planetData.current_sign];
+                } else {
+                    // Calculate from fullDegree (0-360)
+                    // 0-30 = Aries (0), 30-60 = Taurus (1), etc.
+                    const computedIndex = Math.floor(fullDegree / 30) % 12;
+                    signName = zodiacs[computedIndex] || "---";
+                }
+
                 planets.push({
                     name: planetData.name,
-                    fullDegree: planetData.fullDegree || 0,
-                    normDegree: planetData.normDegree || 0,
+                    fullDegree: fullDegree,
+                    normDegree: planetData.normDegree || (fullDegree % 30),
                     speed: planetData.speed || 0,
                     isRetro: planetData.isRetro === "true" || planetData.isRetro === true,
-                    sign: zodiacs[planetData.current_sign] || "---",
+                    sign: signName,
                     signLord: planetData.sign_lord,
                     house: planetData.house_number || 0
                 });
