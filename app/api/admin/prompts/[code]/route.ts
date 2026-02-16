@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function PUT(req: Request, { params }: { params: { code: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ code: string }> }) {
     try {
         const supabase = await createClient();
-        const { code } = params;
+        const { code } = await params;
         const body = await req.json();
         const { template, description, language } = body;
 
