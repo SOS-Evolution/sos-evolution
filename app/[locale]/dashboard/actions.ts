@@ -90,7 +90,7 @@ export async function unlockFeature(feature: string) {
     const COST = readingType?.credit_cost ?? 50;
 
     // 1. Intentar gastar créditos
-    const { data: newBalance, error: spendError } = await supabase.rpc('spend_credits', {
+    const { data: newBalance, error: spendError } = await supabase.rpc('spend_credits_v2', {
         p_user_id: user.id,
         p_amount: COST,
         p_description: `Unlock feature: ${feature}`
