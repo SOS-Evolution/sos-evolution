@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Coins, Info, AlertCircle } from "lucide-react";
+import { Coins, Info, AlertCircle, Trophy } from "lucide-react";
 
 export default function SettingsPage() {
     const [activeFrame, setActiveFrame] = useState<TarotFrameId>("celestial");
@@ -248,11 +248,122 @@ export default function SettingsPage() {
                     </Card>
                 </AnimatedSection>
 
+                {/* Gestión de Misiones y Recompensas */}
+                <AnimatedSection delay={0.4}>
+                    <MissionsSettingsCard />
+                </AnimatedSection>
+
                 {/* Más ajustes en el futuro */}
                 <Card className="p-8 bg-slate-900/30 border-slate-800 border-dashed border-2 flex flex-col items-center justify-center text-center opacity-50">
                     <p className="text-slate-400 text-sm">Próximamente: Ajustes de IA, correos transaccionales y límites de créditos.</p>
                 </Card>
             </div>
         </div>
+    );
+}
+
+// Subcomponente para aislar la lógica de misiones
+import { getMissions, updateMissionReward } from "./missions-actions";
+
+function MissionsSettingsCard() {
+    const [missions, setMissions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [savingId, setSavingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        getMissions()
+            .then(setMissions)
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
+
+    const handleRewardSave = async (id: string, newReward: number) => {
+        setSavingId(id);
+        try {
+            await updateMissionReward(id, newReward);
+            toast.success("Recompensa actualizada");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al actualizar recompensa");
+        } finally {
+            setSavingId(null);
+        }
+    };
+
+    if (loading) return (
+        <Card className="p-8 bg-slate-900/50 border-slate-800 text-center">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-500" />
+        </Card>
+    );
+
+    return (
+        <Card className="p-8 bg-slate-900/50 border-slate-800 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+                <Trophy className="w-24 h-24 text-yellow-400" />
+            </div>
+
+            <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                        <Trophy className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-white">Recompensas y Misiones</h3>
+                        <p className="text-slate-400 text-sm">Define la cantidad de AURA que otorgan las misiones.</p>
+                    </div>
+                </div>
+
+                <div className="bg-slate-950/40 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div className="grid grid-cols-12 gap-4 p-4 border-b border-slate-800 bg-slate-900/50 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        <div className="col-span-5">Misión</div>
+                        <div className="col-span-4">Descripción</div>
+                        <div className="col-span-3 text-right">Recompensa (AURA)</div>
+                    </div>
+
+                    <div className="divide-y divide-slate-800">
+                        {missions.length === 0 ? (
+                            <div className="p-8 text-center text-slate-500 italic text-sm">
+                                No se encontraron misiones...
+                            </div>
+                        ) : (
+                            missions.map((mission) => (
+                                <div key={mission.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors">
+                                    <div className="col-span-5 flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-slate-800/50 border border-slate-700 flex items-center justify-center text-xl">
+                                            {mission.icon || '🎯'}
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-medium text-slate-200">{mission.title}</div>
+                                            <div className="text-[10px] text-purple-400 font-mono">{mission.code}</div>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-4">
+                                        <p className="text-xs text-slate-500 line-clamp-1">{mission.description}</p>
+                                    </div>
+                                    <div className="col-span-3 flex items-center justify-end gap-3">
+                                        <div className="relative w-24">
+                                            <Input
+                                                type="number"
+                                                defaultValue={mission.reward_credits}
+                                                onBlur={(e) => {
+                                                    const val = parseInt(e.target.value);
+                                                    if (val !== mission.reward_credits && !isNaN(val)) {
+                                                        handleRewardSave(mission.id, val);
+                                                    }
+                                                }}
+                                                className="h-10 bg-slate-900 border-slate-700 text-right pr-4 font-bold text-yellow-400 rounded-lg focus:border-yellow-500/50"
+                                            />
+                                        </div>
+                                        {savingId === mission.id && (
+                                            <Loader2 className="w-4 h-4 text-yellow-500 animate-spin" />
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+        </Card>
     );
 }

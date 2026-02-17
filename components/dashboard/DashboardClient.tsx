@@ -55,6 +55,8 @@ import TransactionModal from "@/components/dashboard/TransactionModal";
 
 import { useRouter } from "next/navigation";
 
+import RewardPopup from "@/components/dashboard/RewardPopup";
+
 export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
     const tz = useTranslations('Zodiac');
@@ -66,6 +68,15 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
     const [balance, setBalance] = useState<number>(0);
     const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
     const [neededAmount, setNeededAmount] = useState(50);
+
+    // Reward Popup State
+    const [rewardPopup, setRewardPopup] = useState({
+        isOpen: false,
+        title: "",
+        description: "",
+        credits: 0,
+        icon: "🎉"
+    });
 
     useEffect(() => {
         async function loadCosts() {
@@ -92,6 +103,62 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
             })
             .catch(err => console.error("Error fetching credits:", err));
 
+        // Check for Daily Rewards (only if profile is complete / not in onboarding)
+        // sessionStorage guard: only call ONCE per browser tab session
+        const profileComplete = initialProfile?.full_name && initialProfile?.birth_date && initialProfile?.gender;
+        const dailyCheckKey = 'daily_reward_checked';
+        const alreadyChecked = sessionStorage.getItem(dailyCheckKey);
+
+        if (profileComplete && !alreadyChecked) {
+            // Mark BEFORE the fetch to prevent any race conditions (React Strict Mode, double mount, etc.)
+            sessionStorage.setItem(dailyCheckKey, 'true');
+
+            fetch('/api/missions/daily', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.rewarded) {
+                        // Update balance immediately
+                        setBalance(prev => prev + (data.credits || 0));
+
+                        // Show Popup
+                        setRewardPopup({
+                            isOpen: true,
+                            title: data.is_milestone ? "¡Racha de 3 Días!" : "Recompensa Diaria",
+                            description: data.is_milestone
+                                ? "Tu constancia ha sido recompensada por el universo."
+                                : "Gracias por volver a conectar con tu esencia hoy.",
+                            credits: data.credits,
+                            icon: data.is_milestone ? "🔥" : "✨"
+                        });
+                    }
+                })
+                .catch(err => {
+                    // Si falla, limpiar la marca para que pueda reintentar
+                    sessionStorage.removeItem(dailyCheckKey);
+                    console.error("Error checking daily reward:", err);
+                });
+        }
+
+        // Global event listener for rewards (triggered by other components)
+        const handleReward = (e: any) => {
+            if (e.detail) {
+                setRewardPopup({
+                    isOpen: true,
+                    title: e.detail.title || "¡Misión Completada!",
+                    description: e.detail.description || "Has desbloqueado un nuevo logro en tu camino.",
+                    credits: e.detail.credits || 0,
+                    icon: e.detail.icon || "🎯"
+                });
+                // Update balance if provided
+                if (e.detail.newBalance) {
+                    setBalance(e.detail.newBalance);
+                } else if (e.detail.credits) {
+                    setBalance(prev => prev + e.detail.credits);
+                }
+            }
+        };
+        window.addEventListener('mission-completed', handleReward);
+
         // Sync balance updates
         const handleUpdate = (e: any) => {
             if (e.detail?.newBalance !== undefined) {
@@ -99,7 +166,11 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
             }
         };
         window.addEventListener('credits-updated', handleUpdate);
-        return () => window.removeEventListener('credits-updated', handleUpdate);
+
+        return () => {
+            window.removeEventListener('credits-updated', handleUpdate);
+            window.removeEventListener('mission-completed', handleReward);
+        };
     }, []);
 
     // Transaction Modal State
@@ -295,6 +366,15 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 onClose={() => setInsufficientAuraModalOpen(false)}
                 requiredAmount={neededAmount}
                 currentBalance={balance}
+            />
+
+            <RewardPopup
+                isOpen={rewardPopup.isOpen}
+                onClose={() => setRewardPopup(prev => ({ ...prev, isOpen: false }))}
+                title={rewardPopup.title}
+                description={rewardPopup.description}
+                credits={rewardPopup.credits}
+                icon={rewardPopup.icon}
             />
 
             {/* Fondo animado */}

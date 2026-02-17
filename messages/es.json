@@ -49,6 +49,7 @@
         "aura": "Aura de Evolución",
         "rewards": "Recompensas",
         "missions": "Misiones",
+        "missions_desc": "Completa desafíos para ganar AURA y desbloquear tu potencial.",
         "gain_aura": "Gana Aura de Evolución",
         "control_panel": "Panel de Control",
         "insufficient_aura_modal": {
