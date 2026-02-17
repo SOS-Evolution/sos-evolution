@@ -184,20 +184,42 @@ export async function PUT(req: Request) {
 // Función auxiliar para verificar misión de perfil completo
 async function checkProfileMission(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
     try {
-        // Verificar si la misión ya está completada
-        const { data: userMission } = await supabase
-            .from('user_missions')
-            .select('*, mission:missions(*)')
-            .eq('user_id', userId)
-            .eq('mission.code', 'complete_profile')
+        // 1. Buscar la misión directamente por código
+        const { data: mission } = await supabase
+            .from('missions')
+            .select('id')
+            .eq('code', 'complete_profile')
+            .eq('is_active', true)
             .single();
 
-        if (userMission && !userMission.completed) {
-            // Completar la misión usando la función de la BD
-            await supabase.rpc('complete_mission', {
-                p_user_id: userId,
-                p_mission_code: 'complete_profile'
-            });
+        if (!mission) {
+            console.log('[MISSION] complete_profile mission not found or inactive');
+            return;
+        }
+
+        // 2. Verificar si el usuario ya la completó
+        const { data: userMission } = await supabase
+            .from('user_missions')
+            .select('id, completed')
+            .eq('user_id', userId)
+            .eq('mission_id', mission.id)
+            .single();
+
+        if (userMission?.completed) {
+            console.log('[MISSION] complete_profile already completed for', userId);
+            return;
+        }
+
+        // 3. Completar la misión usando la función de la BD
+        const { data, error } = await supabase.rpc('complete_mission', {
+            p_user_id: userId,
+            p_mission_code: 'complete_profile'
+        });
+
+        if (error) {
+            console.error('[MISSION] Error completing profile mission:', error);
+        } else {
+            console.log('[MISSION] Profile mission completed:', data);
         }
     } catch (error) {
         console.error('Error checking profile mission:', error);
