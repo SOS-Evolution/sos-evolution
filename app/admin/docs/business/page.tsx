@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Sparkle, Calendar, Zap, Gift, Star } from "lucide-react";
+import { Target, TrendingUp, DollarSign, Repeat, HeartHandshake, ArrowLeft, Sparkle, Calendar, Zap, Gift, Star, ShieldCheck, Clock, Settings, Activity } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -159,16 +159,18 @@ export default function BusinessDocsPage() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <h5 className="text-white text-sm font-bold mb-1">Opción A (Recomendada)</h5>
+                                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                                    <h5 className="text-emerald-200 text-sm font-bold mb-1">Opción A (Actual) - Lemon Squeezy</h5>
                                     <p className="text-xs text-slate-400">
-                                        <strong>Lemon Squeezy</strong>: Resuelve Impuestos, Tarjetas y PayPal en una sola integración. Ideal para productos digitales globales.
+                                        <strong>Pros</strong>: Muy fácil de configurar, excelente para creadores individuales, soporte nativo de PayPal.
+                                        <strong>Cons</strong>: API un poco más limitada que Paddle.
                                     </p>
                                 </div>
-                                <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                                    <h5 className="text-white text-sm font-bold mb-1">Opción B (Control)</h5>
+                                <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                    <h5 className="text-blue-200 text-sm font-bold mb-1">Opción B (Alternativa) - Paddle</h5>
                                     <p className="text-xs text-slate-400">
-                                        <strong>Stripe + PayPal Std</strong>: Menor comisión pero requiere doble integración y gestión manual de impuestos.
+                                        <strong>Pros</strong>: APIs más potentes, mejor gestión de suscripciones complejas y analíticas avanzadas.
+                                        <strong>Cons</strong>: Proceso de aprobación de cuenta un poco más estricto.
                                     </p>
                                 </div>
                             </div>
@@ -187,9 +189,9 @@ export default function BusinessDocsPage() {
                                     <span className="text-amber-500 font-bold">1</span>
                                 </div>
                                 <div>
-                                    <h5 className="text-white font-medium">Pase "No Recurrente"</h5>
+                                    <h5 className="text-white font-medium">Pase &quot;No Recurrente&quot;</h5>
                                     <p className="text-sm text-slate-400">
-                                        Vender el Pase como <strong>Producto de Temporada</strong> (ej: "Temporada de Eclipses") en lugar de suscripción automática. Elimina el miedo a "olvidar cancelar" y aumenta conversión.
+                                        Vender el Pase como <strong>Producto de Temporada</strong> (ej: &quot;Temporada de Eclipses&quot;) en lugar de suscripción automática. Elimina el miedo a &quot;olvidar cancelar&quot; y aumenta conversión.
                                     </p>
                                 </div>
                             </div>
@@ -209,7 +211,101 @@ export default function BusinessDocsPage() {
                     </Card>
 
                 </div>
-                {/* 4. Estrategia de Precios */}
+
+                {/* 4. Estado de Integración Lemon Squeezy */}
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
+                    <Activity className="w-5 h-5 text-purple-400" />
+                    Integración Lemon Squeezy (Fase 2)
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Lo que ya existe */}
+                    <Card className="p-6 bg-slate-900 border-slate-800">
+                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                            Implementado (Estado Actual)
+                        </h4>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Interfaz de Tienda Mística</p>
+                                    <p className="text-xs text-slate-500">Página de compra `/purchase` con 6 tiers diseñados y responsivos.</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Internacionalización (i18n)</p>
+                                    <p className="text-xs text-slate-500">Rutas y traducciones para la tienda configuradas para ES/EN.</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Arquitectura de Servicios</p>
+                                    <p className="text-xs text-slate-500">`BillingService` listo para provisionar créditos tras confirmación de pago.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </Card>
+
+                    {/* Lo que falta */}
+                    <Card className="p-6 bg-slate-900 border-slate-800 border-dashed">
+                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <Clock className="w-5 h-5 text-amber-400" />
+                            Pendiente (Por Implementar)
+                        </h4>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Backend de Checkout</p>
+                                    <p className="text-xs text-slate-500">API `/api/checkout` para generar el link de pago dinámico.</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Webhook Handler</p>
+                                    <p className="text-xs text-slate-500">Validación de firma `X-Signature` y procesamiento de `order_created`.</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2" />
+                                <div>
+                                    <p className="text-sm text-slate-200 font-medium">Base de Datos de Ordenes</p>
+                                    <p className="text-xs text-slate-500">Tablas `orders` y `subscriptions` para seguimiento post-venta.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </Card>
+                </div>
+
+                {/* Requerimientos Técnicos */}
+                <Card className="p-6 bg-slate-900/50 border-purple-500/20 mt-6 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                        <Settings className="w-32 h-32" />
+                    </div>
+                    <h4 className="text-lg font-bold text-white mb-4">Requerimientos de Configuración (Dashboard LS)</h4>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-4">Variables de Entorno</p>
+                            <div className="space-y-2">
+                                <code className="block p-2 bg-black/40 rounded border border-white/5 text-[10px] text-purple-200">LEMONSQUEEZY_API_KEY</code>
+                                <code className="block p-2 bg-black/40 rounded border border-white/5 text-[10px] text-purple-200">LEMONSQUEEZY_STORE_ID</code>
+                                <code className="block p-2 bg-black/40 rounded border border-white/5 text-[10px] text-purple-200">LEMONSQUEEZY_WEBHOOK_SECRET</code>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4">Productos (Variant IDs)</p>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                                Cada botón de la tienda debe mapearse a un <strong className="text-white">Variant ID</strong> específico en el Dashboard de Lemon Squeezy para que el webhook sepa cuánta &quot;Aura&quot; otorgar al usuario tras la compra.
+                            </p>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* 5. Estrategia de Precios */}
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
                     <DollarSign className="w-5 h-5 text-emerald-400" />
                     Precios Objetivo (Tier List)
@@ -288,7 +384,7 @@ export default function BusinessDocsPage() {
 
                 </div>
 
-                {/* 5. Consumo de Aura de Evolución */}
+                {/* 6. Consumo de Aura de Evolución */}
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
                     <Zap className="w-5 h-5 text-amber-500" />
                     Consumo por Función (Economy)
@@ -327,7 +423,7 @@ export default function BusinessDocsPage() {
                             <tr className="hover:bg-slate-800/30 transition-colors">
                                 <td className="px-6 py-4 text-white font-medium">Herradura (Horseshoe)</td>
                                 <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">100</td>
-                                <td className="px-6 py-4 text-slate-400 text-xs">Mapa de 7 cartas en "V" que explora influencias, consejos y el desenlace más probable.</td>
+                                <td className="px-6 py-4 text-slate-400 text-xs">Mapa de 7 cartas en &quot;V&quot; que explora influencias, consejos y el desenlace más probable.</td>
                             </tr>
                             <tr className="hover:bg-slate-800/30 transition-colors">
                                 <td className="px-6 py-4 text-white font-medium">Lectura Profunda (Cruz Celta)</td>
@@ -354,7 +450,7 @@ export default function BusinessDocsPage() {
                     </table>
                 </Card>
 
-                {/* 6. Sistema de Misiones */}
+                {/* 7. Sistema de Misiones */}
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 mt-8">
                     <Gift className="w-5 h-5 text-purple-400" />
                     Sistema de Recompensas (Misiones)

@@ -14,15 +14,14 @@ export default async function AdminLayout({
 }) {
     const supabase = await createClient();
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    // Revertido a getUser para evitar advertencias de seguridad de SSR
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
         redirect("/login?next=/admin");
     }
 
-    // Verificar rol de admin
+    // Un único roundtrip real: verificar rol de admin en DB
     const { data: profile } = await supabase
         .from("profiles")
         .select("role")

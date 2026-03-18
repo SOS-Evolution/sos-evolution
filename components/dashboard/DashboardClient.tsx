@@ -117,8 +117,17 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.rewarded) {
-                        // Update balance immediately
-                        setBalance(prev => prev + (data.credits || 0));
+                        // Fetch the precise new balance and dispatch global event to sync Navbar
+                        fetch('/api/credits')
+                            .then(r => r.json())
+                            .then(creditData => {
+                                if (creditData && typeof creditData.balance === 'number') {
+                                    setBalance(creditData.balance);
+                                    window.dispatchEvent(new CustomEvent('credits-updated', {
+                                        detail: { newBalance: creditData.balance }
+                                    }));
+                                }
+                            });
 
                         // Show Popup
                         setRewardPopup({

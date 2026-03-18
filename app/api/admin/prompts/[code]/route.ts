@@ -1,24 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getAdminUser } from '@/lib/supabase/admin-auth';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ code: string }> }) {
     try {
-        const supabase = await createClient();
         const { code } = await params;
         const body = await req.json();
         const { template, description, language } = body;
 
-        // Auth check
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Admin check
-        const { data: is_admin } = await supabase.rpc('is_admin', { user_id: user.id });
-        if (!is_admin) {
-            return NextResponse.json({ error: 'Forbidden: Admins only' }, { status: 403 });
-        }
+        const { supabase, error: authResponse } = await getAdminUser();
+        if (authResponse) return authResponse;
 
         if (!template) {
             return NextResponse.json({ error: 'Template content is required' }, { status: 400 });

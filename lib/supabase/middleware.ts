@@ -26,7 +26,9 @@ export async function updateSession(request: NextRequest, response?: NextRespons
         }
     )
 
-    // IMPORTANTE: Refresca la sesión si ha expirado
+    // IMPORTANTE: NO uses getSession() en Server Components o Rutas de API,
+    // utilizar getUser() asegura que la data viene autenticada desde el servidor
+    // de Supabase.
     await supabase.auth.getUser()
 
     return supabaseResponse

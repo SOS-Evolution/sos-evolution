@@ -15,7 +15,8 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const t = await getTranslations('Landing');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   return (
     <div className="min-h-screen text-slate-200 font-sans overflow-x-hidden">

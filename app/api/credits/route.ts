@@ -1,25 +1,18 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/src/services/auth.service';
+import { BillingService } from '@/src/services/billing.service';
+import { handleRouteError } from '@/src/utils/route-handler';
 import type { UserBalance } from '@/types';
 
 // GET /api/credits - Obtener balance y transacciones
 export async function GET(req: Request) {
     try {
         const supabase = await createClient();
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        const user = await requireAuth(supabase);
+        const billing = new BillingService(supabase);
 
-        if (authError || !user) {
-            return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
-        }
-
-        // Obtener balance v2 (robusto)
-        const { data: balanceData, error: balanceError } = await supabase
-            .rpc('get_user_balance_v2', { p_user_id: user.id });
-
-        if (balanceError) {
-            console.error('Error getting balance v2:', balanceError);
-            return NextResponse.json({ error: 'Error al obtener balance' }, { status: 500 });
-        }
+        const balance = await billing.getBalance(user.id);
 
         // Obtener parámetros de query
         const url = new URL(req.url);
@@ -39,13 +32,12 @@ export async function GET(req: Request) {
         }
 
         const response: UserBalance = {
-            balance: balanceData || 0,
+            balance,
             transactions: transactions || []
         };
 
         return NextResponse.json(response);
-    } catch (error) {
-        console.error('Credits GET error:', error);
-        return NextResponse.json({ error: 'Error del servidor' }, { status: 500 });
+    } catch (error: unknown) {
+        return handleRouteError(error);
     }
 }

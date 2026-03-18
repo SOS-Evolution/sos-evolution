@@ -20,10 +20,13 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
     const userId = params.id;
     const supabase = await createClient();
 
-    // 1. Obtener perfil completo via RPC (para incluir email de forma segura)
-    const { data: profile, error } = await supabase.rpc('get_user_detail_admin', {
-        p_user_id: userId
-    });
+    // PERFORMANCE: Paralelizar queries independientes
+    const [profileResult, balanceResult] = await Promise.all([
+        supabase.rpc('get_user_detail_admin', { p_user_id: userId }),
+        supabase.rpc('get_user_balance', { user_uuid: userId }),
+    ]);
+
+    const { data: profile, error } = profileResult;
 
     if (error || !profile) {
         return (
@@ -39,24 +42,27 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
         );
     }
 
-    // 2. Obtener balance
-    const { data: balance } = await supabase.rpc('get_user_balance', { user_uuid: userId });
+    const balance = balanceResult.data;
 
-    // 3. Obtener Historial de Créditos
-    const { data: credits } = await supabase
-        .from("user_credits")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(10);
+    // PERFORMANCE: Credits y readings en paralelo
+    const [creditsResult, readingsResult] = await Promise.all([
+        supabase
+            .from("user_credits")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false })
+            .limit(10),
+        supabase
+            .from("lecturas")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false })
+            .limit(10),
+    ]);
 
-    // 4. Obtener Historial de Lecturas
-    const { data: readings } = await supabase
-        .from("lecturas")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(10);
+    const credits = creditsResult.data;
+    const readings = readingsResult.data;
+
 
     return (
         <div className="space-y-8 animate-fade-in-up pb-12">

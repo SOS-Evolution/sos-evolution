@@ -175,78 +175,66 @@ export default function ReadingPage() {
     setRevealedCards(new Array(cards.length).fill(false));
 
     try {
-      const readings: CardReadingData[] = [];
+      let readingTypeCode = "general";
+      if (selectedMode === "classic") readingTypeCode = "classic";
+      else if (selectedMode === "daily") readingTypeCode = "daily";
 
-      for (let i = 0; i < cards.length; i++) {
-        const cardIndex = cards[i];
+      const positions = selectedMode === "classic" ? CLASSIC_LABELS_KEYS : undefined;
 
-        // Determine reading type code for API
-        let readingTypeCode = "general";
-        if (selectedMode === "classic") readingTypeCode = "classic";
-        else if (selectedMode === "daily") readingTypeCode = "daily";
+      const response = await fetch("/api/lectura", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question || null,
+          cardIndices: cards, // Enviamos el array completo de una vez
+          readingTypeCode: readingTypeCode,
+          positions: positions,
+          locale: params.locale
+        })
+      });
 
-        const response = await fetch("/api/lectura", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: question || null,
-            cardIndex: cardIndex,
-            readingTypeCode: readingTypeCode,
-            position: selectedMode === "classic" ? CLASSIC_LABELS_KEYS[i] : undefined,
-            locale: params.locale
-          })
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          if (response.status === 402) {
-            let costCode = "general";
-            if (selectedMode === "classic") costCode = "classic";
-            else if (selectedMode === "daily") costCode = "daily";
-
-            const cost = readingCosts[costCode] ?? 20;
-            setNeededAmount(cost);
-            setInsufficientAuraModalOpen(true);
-            setStep("selection");
-            setIsLoading(false);
-            clearLoadingTimers();
-            return;
-          }
-
-          if (response.status === 429 || (data.error && (data.error.includes('429') || data.error.toLowerCase().includes('quota')))) {
-            toast.error(t('error_quota'), {
-              description: t('error_quota_desc'),
-              duration: 5000,
-            });
-            setStep("selection");
-            setIsLoading(false);
-            clearLoadingTimers();
-            return;
-          }
-
-          throw new Error(data.error || "Error in session");
+      if (!response.ok) {
+        if (response.status === 402) {
+          const costCode = readingTypeCode;
+          const cost = readingCosts[costCode] ?? 20;
+          setNeededAmount(cost);
+          setInsufficientAuraModalOpen(true);
+          setStep("selection");
+          setIsLoading(false);
+          clearLoadingTimers();
+          return;
         }
 
-        // Defensive: ensure keywords is always an array
-        const safeKeywords = Array.isArray(data.keywords) ? data.keywords : [];
-
-        readings.push({
-          ...data,
-          keywords: safeKeywords,
-          description: data.description || '',
-          action: data.action || '',
-          position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[i]}`) : undefined
-        });
-
-        // Update balance if returned
-        if (data.newBalance !== undefined) {
-          setBalance(data.newBalance);
-          // Dispatch event so CreditsDisplay in Navbar updates too
-          window.dispatchEvent(new CustomEvent('credits-updated', {
-            detail: { newBalance: data.newBalance }
-          }));
+        if (response.status === 429 || (data.error && (data.error.includes('429') || data.error.toLowerCase().includes('quota')))) {
+          toast.error(t('error_quota'), {
+            description: t('error_quota_desc'),
+            duration: 5000,
+          });
+          setStep("selection");
+          setIsLoading(false);
+          clearLoadingTimers();
+          return;
         }
+        throw new Error(data.error || "Error in session");
+      }
+
+      // La API ahora devolverá un array de lecturas
+      const readings: CardReadingData[] = data.readings.map((r: any, idx: number) => ({
+        ...r,
+        keywords: Array.isArray(r.keywords) ? r.keywords : [],
+        description: r.description || '',
+        action: r.action || '',
+        position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[idx]}`) : undefined
+      }));
+
+      // Update balance globally once
+      if (data.newBalance !== undefined) {
+        setBalance(data.newBalance);
+        window.dispatchEvent(new CustomEvent('credits-updated', {
+          detail: { newBalance: data.newBalance }
+        }));
       }
 
       setReadingData(readings);

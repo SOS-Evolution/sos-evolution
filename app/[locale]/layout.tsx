@@ -50,9 +50,12 @@ export default async function LocaleLayout({
     // Cargar mensajes del servidor
     const messages = await getMessages();
 
-    // 1. Obtenemos el usuario en el servidor (una sola vez para toda la app)
+    // 1. Obtenemos el usuario en el servidor (usando getSession para latencia 0)
+    // Nota: Mantenemos getSession a pesar del warning de Supabase para evitar 
+    // bloqueos de 2-5 segundos en la carga inicial de toda la app.
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     // 1.1 Obtenemos el perfil completo
     let profile = null;

@@ -32,11 +32,16 @@ export default function PromptsAdminPage() {
         setLoading(true);
         try {
             const res = await fetch('/api/admin/prompts');
-            if (!res.ok) throw new Error('Failed to fetch prompts');
             const data = await res.json();
+
+            if (!res.ok) {
+                const errMsg = data.details || data.error || 'Failed to fetch prompts';
+                throw new Error(errMsg);
+            }
+
             setPrompts(data);
-        } catch (error) {
-            toast.error("Error cargando prompts");
+        } catch (error: any) {
+            toast.error(`Error: ${error.message}`);
             console.error(error);
         } finally {
             setLoading(false);
