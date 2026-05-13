@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/routing";
 import { getWesternChartData, getMockChartData, WesternChartData } from "@/lib/astrology-api";
+import { getOrFetchChart } from "@/lib/supabase/astrology-cache";
 import { getTranslations } from "next-intl/server";
 import AstrologyClient from "@/components/astrology/AstrologyClient";
 
@@ -65,69 +66,20 @@ export default async function AstrologyPage({ params }: { params: Promise<{ loca
         .maybeSingle();
 
     // 3. Prepare/Fetch Chart Data
-    let chartData: WesternChartData | null = null;
-
-    if (profile?.birth_date) {
+    const chartData = profile?.birth_date ? await getOrFetchChart(user.id, profile) : null;
+    
+    // Fallback for Demo if API fails
+    let finalChartData = chartData;
+    if (profile?.birth_date && (!finalChartData || finalChartData.planets.length === 0)) {
         const [y, m, d] = profile.birth_date.split('-').map(Number);
         const [hour, minute] = profile.birth_time ? profile.birth_time.split(':').map(Number) : [12, 0];
-        const lat = profile.latitude || 0;
-        const lng = profile.longitude || 0;
-
-        const details = {
+        finalChartData = getMockChartData({
             year: y, month: m, date: d,
             hours: hour, minutes: minute,
-            latitude: lat, longitude: lng,
+            latitude: profile.latitude || 0,
+            longitude: profile.longitude || 0,
             timezone: profile.timezone || 0
-        };
-
-        // Check Cache first, but VALIDATE IT
-        let isValidCache = false;
-        if (profile?.astrology_chart && Object.keys(profile.astrology_chart).length > 0) {
-            const cachedPlanets = (profile.astrology_chart as WesternChartData).planets;
-            const sun = cachedPlanets.find(p => p.name === "Sun");
-            const moon = cachedPlanets.find(p => p.name === "Moon");
-            const asc = cachedPlanets.find(p => p.name === "Ascendant");
-
-            // Only consider cache valid if key planets have valid signs
-            if (sun && sun.sign !== "---" && moon && moon.sign !== "---" && asc && asc.sign !== "---") {
-                isValidCache = true;
-            }
-        }
-
-        if (isValidCache) {
-            console.log("Using validated cached astrology chart");
-            chartData = profile.astrology_chart as WesternChartData;
-        } else {
-            // Cache missing or invalid (e.g. Moon was "---"), so refetch
-            if (profile?.astrology_chart) {
-                console.log("Cached chart found but invalid (missing signs). Refetching...");
-            }
-            // Try Real API
-            console.log("Fetching new astrology chart from API...");
-            chartData = await getWesternChartData(details);
-
-            // Cache the result
-            if (chartData) {
-                const { error: cacheError } = await supabase
-                    .from('profiles')
-                    .update({ astrology_chart: chartData })
-                    .eq('id', user.id);
-
-                if (cacheError) console.error("Error caching chart:", JSON.stringify(cacheError, null, 2));
-            }
-        }
-
-        // Fallback for Demo if API fails or no key
-        if (!chartData || chartData.planets.length === 0) {
-            chartData = getMockChartData(details);
-        }
-
-        // DEBUG: Log planet data to investigate Moon issue
-        if (chartData) {
-            console.log("[ASTROLOGY DEBUG] Chart planets:", chartData.planets.map(p => ({ name: p.name, sign: p.sign })));
-            const moon = chartData.planets.find(p => p.name === "Moon");
-            console.log("[ASTROLOGY DEBUG] Moon data:", moon);
-        }
+        });
     }
 
     return (
@@ -140,7 +92,7 @@ export default async function AstrologyPage({ params }: { params: Promise<{ loca
 
             <AstrologyClient
                 profile={profile}
-                initialChartData={chartData}
+                initialChartData={finalChartData}
                 initialInterpretation={interpretation}
                 t={t}
                 tz={tz}

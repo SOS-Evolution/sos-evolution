@@ -390,6 +390,12 @@
             "powerWord": "AMOR UNIVERSAL",
             "essence": "Sanación a través del amor incondicional y guía espiritual elevada.",
             "quote": "Elevo al mundo con la pureza de mi espíritu."
+        },
+        "unknown": {
+            "title": "Misterio",
+            "powerWord": "INCÓGNITA",
+            "essence": "Un sendero que requiere auto-descubrimiento profundo.",
+            "quote": "El universo aún está escribiendo este capítulo."
         }
     },
     "Onboarding": {

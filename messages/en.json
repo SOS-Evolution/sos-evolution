@@ -390,6 +390,12 @@
             "powerWord": "UNIVERSAL LOVE",
             "essence": "Healing through unconditional love and elevated spiritual guidance.",
             "quote": "I lift the world with the purity of my spirit."
+        },
+        "unknown": {
+            "title": "Mystery",
+            "powerWord": "UNKNOWN",
+            "essence": "A path that requires deep self-discovery.",
+            "quote": "The universe is still writing this chapter."
         }
     },
     "Onboarding": {
