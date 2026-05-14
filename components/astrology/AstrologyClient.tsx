@@ -14,16 +14,45 @@ import AstroInterpretation from "@/components/astrology/AstroInterpretation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { Profile } from "@/types";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 import AuraActionButton from "@/components/ui/AuraActionButton";
 import DailyHoroscopeCard from "@/components/astrology/DailyHoroscopeCard";
 
+interface InterpretationData {
+    summary: string;
+    core_personality: string;
+    strengths: string[];
+    challenges: string[];
+    evolutionary_advice: string;
+}
+
+interface AstrologyTranslations {
+    title_natal: string;
+    chart_title: string;
+    location_unknown: string;
+    setup_button: string;
+    sun: string;
+    moon: string;
+    asc: string;
+    planets_title: string;
+    aspects_title: string;
+    houses_title: string;
+    house_label: string;
+    cusp_label: string;
+    no_data_title: string;
+    no_data_description: string;
+    complete_profile_button: string;
+    planets: Record<string, string>;
+    aspects: Record<string, string>;
+}
+
 interface AstrologyClientProps {
-    profile: unknown;
+    profile: Profile | null;
     initialChartData: WesternChartData | null;
-    initialInterpretation: unknown | null;
-    t: unknown;
-    tz: unknown;
+    initialInterpretation: InterpretationData | null;
+    t: AstrologyTranslations;
+    tz: Record<string, string>;
     locale: string;
 }
 
@@ -35,7 +64,7 @@ export default function AstrologyClient({
     tz,
     locale
 }: AstrologyClientProps) {
-    const [interpretation, setInterpretation] = useState(initialInterpretation);
+    const [interpretation, setInterpretation] = useState<InterpretationData | null>(initialInterpretation);
     const [isLoading, setIsLoading] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
     const [auraCost, setAuraCost] = useState<number>(20); // Default fallback
@@ -201,7 +230,7 @@ export default function AstrologyClient({
                     {interpretation && (
                         <AnimatedSection delay={0.1}>
                             <div id="astro-interpretation">
-                                <AstroInterpretation data={interpretation} locale={locale} />
+                                <AstroInterpretation data={interpretation} />
                             </div>
                             <div className="flex justify-center mt-8">
                                 <Button

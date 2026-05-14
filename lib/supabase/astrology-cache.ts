@@ -1,11 +1,12 @@
 import { createClient } from "./server";
 import { getWesternChartData, WesternChartData } from "../astrology-api";
+import { Profile } from "@/types";
 
 /**
  * Obtiene la carta astral del usuario, priorizando el caché en la base de datos.
  * Si el caché no existe o es inválido, consulta la API y actualiza el caché.
  */
-export async function getOrFetchChart(userId: string, profile: unknown) {
+export async function getOrFetchChart(userId: string, profile: Profile | null | undefined) {
     const supabase = await createClient();
 
     // 1. Validar si el perfil tiene los datos necesarios para el cálculo
@@ -16,7 +17,7 @@ export async function getOrFetchChart(userId: string, profile: unknown) {
     // 2. Verificar Caché existente en el perfil
     let isValidCache = false;
     if (profile?.astrology_chart && Object.keys(profile.astrology_chart).length > 0) {
-        const cachedPlanets = (profile.astrology_chart as WesternChartData).planets;
+        const cachedPlanets = (profile.astrology_chart as unknown as WesternChartData).planets;
         const sun = cachedPlanets?.find(p => p.name === "Sun");
         const moon = cachedPlanets?.find(p => p.name === "Moon");
         const asc = cachedPlanets?.find(p => p.name === "Ascendant");
@@ -29,20 +30,20 @@ export async function getOrFetchChart(userId: string, profile: unknown) {
 
     if (isValidCache) {
         console.log(`[AstrologyCache] Usando caché válido para usuario ${userId}`);
-        return profile.astrology_chart as WesternChartData;
+        return profile.astrology_chart as unknown as WesternChartData;
     }
 
     // 3. Si no hay caché válido, preparar detalles para la API
-    const [y, m, d] = profile.birth_date.split('-').map(Number);
-    const [hour, minute] = profile.birth_time ? profile.birth_time.split(':').map(Number) : [12, 0];
-    const lat = profile.latitude || 0;
-    const lng = profile.longitude || 0;
+    const [y, m, d] = profile!.birth_date!.split('-').map(Number);
+    const [hour, minute] = profile?.birth_time ? profile.birth_time.split(':').map(Number) : [12, 0];
+    const lat = profile?.latitude || 0;
+    const lng = profile?.longitude || 0;
 
     const details = {
         year: y, month: m, date: d,
         hours: hour, minutes: minute,
         latitude: lat, longitude: lng,
-        timezone: profile.timezone || 0
+        timezone: profile?.timezone || 0
     };
 
     console.log(`[AstrologyCache] Consultando API externa para usuario ${userId}...`);

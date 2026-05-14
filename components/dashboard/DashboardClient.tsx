@@ -30,10 +30,13 @@ import { useTranslations } from 'next-intl';
 import { getLifePathNumber, getZodiacSign } from "@/lib/soul-math";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 
+import { Profile, CardStat, ReadingType } from "@/types";
+import { User } from "@supabase/supabase-js";
+
 interface DashboardClientProps {
-    profile: unknown;
-    stats: unknown;
-    user: unknown;
+    profile: Profile | null;
+    stats: CardStat | null;
+    user: User | null;
 }
 
 import TransactionModal from "@/components/dashboard/TransactionModal";
@@ -66,7 +69,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         async function loadCosts() {
             try {
                 const costs = await getReadingTypes();
-                const costMap = costs.reduce((acc: unknown, curr: unknown) => {
+                const costMap = costs.reduce((acc: Record<string, number>, curr: ReadingType) => {
                     acc[curr.code] = curr.credit_cost;
                     return acc;
                 }, {});
@@ -133,7 +136,8 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         }
 
         // Global event listener for rewards (triggered by other components)
-        const handleReward = (e: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleReward = (e: any) => {
             if (e.detail) {
                 setRewardPopup({
                     isOpen: true,
@@ -153,7 +157,8 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         window.addEventListener('mission-completed', handleReward);
 
         // Sync balance updates
-        const handleUpdate = (e: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleUpdate = (e: any) => {
             if (e.detail?.newBalance !== undefined) {
                 setBalance(e.detail.newBalance);
             }
@@ -211,10 +216,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 toast.success(t('transaction.success', {
                     feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
                 }));
-                setProfile((prev: unknown) => ({
-                    ...prev,
-                    unlocked_features: [...(prev.unlocked_features || []), selectedFeature]
-                }));
+                setProfile((prev: Profile | null) => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        unlocked_features: [...(prev.unlocked_features || []), selectedFeature]
+                    };
+                });
                 // Dispatch event to update CreditsDisplay
                 window.dispatchEvent(new CustomEvent('credits-updated', {
                     detail: { newBalance: result.newBalance }
@@ -236,7 +244,16 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         }
     };
 
-    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: unknown) => {
+    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: {
+        feature: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        href: any;
+        color: string;
+        icon: React.ReactNode;
+        title: string;
+        description: string;
+        badge?: string | null;
+    }) => {
         const isUnlocked = unlockedFeatures.includes(feature);
 
         // Ya no usamos el estado local 'unlocking' para el loader del botón de la tarjeta

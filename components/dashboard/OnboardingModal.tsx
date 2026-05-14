@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import WarningModal from "@/components/dashboard/WarningModal";
 
 interface OnboardingModalProps {
-    initialData: Record<string, unknown> | null;
+    initialData: Profile | null;
     onComplete: (updatedProfile: Profile) => void;
     onClose?: () => void;
     isEdit?: boolean;

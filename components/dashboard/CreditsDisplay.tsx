@@ -25,7 +25,8 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
 
     // Escuchar eventos de actualización de créditos (custom event)
     useEffect(() => {
-        const handleUpdate = (e: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleUpdate = (e: any) => {
             if (e.detail?.newBalance !== undefined) {
                 setBalance(e.detail.newBalance);
             }

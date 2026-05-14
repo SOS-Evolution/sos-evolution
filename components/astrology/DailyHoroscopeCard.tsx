@@ -89,9 +89,10 @@ export default function DailyHoroscopeCard() {
                 });
             }
 
-        } catch (error: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
             toast.error(t('error_title'), {
-                description: error.message || t('error_desc')
+                description: error?.message || t('error_desc')
             });
         } finally {
             setLoading(false);

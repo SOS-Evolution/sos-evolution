@@ -8,12 +8,26 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
-import { routing } from "@/i18n/routing";
+
+
 import LocaleSwitcher from "./LocaleSwitcher";
 
-type Pathname = keyof typeof routing.pathnames;
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
-export default function Navbar({ user, role, profile }: { user: unknown, role?: string, profile?: unknown }) {
+
+interface NavbarProfile {
+    role?: string;
+    full_name?: string | null;
+    display_name?: string | null;
+}
+
+interface NavbarProps {
+    user: SupabaseUser | null | undefined;
+    role?: string;
+    profile?: NavbarProfile | null | undefined;
+}
+
+export default function Navbar({ user, role, profile }: NavbarProps) {
     const pathname = usePathname();
     const t = useTranslations('Navbar');
 
@@ -24,9 +38,9 @@ export default function Navbar({ user, role, profile }: { user: unknown, role?: 
 
     const isAdmin = role === 'admin';
 
-    const navItems: { href: Pathname, icon: unknown, label: string }[] = isAdmin
+    const navItems: { href: string, icon: React.ElementType, label: string }[] = isAdmin
         ? [
-            { href: "/admin", icon: Layers, label: "Administrador" } as unknown,
+            { href: "/admin", icon: Layers, label: "Administrador" },
             { href: "/dashboard", icon: Home, label: "SOS" },
         ]
         : [
@@ -56,8 +70,11 @@ export default function Navbar({ user, role, profile }: { user: unknown, role?: 
                     {/* Enlaces Centrales (Solo si hay usuario) */}
                     {user && (
                         <div className="hidden md:flex items-center gap-1 ml-4 border-l border-white/10 pl-6 h-8">
-                            {navItems.map((item, index) => (
-                                <div key={item.href} className="flex items-center">
+                            {navItems.map((item, index) => {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                const itemHref = item.href as any;
+                                return (
+                                    <div key={item.href} className="flex items-center">
                                     {/* Separadores: Antes de Lectura (index 1) y Astrología (index 3) - Solo para clientes */}
                                     {!isAdmin && (index === 1 || index === 3) && (
                                         <div className="w-px h-4 bg-white/10 mx-2" />
@@ -83,7 +100,7 @@ export default function Navbar({ user, role, profile }: { user: unknown, role?: 
                                             </motion.div>
                                         </NextLink>
                                     ) : (
-                                        <Link href={item.href}>
+                                        <Link href={itemHref}>
                                             <motion.div
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
@@ -99,8 +116,9 @@ export default function Navbar({ user, role, profile }: { user: unknown, role?: 
                                             </motion.div>
                                         </Link>
                                     )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

@@ -10,8 +10,10 @@ import MagicModal from "@/components/ui/MagicModal";
 import type { Profile } from "@/types";
 import { useTranslations } from 'next-intl';
 
+import { User as SupabaseUser } from "@supabase/supabase-js";
+
 interface UserProfileProps {
-    user: { user_metadata?: { full_name?: string } }; // Mantenemos el usuario de auth como prop inicial
+    user: SupabaseUser | null;
     profile?: Profile | null; // Añadimos perfil opcional desde el padre
     onEdit?: () => void; // Función para abrir el modal de edición
     className?: string;
@@ -98,7 +100,7 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
 
                         <div className="space-y-3">
                             <div className="text-xl md:text-2xl font-serif font-bold text-white tracking-wide leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                                {profile?.full_name || user.user_metadata?.full_name || t('unknown_traveler')}
+                                {profile?.full_name || user?.user_metadata?.full_name || t('unknown_traveler')}
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3 text-sm text-slate-400">
                                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">

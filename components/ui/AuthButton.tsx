@@ -21,7 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
 
-export default function AuthButton({ user, profile }: { user: unknown, profile?: unknown }) {
+import { User as SupabaseUser } from "@supabase/supabase-js";
+interface AuthButtonProfile {
+    full_name?: string | null;
+    display_name?: string | null;
+}
+
+export default function AuthButton({ user, profile }: { user: SupabaseUser | null | undefined, profile?: AuthButtonProfile | null }) {
     const [loading, setLoading] = useState(false);
     const [, startTransition] = useTransition();
     const locale = useLocale();

@@ -9,6 +9,12 @@ interface ConfigContextType {
     refreshSettings: () => Promise<void>;
 }
 
+interface SystemSetting {
+    key: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    value: any;
+}
+
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export function ConfigProvider({
@@ -16,9 +22,9 @@ export function ConfigProvider({
     initialSettings
 }: {
     children: React.ReactNode;
-    initialSettings?: unknown[]
+    initialSettings?: SystemSetting[]
 }) {
-    const [settings, setSettings] = useState<unknown[]>(initialSettings || []);
+    const [settings, setSettings] = useState<SystemSetting[]>(initialSettings || []);
 
     const tarotFrame = (settings.find(s => s.key === "tarot_frame")?.value as TarotFrameId) || "celestial";
 

@@ -24,6 +24,21 @@ import { Button } from "@/components/ui/button";
 import AnimatedSection from "../landing/AnimatedSection";
 import { useTranslations } from 'next-intl';
 
+interface NumerologyNumbers {
+    number: number;
+    title: string;
+    powerWord: string;
+    essence: string;
+    quote: string;
+}
+
+interface NumerologyResultData {
+    lifePath: NumerologyNumbers;
+    expression: NumerologyNumbers;
+    soulUrge: NumerologyNumbers;
+    personality: NumerologyNumbers;
+}
+
 interface NumerologyResultProps {
     initialProfile?: {
         full_name: string | null;
@@ -36,8 +51,33 @@ export default function NumerologyResult({ initialProfile }: NumerologyResultPro
     const tn = useTranslations('Numerology');
     const [name, setName] = useState(initialProfile?.full_name || "");
     const [birthDate, setBirthDate] = useState(initialProfile?.birth_date || "");
-    const [results, setResults] = useState<unknown>(null);
+    const [results, setResults] = useState<NumerologyResultData | null>(null);
     const [isLoading, setIsLoading] = useState(!initialProfile);
+
+    const calculateResults = useCallback((n: string, d: string) => {
+        if (!n || !d) return;
+
+        const lpNum = getLifePathNumber(d);
+        const exNum = getExpressionNumber(n);
+        const suNum = getSoulUrgeNumber(n);
+        const peNum = getPersonalityNumber(n);
+
+        // Helper to get localized details
+        const getLocalizedDetails = (num: number) => ({
+            number: num,
+            title: tn(`${num}.title`),
+            powerWord: tn(`${num}.powerWord`),
+            essence: tn(`${num}.essence`),
+            quote: tn(`${num}.quote`)
+        });
+
+        setResults({
+            lifePath: getLocalizedDetails(lpNum),
+            expression: getLocalizedDetails(exNum),
+            soulUrge: getLocalizedDetails(suNum),
+            personality: getLocalizedDetails(peNum)
+        });
+    }, [tn]);
 
     useEffect(() => {
         if (initialProfile?.full_name && initialProfile?.birth_date) {
@@ -69,30 +109,6 @@ export default function NumerologyResult({ initialProfile }: NumerologyResultPro
         loadProfile();
     }, [initialProfile, calculateResults]);
 
-    const calculateResults = useCallback((n: string, d: string) => {
-        if (!n || !d) return;
-
-        const lpNum = getLifePathNumber(d);
-        const exNum = getExpressionNumber(n);
-        const suNum = getSoulUrgeNumber(n);
-        const peNum = getPersonalityNumber(n);
-
-        // Helper to get localized details
-        const getLocalizedDetails = (num: number) => ({
-            number: num,
-            title: tn(`${num}.title`),
-            powerWord: tn(`${num}.powerWord`),
-            essence: tn(`${num}.essence`),
-            quote: tn(`${num}.quote`)
-        });
-
-        setResults({
-            lifePath: getLocalizedDetails(lpNum),
-            expression: getLocalizedDetails(exNum),
-            soulUrge: getLocalizedDetails(suNum),
-            personality: getLocalizedDetails(peNum)
-        });
-    }, [tn]);
 
     const handleCalculate = (e: React.FormEvent) => {
         e.preventDefault();

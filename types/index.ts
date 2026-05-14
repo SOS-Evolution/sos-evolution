@@ -25,6 +25,8 @@ export interface Profile {
   zodiac_sign: string | null;
   avatar_url: string | null;
   extra_data: Record<string, unknown>;
+  unlocked_features: string[] | null;
+  timezone: number | null;
   astrology_chart?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
