@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
+
 import DashboardClient from "@/components/dashboard/DashboardClient";
 
 export const dynamic = "force-dynamic";

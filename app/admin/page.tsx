@@ -32,7 +32,7 @@ export default async function AdminDashboardPage() {
         return (
             <div className="p-4 rounded-lg bg-red-900/20 border border-red-900/50 text-red-200 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5" />
-                <p>Error al cargar estadísticas. Asegúrate de haber corrido la migración "12_admin_system.sql".</p>
+                <p>Error al cargar estadísticas. Asegúrate de haber corrido la migración &quot;12_admin_system.sql&quot;.</p>
             </div>
         );
     }
@@ -97,7 +97,7 @@ export default async function AdminDashboardPage() {
 
                     <div className="space-y-4">
                         {activity && activity.length > 0 ? (
-                            activity.map((event: any, i: number) => (
+                            activity.map((event: { type: string; full_name?: string; detail?: string; created_at: string }, i: number) => (
                                 <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-slate-800">
                                     <div className={`mt-1 p-2 rounded-lg ${event.type === 'user' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'
                                         }`}>

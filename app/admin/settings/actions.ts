@@ -17,11 +17,11 @@ export async function getSystemSettings() {
     return data;
 }
 
-export async function updateSystemSetting(key: string, value: any) {
+export async function updateSystemSetting(key: string, value: unknown) {
     const supabase = await createClient();
 
     // El RLS ya protege que solo admins puedan hacer esto
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from("system_settings")
         .update({ value, updated_at: new Date().toISOString() })
         .eq("key", key);

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 
 interface GlowingBorderCardProps {
     children: React.ReactNode;

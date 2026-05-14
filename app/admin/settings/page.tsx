@@ -10,11 +10,11 @@ import { toast } from "sonner";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Coins, Info, AlertCircle, Trophy } from "lucide-react";
+import { Coins, Info, Trophy } from "lucide-react";
 
 export default function SettingsPage() {
     const [activeFrame, setActiveFrame] = useState<TarotFrameId>("celestial");
-    const [readingTypes, setReadingTypes] = useState<any[]>([]);
+    const [readingTypes, setReadingTypes] = useState<{ id: string; name: string; code: string; description: string; icon: string; credit_cost: number }[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [savingAura, setSavingAura] = useState<string | null>(null);
@@ -266,7 +266,7 @@ export default function SettingsPage() {
 import { getMissions, updateMissionReward } from "./missions-actions";
 
 function MissionsSettingsCard() {
-    const [missions, setMissions] = useState<any[]>([]);
+    const [missions, setMissions] = useState<{ id: string; title: string; code: string; description: string; icon: string; reward_credits: number }[]>([]);
     const [loading, setLoading] = useState(true);
     const [savingId, setSavingId] = useState<string | null>(null);
 

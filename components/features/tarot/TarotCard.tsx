@@ -86,6 +86,7 @@ export function TarotCard({ cardName, imageUrl, isRevealed, onClick, frameId, la
 
                         {resolvedImageUrl && (DECK.includes(cardName || "")) ? (
                             <div className="relative w-full h-full z-10 p-[4px]">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={resolvedImageUrl}
                                     alt={cardName}

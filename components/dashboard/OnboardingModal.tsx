@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import WarningModal from "@/components/dashboard/WarningModal";
 
 interface OnboardingModalProps {
-    initialData: any;
+    initialData: Record<string, unknown> | null;
     onComplete: (updatedProfile: Profile) => void;
     onClose?: () => void;
     isEdit?: boolean;
@@ -96,9 +96,10 @@ export default function OnboardingModal({
             setTimeout(() => {
                 window.location.reload();
             }, 500);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error guardando perfil:", err);
-            setError(err.message || "Hubo un error al sincronizar con el cosmos. Intenta de nuevo.");
+            const errorMessage = err instanceof Error ? err.message : "Hubo un error al sincronizar con el cosmos. Intenta de nuevo.";
+            setError(errorMessage);
             setLoading(false);
         }
     };

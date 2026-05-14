@@ -13,7 +13,7 @@ import LocaleSwitcher from "./LocaleSwitcher";
 
 type Pathname = keyof typeof routing.pathnames;
 
-export default function Navbar({ user, role, profile }: { user: any, role?: string, profile?: any }) {
+export default function Navbar({ user, role, profile }: { user: unknown, role?: string, profile?: unknown }) {
     const pathname = usePathname();
     const t = useTranslations('Navbar');
 
@@ -24,9 +24,9 @@ export default function Navbar({ user, role, profile }: { user: any, role?: stri
 
     const isAdmin = role === 'admin';
 
-    const navItems: { href: Pathname, icon: any, label: string }[] = isAdmin
+    const navItems: { href: Pathname, icon: unknown, label: string }[] = isAdmin
         ? [
-            { href: "/admin", icon: Layers, label: "Administrador" } as any,
+            { href: "/admin", icon: Layers, label: "Administrador" } as unknown,
             { href: "/dashboard", icon: Home, label: "SOS" },
         ]
         : [

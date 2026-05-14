@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Star, Sun, Moon, Wand2 } from "lucide-react";
+import { Sparkles, Sun, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -47,7 +46,7 @@ export default function DailyHoroscopeCard() {
                     // No horoscope found, this is normal for first visit/day
                     setData(null);
                 }
-            } catch (e) {
+            } catch {
                 // Ignore fetch errors for cleaner console
             }
         };
@@ -90,7 +89,7 @@ export default function DailyHoroscopeCard() {
                 });
             }
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             toast.error(t('error_title'), {
                 description: error.message || t('error_desc')
             });

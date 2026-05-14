@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Quote, User, Sparkles, Brain, BookMarked, ArrowLeft } from "lucide-react";
+import { User, Sparkles, Brain, BookMarked, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/landing/AnimatedSection";
@@ -41,7 +41,7 @@ export default function VisionDocsPage() {
                                 The Evolution of the Spirit
                             </h3>
                             <p className="text-slate-300 leading-relaxed text-lg">
-                                SOS Evolution no es solo una app de tarot. Es una plataforma de autodescubrimiento evolutivo que utiliza la IA para encarnar el rol de un "Coach Espiritual Místico".
+                                SOS Evolution no es solo una app de tarot. Es una plataforma de autodescubrimiento evolutivo que utiliza la IA para encarnar el rol de un &quot;Coach Espiritual Místico&quot;.
                                 A diferencia de lecturas genéricas, construimos un <span className="text-purple-400 font-bold">Mapa Evolutivo del Alma</span> personalizado.
                             </p>
                         </div>
@@ -73,12 +73,12 @@ export default function VisionDocsPage() {
                             <h3 className="text-xl font-bold text-white">Psicología Junguiana</h3>
                         </div>
                         <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                            Entendemos al ser humano como un "sistema operativo" que procesa arquetipos.
+                            Entendemos al ser humano como un &quot;sistema operativo&quot; que procesa arquetipos.
                             Utilizamos los conceptos de <strong>Carl Jung</strong> sobre el inconsciente colectivo y la sincronocidad para dar sentido a las lecturas.
                         </p>
                         <div className="bg-slate-800/50 p-3 rounded-lg border-l-2 border-indigo-500">
                             <p className="text-xs text-slate-300 italic">
-                                "Hasta que el inconsciente no se haga consciente, el subconsciente dirigirá tu vida y tú le llamarás destino."
+                                &quot;Hasta que el inconsciente no se haga consciente, el subconsciente dirigirá tu vida y tú le llamarás destino.&quot;
                             </p>
                         </div>
                     </Card>
@@ -116,7 +116,7 @@ export default function VisionDocsPage() {
                                         <p className="text-xs text-indigo-300 font-mono">Arquetipos & Inconsciente Colectivo</p>
                                     </div>
                                     <p className="text-sm text-slate-400 mb-3 leading-relaxed">
-                                        "Hasta que el inconsciente no se haga consciente, el subconsciente dirigirá tu vida y tú le llamarás destino."
+                                        &quot;Hasta que el inconsciente no se haga consciente, el subconsciente dirigirá tu vida y tú le llamarás destino.&quot;
                                     </p>
                                     <div className="bg-indigo-950/30 p-3 rounded-lg border border-indigo-500/10">
                                         <p className="text-xs text-indigo-200">
@@ -128,14 +128,14 @@ export default function VisionDocsPage() {
                                 <Card className="p-5 bg-slate-900 border-slate-800 hover:border-amber-500/30 group transition-all">
                                     <div className="mb-3">
                                         <h4 className="font-bold text-lg text-white group-hover:text-amber-400 transition-colors">Joseph Campbell</h4>
-                                        <p className="text-xs text-amber-300 font-mono">El Monomito (Hero's Journey)</p>
+                                        <p className="text-xs text-amber-300 font-mono">El Monomito (Hero&apos;s Journey)</p>
                                     </div>
                                     <p className="text-sm text-slate-400 mb-3 leading-relaxed">
                                         Describió el patrón narrativo universal de la transformación humana: Llamada, Iniciación y Retorno.
                                     </p>
                                     <div className="bg-amber-950/30 p-3 rounded-lg border border-amber-500/10">
                                         <p className="text-xs text-amber-200">
-                                            <span className="font-bold">Aplicación Técnica:</span> Estructura la lógica de gamificación. El usuario es la entidad "Héroe" y las lecturas son eventos de "Stage".
+                                            <span className="font-bold">Aplicación Técnica:</span> Estructura la lógica de gamificación. El usuario es la entidad &quot;Héroe&quot; y las lecturas son eventos de &quot;Stage&quot;.
                                         </p>
                                     </div>
                                 </Card>
@@ -158,7 +158,7 @@ export default function VisionDocsPage() {
                                     </p>
                                     <div className="bg-purple-950/30 p-3 rounded-lg border border-purple-500/10">
                                         <p className="text-xs text-purple-200">
-                                            <span className="font-bold">Aplicación Técnica:</span> Define la "Visión del Producto". El KPI final es el bienestar del usuario, no solo la retención.
+                                            <span className="font-bold">Aplicación Técnica:</span> Define la &quot;Visión del Producto&quot;. El KPI final es el bienestar del usuario, no solo la retención.
                                         </p>
                                     </div>
                                 </Card>

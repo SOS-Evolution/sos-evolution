@@ -196,7 +196,7 @@ export default function TarotDeck({
                             <motion.div
                                 key={originalIndex}
                                 layoutId={`tarot-card-${originalIndex}`}
-                                variants={variants as any}
+                                variants={variants as unknown}
                                 animate={isShuffling ? "shuffle" : "fan"}
                                 exit="exit"
                                 initial={{ scale: 0, opacity: 0 }}

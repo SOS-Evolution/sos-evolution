@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Circle, Trophy, Lock } from "lucide-react";
+import { CheckCircle2, Circle, Trophy } from "lucide-react";
 import type { UserMission } from "@/types";
 import { cn } from "@/lib/utils";
 

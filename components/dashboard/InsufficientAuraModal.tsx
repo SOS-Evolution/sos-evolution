@@ -1,11 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Coins, ArrowRight, X } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+
 
 interface InsufficientAuraModalProps {
     isOpen: boolean;

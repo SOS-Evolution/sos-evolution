@@ -19,11 +19,11 @@ import AuraActionButton from "@/components/ui/AuraActionButton";
 import DailyHoroscopeCard from "@/components/astrology/DailyHoroscopeCard";
 
 interface AstrologyClientProps {
-    profile: any;
+    profile: unknown;
     initialChartData: WesternChartData | null;
-    initialInterpretation: any | null;
-    t: any;
-    tz: any;
+    initialInterpretation: unknown | null;
+    t: unknown;
+    tz: unknown;
     locale: string;
 }
 

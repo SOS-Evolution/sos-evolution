@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import {
     Database, Server, Cpu, Globe, Lock, ArrowLeft,
     FolderTree, Network, ShieldCheck, Box, MessageSquare,
-    GitBranch, Layers
+    Layers
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -67,16 +67,16 @@ export default function ArchitectureDocsPage() {
                     </div>
                     <Card className="p-6 bg-slate-900/50 border-slate-800 font-mono text-sm overflow-x-auto">
                         <div className="space-y-1 text-slate-300">
-                            <p className="text-blue-400">/app <span className="text-slate-500 font-sans italic text-xs ml-2">// Next.js App Router (Páginas y API routes)</span></p>
-                            <p className="ml-4">/admin <span className="text-slate-500 font-sans italic text-xs ml-2">// Backend Administrativo</span></p>
-                            <p className="ml-4">/dashboard <span className="text-slate-500 font-sans italic text-xs ml-2">// Panel de Usuario B2C</span></p>
-                            <p className="text-blue-400">/components <span className="text-slate-500 font-sans italic text-xs ml-2">// UI Components (Atomic Design)</span></p>
-                            <p className="ml-4">/ui <span className="text-slate-500 font-sans italic text-xs ml-2">// Shadcn/ui & primitives</span></p>
-                            <p className="ml-4">/features <span className="text-slate-500 font-sans italic text-xs ml-2">// Componentes con lógica de dominio (Tarot, Astral, etc.)</span></p>
-                            <p className="text-blue-400">/lib <span className="text-slate-500 font-sans italic text-xs ml-2">// Core Utilities & API Clients</span></p>
-                            <p className="ml-4 text-emerald-400">/supabase <span className="text-slate-500 font-sans italic text-xs ml-2">// Cliente Supabase y Server actions</span></p>
-                            <p className="text-blue-400">/supabase <span className="text-slate-500 font-sans italic text-xs ml-2">// Infraestructura DB (Migrations & Seed)</span></p>
-                            <p className="text-blue-400">/types <span className="text-slate-500 font-sans italic text-xs ml-2">// TypeScript Interfaces globales</span></p>
+                            <p className="text-blue-400">/app <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Next.js App Router (Páginas y API routes)</span></p>
+                            <p className="ml-4">/admin <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Backend Administrativo</span></p>
+                            <p className="ml-4">/dashboard <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Panel de Usuario B2C</span></p>
+                            <p className="text-blue-400">/components <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} UI Components (Atomic Design)</span></p>
+                            <p className="ml-4">/ui <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Shadcn/ui & primitives</span></p>
+                            <p className="ml-4">/features <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Componentes con lógica de dominio (Tarot, Astral, etc.)</span></p>
+                            <p className="text-blue-400">/lib <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Core Utilities & API Clients</span></p>
+                            <p className="ml-4 text-emerald-400">/supabase <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Cliente Supabase y Server actions</span></p>
+                            <p className="text-blue-400">/supabase <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} Infraestructura DB (Migrations & Seed)</span></p>
+                            <p className="text-blue-400">/types <span className="text-slate-500 font-sans italic text-xs ml-2">{"//"} TypeScript Interfaces globales</span></p>
                         </div>
                     </Card>
                 </section>
@@ -181,7 +181,7 @@ export default function ArchitectureDocsPage() {
                             </div>
                             <div>
                                 <h4 className="text-white font-bold text-sm mb-2">Data Privacy</h4>
-                                <p className="text-xs text-slate-500">RLS (Row Level Security) nivel PostgreSQL. Los datos nunca "viajan" a otros usuarios en la misma consulta.</p>
+                                <p className="text-xs text-slate-500">RLS (Row Level Security) nivel PostgreSQL. Los datos nunca &quot;viajan&quot; a otros usuarios en la misma consulta.</p>
                             </div>
                             <div>
                                 <h4 className="text-white font-bold text-sm mb-2">Admin Access</h4>

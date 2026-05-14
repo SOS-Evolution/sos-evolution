@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase/client";
 import {
     getLifePathNumber,
     getExpressionNumber,
     getSoulUrgeNumber,
-    getPersonalityNumber,
-    getNumerologyDetails
+    getPersonalityNumber
 } from "@/lib/soul-math";
 import NumerologyCard from "./NumerologyCard";
 import {
@@ -19,8 +18,7 @@ import {
     Shield,
     Map,
     Search,
-    BrainCircuit,
-    ChevronRight
+    BrainCircuit
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "../landing/AnimatedSection";
@@ -38,7 +36,7 @@ export default function NumerologyResult({ initialProfile }: NumerologyResultPro
     const tn = useTranslations('Numerology');
     const [name, setName] = useState(initialProfile?.full_name || "");
     const [birthDate, setBirthDate] = useState(initialProfile?.birth_date || "");
-    const [results, setResults] = useState<any>(null);
+    const [results, setResults] = useState<unknown>(null);
     const [isLoading, setIsLoading] = useState(!initialProfile);
 
     useEffect(() => {
@@ -69,9 +67,9 @@ export default function NumerologyResult({ initialProfile }: NumerologyResultPro
             setIsLoading(false);
         }
         loadProfile();
-    }, [initialProfile]);
+    }, [initialProfile, calculateResults]);
 
-    const calculateResults = (n: string, d: string) => {
+    const calculateResults = useCallback((n: string, d: string) => {
         if (!n || !d) return;
 
         const lpNum = getLifePathNumber(d);
@@ -94,7 +92,7 @@ export default function NumerologyResult({ initialProfile }: NumerologyResultPro
             soulUrge: getLocalizedDetails(suNum),
             personality: getLocalizedDetails(peNum)
         });
-    };
+    }, [tn]);
 
     const handleCalculate = (e: React.FormEvent) => {
         e.preventDefault();

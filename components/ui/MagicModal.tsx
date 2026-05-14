@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Quote } from "lucide-react";
+import { X, Quote } from "lucide-react";
 import { LifePathDetails } from "@/lib/soul-math";
 import { Button } from "@/components/ui/button";
 
@@ -123,7 +123,7 @@ export default function MagicModal({ isOpen, onClose, details }: MagicModalProps
                                 >
                                     <Quote className="absolute top-2 left-2 w-6 h-6 text-purple-600/30 rotate-180" />
                                     <p className="text-lg text-white font-serif italic relative z-10">
-                                        "{details.quote}"
+                                        &quot;{details.quote}&quot;
                                     </p>
                                     <Quote className="absolute bottom-2 right-2 w-6 h-6 text-purple-600/30" />
                                 </motion.div>

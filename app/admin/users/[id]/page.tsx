@@ -90,7 +90,8 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 flex flex-col items-center text-center">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 p-1 mb-4 shadow-xl shadow-purple-950/40">
                             {profile.avatar_url ? (
-                                <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover" />
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={profile.avatar_url} alt="Avatar de usuario" className="w-full h-full rounded-full object-cover" />
                             ) : (
                                 <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
                                     <User className="w-10 h-10 text-slate-600" />
@@ -172,7 +173,7 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                                 <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">Lecturas Totales</span>
                                 <History className="w-4 h-4 text-purple-500" />
                             </div>
-                            <p className="text-3xl font-bold text-white">{(readings as any)?.length || 0}</p>
+                            <p className="text-3xl font-bold text-white">{readings?.length || 0}</p>
                         </div>
                     </div>
 
@@ -216,7 +217,7 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                                         <span className="text-purple-400 font-serif font-bold group-hover:text-purple-300 transition-colors uppercase tracking-tighter text-sm">{read.card_name}</span>
                                         <span className="text-[10px] text-slate-600 font-mono">{new Date(read.created_at).toLocaleDateString()}</span>
                                     </div>
-                                    <p className="text-xs text-slate-400 italic line-clamp-2">"{read.question || 'Sin pregunta registrada'}"</p>
+                                    <p className="text-xs text-slate-400 italic line-clamp-2">&quot;{read.question || 'Sin pregunta registrada'}&quot;</p>
                                 </div>
                             ))}
                         </div>

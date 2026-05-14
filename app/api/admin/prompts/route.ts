@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminUser } from '@/lib/supabase/admin-auth';
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
         const { supabase, error: authResponse } = await getAdminUser();
         if (authResponse) return authResponse;
@@ -17,7 +17,8 @@ export async function GET(req: Request) {
         }
 
         return NextResponse.json(prompts);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

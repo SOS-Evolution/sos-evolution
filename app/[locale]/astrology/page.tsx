@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/routing";
-import { getWesternChartData, getMockChartData, WesternChartData } from "@/lib/astrology-api";
+import { getMockChartData } from "@/lib/astrology-api";
 import { getOrFetchChart } from "@/lib/supabase/astrology-cache";
 import { getTranslations } from "next-intl/server";
 import AstrologyClient from "@/components/astrology/AstrologyClient";
@@ -44,7 +44,7 @@ export default async function AstrologyPage({ params }: { params: Promise<{ loca
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        redirect("/login" as any);
+        redirect({ href: "/login", locale });
         return null;
     }
 

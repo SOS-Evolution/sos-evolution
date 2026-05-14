@@ -5,7 +5,7 @@ import { getWesternChartData, WesternChartData } from "../astrology-api";
  * Obtiene la carta astral del usuario, priorizando el caché en la base de datos.
  * Si el caché no existe o es inválido, consulta la API y actualiza el caché.
  */
-export async function getOrFetchChart(userId: string, profile: any) {
+export async function getOrFetchChart(userId: string, profile: unknown) {
     const supabase = await createClient();
 
     // 1. Validar si el perfil tiene los datos necesarios para el cálculo

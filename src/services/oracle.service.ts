@@ -135,7 +135,7 @@ export class OracleService {
             schemaJSON: TAROT_RESPONSE_SCHEMA_JSON,
         });
 
-        let rawJson = await this.ai.generateJson({ systemPrompt, userPrompt });
+        const rawJson = await this.ai.generateJson({ systemPrompt, userPrompt });
         let aiResponse: TarotAiResponse;
 
         try {

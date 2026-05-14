@@ -40,8 +40,9 @@ export default function PromptsAdminPage() {
             }
 
             setPrompts(data);
-        } catch (error: any) {
-            toast.error(`Error: ${error.message}`);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            toast.error(`Error: ${errorMessage}`);
             console.error(error);
         } finally {
             setLoading(false);

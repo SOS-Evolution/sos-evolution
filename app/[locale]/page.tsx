@@ -80,7 +80,7 @@ export default async function Home() {
               </Button>
             </Link>
 
-            <Link href={"#how-it-works" as any} className="w-full">
+            <a href="#how-it-works" className="w-full">
               <Button
                 variant="ghost"
                 size="lg"
@@ -89,7 +89,7 @@ export default async function Home() {
                 {t('hero.cta_how')}
                 <ChevronDown className="ml-2 w-4 h-4 animate-bounce" />
               </Button>
-            </Link>
+            </a>
           </div>
 
           {/* Scroll indicator */}
@@ -270,7 +270,7 @@ export default async function Home() {
             <ul className="space-y-3 text-sm text-slate-500">
               <li><Link href="/login" className="hover:text-purple-400 transition-colors">Login</Link></li>
               <li><Link href="/login" className="hover:text-purple-400 transition-colors">Register</Link></li>
-              <li><Link href={"#how-it-works" as any} className="hover:text-purple-400 transition-colors">Features</Link></li>
+              <li><a href="#how-it-works" className="hover:text-purple-400 transition-colors">Features</a></li>
             </ul>
           </div>
           <div>

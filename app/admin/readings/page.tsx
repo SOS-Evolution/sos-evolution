@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ScrollText, Sparkles } from "lucide-react";
+import { ScrollText } from "lucide-react";
 
 export default async function AdminReadingsPage() {
     const supabase = await createClient();
@@ -40,7 +40,7 @@ export default async function AdminReadingsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {readings?.map((read: any) => (
+                            {readings?.map((read: { id: string; full_name?: string; email?: string; card_name: string; is_reversed: boolean; question?: string; created_at: string }) => (
                                 <tr key={read.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors">
                                     <td className="p-4">
                                         <div className="flex flex-col">
@@ -55,7 +55,7 @@ export default async function AdminReadingsPage() {
                                         </div>
                                     </td>
                                     <td className="p-4 italic text-slate-400 truncate max-w-xs">
-                                        "{read.question || 'Sin pregunta'}"
+                                        &quot;{read.question || 'Sin pregunta'}&quot;
                                     </td>
                                     <td className="p-4 text-xs text-slate-500">
                                         {new Date(read.created_at).toLocaleString()}

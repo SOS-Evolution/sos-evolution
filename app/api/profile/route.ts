@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getLifePathNumber, getZodiacSign } from '@/lib/soul-math';
-import type { Profile, ProfileUpdate } from '@/types';
+import type { ProfileUpdate } from '@/types';
 
 // GET /api/profile - Obtener perfil del usuario actual
 export async function GET() {
@@ -60,7 +60,7 @@ export async function PUT(req: Request) {
         const body: ProfileUpdate = await req.json();
 
         // Calcular life_path_number y zodiac_sign si hay birth_date
-        let updates: ProfileUpdate = { ...body };
+        const updates: ProfileUpdate = { ...body };
 
         // Check if sensitive birth data is changing
         const isBirthDataChanged = body.birth_date || body.birth_time || body.birth_place || body.latitude !== undefined || body.longitude !== undefined;

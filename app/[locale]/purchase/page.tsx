@@ -175,7 +175,7 @@ export default function PurchasePage() {
                             <h2 className="text-xs font-bold text-purple-400 uppercase tracking-[0.3em] mb-1">{t('title_shop')}</h2>
                             <h1 className="text-4xl font-serif text-white">{t.rich('title_main', {
                                 purple: (chunks) => <span className="text-purple-400">{chunks}</span>
-                            }) as any}</h1>
+                            }) as React.ReactNode}</h1>
                             <p className="text-slate-400 text-sm mt-1">
                                 {t('description')}
                             </p>

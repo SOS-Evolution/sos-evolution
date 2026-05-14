@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, GripVertical, CheckCircle2, Circle, Clock, ArrowLeft } from "lucide-react";
+import { Plus, CheckCircle2, Circle, Clock, ArrowLeft, LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -42,7 +41,7 @@ export default function IdeasDocsPage() {
         setIdeas(ideas.map(idea => idea.id === id ? { ...idea, status: newStatus } : idea));
     };
 
-    const Column = ({ title, status, icon: Icon, color }: { title: string, status: IdeaStatus, icon: any, color: string }) => (
+    const Column = ({ title, status, icon: Icon, color }: { title: string, status: IdeaStatus, icon: LucideIcon, color: string }) => (
         <div className="flex-1 min-w-[300px] bg-slate-900/40 rounded-xl p-4 border border-slate-800 flex flex-col h-[600px]">
             <div className={`flex items-center gap-2 mb-4 pb-3 border-b border-slate-800 ${color}`}>
                 <Icon className="w-5 h-5" />

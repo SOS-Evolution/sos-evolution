@@ -210,7 +210,7 @@ export async function getWesternChartData(details: BirthDetails): Promise<Wester
     }
 }
 
-export async function fetchDailyTransits(date = new Date()): Promise<any> {
+export async function fetchDailyTransits(date = new Date()): Promise<Record<string, unknown>> {
     try {
         // Format date as DD-MM-YYYY as required by some endpoints, or standard ISO
         // The endpoint 'natal_transits/daily' usually takes current time if not specified, 
@@ -257,7 +257,7 @@ export async function fetchDailyTransits(date = new Date()): Promise<any> {
 }
 
 // Helper to get dummy transits for dev/visual testing if API fails
-export function getMockTransits(): any {
+export function getMockTransits(): Record<string, unknown> {
     // Returns a structure similar to the API's output[0]
     return {
         "0": { name: "Sun", current_sign: 8, fullDegree: 255 }, // Sagitario

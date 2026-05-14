@@ -2,15 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, ArrowRight, LockKeyhole, RotateCcwKey, UserPlus, LogIn } from "lucide-react";
+import { Sparkles, Lock, Mail, Loader2, Eye, EyeOff, LockKeyhole, RotateCcwKey, UserPlus, LogIn } from "lucide-react";
 import { login, signup, signInWithOAuth, resetPassword } from "./actions";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 
 function LoginForm() {
     const searchParams = useSearchParams();
-    const router = useRouter();
+
     const initialError = searchParams.get("error");
     const initialMessage = searchParams.get("message");
     const nextUrl = searchParams.get("next");

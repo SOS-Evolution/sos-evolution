@@ -62,7 +62,7 @@ export default async function AdminUsersPage(props: {
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
                             {users && users.length > 0 ? (
-                                users.map((user: any) => (
+                                users.map((user: { id: string; full_name?: string; email?: string; role: string; credit_balance: number; readings_count: number; created_at: string }) => (
                                     <tr
                                         key={user.id}
                                         className="border-b border-slate-800 transition-colors hover:bg-slate-800/30 data-[state=selected]:bg-slate-800"

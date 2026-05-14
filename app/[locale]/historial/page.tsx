@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Sparkles, ScrollText, ArrowRight, BookOpen } from "lucide-react";
+import { Calendar, Sparkles, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
@@ -107,7 +106,7 @@ export default async function HistoryPage() {
 
                                         {/* Description */}
                                         <p className="text-sm text-slate-300 line-clamp-3 mb-5 font-light leading-relaxed">
-                                            "{item.description}"
+                                            &quot;{item.description}&quot;
                                         </p>
 
                                         {/* Mission */}

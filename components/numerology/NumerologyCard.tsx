@@ -60,7 +60,7 @@ export default function NumerologyCard({ title, details, icon: Icon, delay = 0, 
                     </div>
 
                     <p className="text-sm text-slate-400 leading-relaxed italic">
-                        "{details.quote}"
+                        &quot;{details.quote}&quot;
                     </p>
 
                     <p className="text-xs text-slate-500 border-t border-white/5 pt-3 leading-snug">

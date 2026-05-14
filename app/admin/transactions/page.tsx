@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { CreditCard, History } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 export default async function AdminTransactionsPage() {
     const supabase = await createClient();
@@ -40,7 +40,7 @@ export default async function AdminTransactionsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {transactions?.map((tx: any) => (
+                            {transactions?.map((tx: { id: string; full_name?: string; email?: string; source: string; description?: string; amount: number; created_at: string }) => (
                                 <tr key={tx.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors">
                                     <td className="p-4">
                                         <div className="flex flex-col">

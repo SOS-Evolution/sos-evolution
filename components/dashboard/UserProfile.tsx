@@ -3,17 +3,15 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Sparkles, User, MapPin, Calendar as CalendarIcon, Save, Edit2, Clock, Info } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { User, MapPin, Calendar as CalendarIcon, Edit2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getLifePathNumber, getZodiacSign, getNumerologyDetails, LifePathDetails } from "@/lib/soul-math";
+import { LifePathDetails } from "@/lib/soul-math";
 import MagicModal from "@/components/ui/MagicModal";
 import type { Profile } from "@/types";
 import { useTranslations } from 'next-intl';
 
 interface UserProfileProps {
-    user: any; // Mantenemos el usuario de auth como prop inicial
+    user: { user_metadata?: { full_name?: string } }; // Mantenemos el usuario de auth como prop inicial
     profile?: Profile | null; // Añadimos perfil opcional desde el padre
     onEdit?: () => void; // Función para abrir el modal de edición
     className?: string;
@@ -56,10 +54,6 @@ export default function UserProfile({ user, profile: externalProfile, onEdit, cl
     const gender = profile?.gender;
     const latitude = profile?.latitude;
     const longitude = profile?.longitude;
-    const fullName = profile?.full_name;
-
-    const zodiac = birthDate ? getZodiacSign(new Date(birthDate).getDate(), new Date(birthDate).getMonth() + 1) : "---";
-    const lifePath = birthDate ? getLifePathNumber(birthDate) : "---";
 
     if (loading && !profile) return <div className="animate-pulse h-32 bg-slate-900/50 rounded-xl w-full"></div>;
     if (!profile) return null;

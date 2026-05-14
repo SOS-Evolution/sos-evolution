@@ -37,7 +37,7 @@ export async function updateProfile(formData: FormData) {
     // Mejor: Hago fetch al endpoint de API que ya escribí? No, server-to-server fetch es hacky.
     // Escribiré la lógica DB directa.
 
-    const updates: any = {
+    const updates: Record<string, string | null> = {
         full_name: fullName,
         birth_date: birthDate || null,
         birth_place: birthPlace,

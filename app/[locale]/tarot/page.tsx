@@ -14,7 +14,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
-import { supabase } from "@/lib/supabase/client";
+
 import { getReadingTypes } from "@/app/admin/settings/actions";
 
 type ReadingMode = "daily" | "question" | "classic"; // classic = 3 cartas, daily = 1 carta
@@ -34,7 +34,7 @@ export default function ReadingPage() {
   const [revealedCards, setRevealedCards] = useState<boolean[]>([]);
   const [readingData, setReadingData] = useState<CardReadingData[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentRevealIndex, setCurrentRevealIndex] = useState(0);
+
   const [loadingPhase, setLoadingPhase] = useState(0);
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [pendingMode, setPendingMode] = useState<ReadingMode | null>(null);
@@ -52,7 +52,7 @@ export default function ReadingPage() {
       try {
         // 1. Fetch costs
         const costs = await getReadingTypes();
-        const costMap = costs.reduce((acc: any, curr: any) => {
+        const costMap = costs.reduce((acc: Record<string, number>, curr: { code: string; credit_cost: number }) => {
           acc[curr.code] = curr.credit_cost;
           return acc;
         }, {});
@@ -74,9 +74,10 @@ export default function ReadingPage() {
     loadInitialData();
 
     // 3. Sync balance updates via custom event
-    const handleUpdate = (e: any) => {
-      if (e.detail?.newBalance !== undefined) {
-        setBalance(e.detail.newBalance);
+    const handleUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ newBalance?: number }>;
+      if (customEvent.detail?.newBalance !== undefined) {
+        setBalance(customEvent.detail.newBalance);
       }
     };
     window.addEventListener('credits-updated', handleUpdate);
@@ -100,6 +101,7 @@ export default function ReadingPage() {
       enterMode(pendingMode);
       setPendingMode(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDataLoading, balance, pendingMode]);
 
   // Actually enter the mode (check credits and navigate)
@@ -221,7 +223,7 @@ export default function ReadingPage() {
       }
 
       // La API ahora devolverá un array de lecturas
-      const readings: CardReadingData[] = data.readings.map((r: any, idx: number) => ({
+      const readings: CardReadingData[] = data.readings.map((r: { keywords?: string[]; description?: string; action?: string; cardName: string }, idx: number) => ({
         ...r,
         keywords: Array.isArray(r.keywords) ? r.keywords : [],
         description: r.description || '',
@@ -240,7 +242,7 @@ export default function ReadingPage() {
       setReadingData(readings);
 
       // Preload card images so they're cached before reveal flip
-      readings.forEach((reading: any) => {
+      readings.forEach((reading: { cardName: string }) => {
         const idx = DECK.indexOf(reading.cardName);
         if (idx >= 0) {
           const img = new Image();
@@ -258,10 +260,11 @@ export default function ReadingPage() {
         setLoadingPhase(0);
       }, 1200);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("Error conectando con el alma:", error);
       toast.error(t('error_generic'), {
-        description: error.message || t('error_generic_desc'),
+        description: errorMessage || t('error_generic_desc'),
       });
       setStep("selection");
       setIsLoading(false);
@@ -297,7 +300,7 @@ export default function ReadingPage() {
     setSelectedCards([]);
     setRevealedCards([]);
     setReadingData(null);
-    setCurrentRevealIndex(0);
+
     setIsLoading(false);
     setLoadingPhase(0);
     clearLoadingTimers();
@@ -340,7 +343,7 @@ export default function ReadingPage() {
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
                   {t.rich('choose_path', {
                     purple: (chunks) => <span className="text-gradient-purple">{chunks}</span>
-                  }) as any}
+                  }) as React.ReactNode}
                 </h1>
                 <p className="text-slate-400 mb-12 max-w-lg mx-auto">
                   {t('choose_path_desc')}
@@ -718,13 +721,13 @@ export default function ReadingPage() {
                       <h2 className="text-2xl font-serif text-white">
                         {t.rich('evolution_title', {
                           purple: (chunks) => <span className="text-purple-400">{chunks}</span>
-                        }) as any}
+                        }) as React.ReactNode}
                       </h2>
                     )}
                     {question && (
                       <div className="mt-2 text-slate-300">
                         <span className="text-slate-500 text-xs uppercase tracking-widest mr-2">{t('your_question')}:</span>
-                        "{question}"
+                        &quot;{question}&quot;
                       </div>
                     )}
                   </div>
@@ -758,7 +761,7 @@ export default function ReadingPage() {
                         </div>
                         {reading.description ? (
                           <p className="text-lg text-slate-300 leading-relaxed italic border-l-2 border-purple-500/50 pl-4">
-                            "{reading.description}"
+                            &quot;{reading.description}&quot;
                           </p>
                         ) : null}
                       </div>

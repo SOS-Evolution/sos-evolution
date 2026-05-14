@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
 
-export default function AuthButton({ user, profile }: { user: any, profile?: any }) {
+export default function AuthButton({ user, profile }: { user: unknown, profile?: unknown }) {
     const [loading, setLoading] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();

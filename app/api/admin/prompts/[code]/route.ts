@@ -26,7 +26,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ code: st
         }
 
         return NextResponse.json(updatedPrompt);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

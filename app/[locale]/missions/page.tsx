@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 import MissionsPanel from '@/components/dashboard/MissionsPanel';
-import { Card } from '@/components/ui/card';
+
 import { Trophy } from 'lucide-react';
 
 export default function MissionsPage() {

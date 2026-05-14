@@ -5,29 +5,14 @@ import { Link } from "@/i18n/routing";
 import {
     Trophy,
     Sparkles,
-    LogOut,
-    Check,
-    X,
-    Shield,
     Star,
     BookOpen,
-    Clock,
-    Settings,
-    User,
-    Compass,
-    History,
-    HelpCircle,
-    Palette,
-
-    LayoutDashboard,
     ChevronRight,
     Hash,
     Layers,
     ArrowRight,
     Lock,
-    LockOpen,
-    Wand2,
-    Loader2
+    Wand2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -42,18 +27,18 @@ import CardStats from "@/components/dashboard/CardStats";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import OnboardingModal from "@/components/dashboard/OnboardingModal";
 import { useTranslations } from 'next-intl';
-import { getLifePathNumber, getZodiacSign, getNumerologyDetails } from "@/lib/soul-math";
+import { getLifePathNumber, getZodiacSign } from "@/lib/soul-math";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
 
 interface DashboardClientProps {
-    profile: any;
-    stats: any;
-    user: any;
+    profile: unknown;
+    stats: unknown;
+    user: unknown;
 }
 
 import TransactionModal from "@/components/dashboard/TransactionModal";
 
-import { useRouter } from "next/navigation";
+
 
 import RewardPopup from "@/components/dashboard/RewardPopup";
 
@@ -61,7 +46,6 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
     const t = useTranslations('Dashboard');
     const tz = useTranslations('Zodiac');
     const tn = useTranslations('Numerology');
-    const router = useRouter();
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
     const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
@@ -82,7 +66,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         async function loadCosts() {
             try {
                 const costs = await getReadingTypes();
-                const costMap = costs.reduce((acc: any, curr: any) => {
+                const costMap = costs.reduce((acc: unknown, curr: unknown) => {
                     acc[curr.code] = curr.credit_cost;
                     return acc;
                 }, {});
@@ -149,7 +133,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         }
 
         // Global event listener for rewards (triggered by other components)
-        const handleReward = (e: any) => {
+        const handleReward = (e: unknown) => {
             if (e.detail) {
                 setRewardPopup({
                     isOpen: true,
@@ -169,7 +153,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         window.addEventListener('mission-completed', handleReward);
 
         // Sync balance updates
-        const handleUpdate = (e: any) => {
+        const handleUpdate = (e: unknown) => {
             if (e.detail?.newBalance !== undefined) {
                 setBalance(e.detail.newBalance);
             }
@@ -180,6 +164,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
             window.removeEventListener('credits-updated', handleUpdate);
             window.removeEventListener('mission-completed', handleReward);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Transaction Modal State
@@ -201,7 +186,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
     let lifePathWord = "---";
 
     if (profile?.birth_date) {
-        const [y, m, d] = profile.birth_date.split('-').map(Number);
+        const [, m, d] = profile.birth_date.split('-').map(Number);
         zodiacSign = getZodiacSign(d, m);
         lifePathNum = getLifePathNumber(profile.birth_date);
         if (lifePathNum > 0) {
@@ -226,7 +211,7 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 toast.success(t('transaction.success', {
                     feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
                 }));
-                setProfile((prev: any) => ({
+                setProfile((prev: unknown) => ({
                     ...prev,
                     unlocked_features: [...(prev.unlocked_features || []), selectedFeature]
                 }));
@@ -244,14 +229,14 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                     toast.error(result.error || "Error");
                 }
             }
-        } catch (err) {
+        } catch {
             toast.error("Error al procesar el pago");
         } finally {
             setTransactionLoading(false);
         }
     };
 
-    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: any) => {
+    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: unknown) => {
         const isUnlocked = unlockedFeatures.includes(feature);
 
         // Ya no usamos el estado local 'unlocking' para el loader del botón de la tarjeta

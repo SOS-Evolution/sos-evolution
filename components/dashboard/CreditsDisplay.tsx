@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Sparkles, Trophy, Coins } from "lucide-react";
+import { Sparkles, Coins } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { UserBalance } from "@/types";
@@ -25,7 +25,7 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
 
     // Escuchar eventos de actualización de créditos (custom event)
     useEffect(() => {
-        const handleUpdate = (e: any) => {
+        const handleUpdate = (e: unknown) => {
             if (e.detail?.newBalance !== undefined) {
                 setBalance(e.detail.newBalance);
             }

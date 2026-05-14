@@ -16,9 +16,9 @@ export function ConfigProvider({
     initialSettings
 }: {
     children: React.ReactNode;
-    initialSettings?: any[]
+    initialSettings?: unknown[]
 }) {
-    const [settings, setSettings] = useState<any[]>(initialSettings || []);
+    const [settings, setSettings] = useState<unknown[]>(initialSettings || []);
 
     const tarotFrame = (settings.find(s => s.key === "tarot_frame")?.value as TarotFrameId) || "celestial";
 

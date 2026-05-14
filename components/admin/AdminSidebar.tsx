@@ -73,7 +73,6 @@ export function AdminSidebar() {
             <div className="flex-1 overflow-y-auto py-4">
                 <nav className="space-y-1 px-3">
                     {sidebarItems.map((item) => {
-                        const isActive = pathname === item.href;
                         const isDocs = item.title === "Documentación";
                         const hasSubItems = !!item.subItems;
 

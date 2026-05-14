@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AnimatedSection from "@/components/landing/AnimatedSection";
-import { ArrowLeft, Hash, Sparkles, Calendar } from "lucide-react";
+import { ArrowLeft, Hash, Calendar } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import NumerologyResult from "@/components/numerology/NumerologyResult";
@@ -10,7 +10,7 @@ import { getTranslations } from "next-intl/server";
 export const dynamic = "force-dynamic";
 
 export default async function NumerologyPage({ params }: { params: Promise<{ locale: string }> }) {
-    const { locale } = await params;
+    await params;
     const t = await getTranslations('NumerologyPage');
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Star, Shield, Target, Quote, Disc, Compass } from "lucide-react";
+import { Sparkles, Star, Shield, Target, Quote } from "lucide-react";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { useTranslations } from "next-intl";
 
@@ -13,10 +13,9 @@ interface AstroInterpretationProps {
         challenges: string[];
         evolutionary_advice: string;
     };
-    locale?: string;
 }
 
-export default function AstroInterpretation({ data, locale = 'es' }: AstroInterpretationProps) {
+export default function AstroInterpretation({ data }: AstroInterpretationProps) {
     const t = useTranslations('AstrologyPage.interpretation');
 
     return (
@@ -45,7 +44,7 @@ export default function AstroInterpretation({ data, locale = 'es' }: AstroInterp
                         {t('summary_title')}
                     </h3>
                     <p className="text-xl font-serif text-slate-100 leading-relaxed italic">
-                        "{data.summary}"
+                        &quot;{data.summary}&quot;
                     </p>
                 </div>
             </GlowingBorderCard>
