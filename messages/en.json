@@ -519,7 +519,12 @@
         "loading_energies": "Channelling energies... please wait a moment",
         "loading_phase_1": "Connecting with the cosmos...",
         "loading_phase_2": "Channeling your card's energy...",
-        "loading_phase_3": "Interpreting the symbols...",
-        "loading_phase_ready": "Your message is ready..."
+        "loading_phase_3": "Interpreting the symbols..."
+    },
+    "SuccessPage": {
+        "title": "Recharge Completed",
+        "subtitle": "Your energy has been renewed!",
+        "description": "The oracle has registered your sacred exchange. Your Aura credits are now available in your account.",
+        "button": "Back to Dashboard"
     }
 }

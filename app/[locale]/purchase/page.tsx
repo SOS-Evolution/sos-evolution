@@ -7,10 +7,15 @@ import { Link } from "@/i18n/routing";
 import AnimatedSection from "@/components/landing/AnimatedSection";
 import { useTranslations } from 'next-intl';
 
+import { useState } from "react";
+import { toast } from "sonner";
+
 interface PricingTier {
     id: string;
+    variantId: string; // Añadido
     name: string;
     price: string;
+    amount: number; // Añadido (en centavos para registro)
     credits?: number;
     duration?: string;
     emoji: string;
@@ -27,12 +32,15 @@ interface PricingTier {
 
 export default function PurchasePage() {
     const t = useTranslations('PurchasePage');
+    const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
     const pricingTiers: PricingTier[] = [
         {
             id: "explorador",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PACK_1 || "",
             name: t('tiers.explorador.name'),
             price: "$1.99",
+            amount: 199,
             credits: 150,
             emoji: "✨",
             badge: {
@@ -52,8 +60,10 @@ export default function PurchasePage() {
         },
         {
             id: "iniciado",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PACK_2 || "",
             name: t('tiers.iniciado.name'),
             price: "$4.99",
+            amount: 499,
             credits: 500,
             emoji: "🥉",
             features: [
@@ -69,8 +79,10 @@ export default function PurchasePage() {
         },
         {
             id: "adepto",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PACK_3 || "",
             name: t('tiers.adepto.name'),
             price: "$19.99",
+            amount: 1999,
             credits: 2500,
             emoji: "🥈",
             badge: {
@@ -91,8 +103,10 @@ export default function PurchasePage() {
         },
         {
             id: "maestro",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PACK_4 || "",
             name: t('tiers.maestro.name'),
             price: "$44.99",
+            amount: 4499,
             credits: 6500,
             emoji: "🥇",
             features: [
@@ -109,8 +123,10 @@ export default function PurchasePage() {
         },
         {
             id: "avatar",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PACK_5 || "",
             name: t('tiers.avatar.name'),
             price: "$99.99",
+            amount: 9999,
             credits: 15000,
             emoji: "🌌",
             badge: {
@@ -131,8 +147,10 @@ export default function PurchasePage() {
         },
         {
             id: "amuleto",
+            variantId: process.env.NEXT_PUBLIC_LS_VARIANT_SUSCRIPCION_PREMIUM || "",
             name: t('tiers.amuleto.name'),
             price: "$11.11",
+            amount: 1111,
             duration: t('tiers.amuleto.duration'),
             emoji: "👑",
             badge: {
@@ -152,6 +170,35 @@ export default function PurchasePage() {
             icon: <Calendar className="w-4 h-4 text-purple-400" />
         }
     ];
+
+    const handlePurchase = async (tier: PricingTier) => {
+        try {
+            setLoadingTier(tier.id);
+            const response = await fetch('/api/payments/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    variantId: tier.variantId,
+                    credits: tier.credits || 0,
+                    amount: tier.amount
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al iniciar el pago');
+            }
+
+            // Redirigir a Lemon Squeezy
+            window.location.href = data.url;
+        } catch (error: any) {
+            console.error('Purchase error:', error);
+            toast.error(error.message || 'Hubo un problema al procesar tu solicitud');
+        } finally {
+            setLoadingTier(null);
+        }
+    };
 
     return (
         <div className="min-h-screen text-slate-100 pb-20 relative overflow-hidden">
@@ -242,10 +289,16 @@ export default function PurchasePage() {
 
                                 {/* CTA Button */}
                                 <Button
+                                    onClick={() => handlePurchase(tier)}
+                                    disabled={loadingTier !== null}
                                     className={`relative z-10 w-full bg-gradient-to-r from-${tier.glowColor}-600 to-${tier.glowColor}-700 hover:from-${tier.glowColor}-500 hover:to-${tier.glowColor}-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all group-hover:shadow-xl`}
                                 >
-                                    <CreditCard className="w-4 h-4 mr-2" />
-                                    {t('buy_button')}
+                                    {loadingTier === tier.id ? (
+                                        <Zap className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : (
+                                        <CreditCard className="w-4 h-4 mr-2" />
+                                    )}
+                                    {loadingTier === tier.id ? 'Conectando...' : t('buy_button')}
                                 </Button>
                             </Card>
                         </AnimatedSection>

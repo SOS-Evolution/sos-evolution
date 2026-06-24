@@ -519,7 +519,12 @@
         "loading_energies": "Canalizando energías... espera un momento",
         "loading_phase_1": "Conectando con el cosmos...",
         "loading_phase_2": "Canalizando la energía de tu carta...",
-        "loading_phase_3": "Interpretando los símbolos...",
-        "loading_phase_ready": "Tu mensaje está listo..."
+        "loading_phase_3": "Interpretando los símbolos..."
+    },
+    "SuccessPage": {
+        "title": "Carga Completada",
+        "subtitle": "¡Tu energía ha sido renovada!",
+        "description": "El oráculo ha registrado tu intercambio sagrado. Tus créditos de Aura ya están disponibles en tu cuenta.",
+        "button": "Volver al Dashboard"
     }
 }

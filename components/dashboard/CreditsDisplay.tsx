@@ -2,11 +2,10 @@
 
 import { Card } from "@/components/ui/card";
 import { Sparkles, Coins } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 import type { UserBalance } from "@/types";
 import { useTranslations } from 'next-intl';
-
 export default function CreditsDisplay({ minimal = false }: { minimal?: boolean }) {
     const t = useTranslations('Dashboard');
     const [balance, setBalance] = useState<number | null>(null);
@@ -37,10 +36,10 @@ export default function CreditsDisplay({ minimal = false }: { minimal?: boolean 
 
     if (minimal) {
         return (
-            <div className="flex items-center gap-2 bg-purple-900/40 border border-purple-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-purple-200">
+            <Link href="/purchase" className="flex items-center gap-2 bg-purple-900/40 border border-purple-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-purple-200 hover:bg-purple-800/50 hover:border-purple-400/50 transition-all cursor-pointer">
                 <Sparkles className="w-4 h-4 text-yellow-400" />
                 <span>{balance !== null ? balance : "..."}</span>
-            </div>
+            </Link>
         );
     }
 
