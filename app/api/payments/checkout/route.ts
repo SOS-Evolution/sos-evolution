@@ -10,8 +10,17 @@ export async function POST(req: Request) {
         const user = await requireAuth(supabase);
         const { variantId, credits, amount } = await req.json();
 
-        if (!variantId || !credits || !amount) {
-            return NextResponse.json({ error: 'Faltan parámetros requeridos' }, { status: 400 });
+        console.log('Checkout Request Payload:', { variantId, credits, amount });
+
+        const missingParams: string[] = [];
+        if (!variantId) missingParams.push('variantId');
+        if (credits === undefined || credits === null) missingParams.push('credits');
+        if (!amount) missingParams.push('amount');
+
+        if (missingParams.length > 0) {
+            return NextResponse.json({ 
+                error: `Faltan parámetros requeridos: ${missingParams.join(', ')}` 
+            }, { status: 400 });
         }
 
         // 1. Obtener email del usuario
