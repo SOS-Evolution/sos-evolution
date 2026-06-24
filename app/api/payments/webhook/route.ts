@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { lemonSqueezy } from '@/src/services/lemonsqueezy.service';
-import { BillingService } from '@/src/services/billing.service';
 
 export async function POST(req: Request) {
     try {
@@ -18,7 +17,6 @@ export async function POST(req: Request) {
         const data = payload.data;
 
         const supabase = await createClient(); // Nota: Aquí podrías necesitar service_role si RLS es muy estricto
-        const billing = new BillingService(supabase);
 
         console.log(`Webhook recibido: ${eventName}`);
 

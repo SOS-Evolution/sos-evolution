@@ -192,9 +192,10 @@ export default function PurchasePage() {
 
             // Redirigir a Lemon Squeezy
             window.location.href = data.url;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Purchase error:', error);
-            toast.error(error.message || 'Hubo un problema al procesar tu solicitud');
+            const message = error instanceof Error ? error.message : 'Hubo un problema al procesar tu solicitud';
+            toast.error(message);
         } finally {
             setLoadingTier(null);
         }
