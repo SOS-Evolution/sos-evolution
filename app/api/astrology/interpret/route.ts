@@ -5,6 +5,8 @@ import { BillingService } from '@/src/services/billing.service';
 import { OracleService } from '@/src/services/oracle.service';
 import { handleRouteError } from '@/src/utils/route-handler';
 
+export const maxDuration = 60; // Vercel: permite hasta 60s (30s en Hobby)
+
 export async function POST(req: Request) {
     try {
         const body = await req.json().catch(() => ({}));
