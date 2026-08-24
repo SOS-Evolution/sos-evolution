@@ -1,3 +1,6 @@
+import * as Astronomy from 'astronomy-engine';
+import { getZodiacSign } from "./soul-math";
+
 export interface BirthDetails {
     year: number;
     month: number;
@@ -9,11 +12,9 @@ export interface BirthDetails {
     longitude: number;
     timezone: number;
     settings?: {
-        ayanamsha?: string; // default 'nc_lahiri' for vedic, but we are doing western
+        ayanamsha?: string;
     }
 }
-
-import { getZodiacSign } from "./soul-math";
 
 export interface PlanetPosition {
     name: string;
@@ -89,169 +90,147 @@ function calculateAspects(planets: PlanetPosition[]): Aspect[] {
     return aspects;
 }
 
-const API_BASE_URL = "https://json.freeastrologyapi.com";
-// Note: Some endpoints might need an API key in the future, 
-// using public access header if applicable or default.
+// ──────────────────────────────────────────────────────────────────────────
+// LOCAL EPHEMERIS HELPERS (astronomy-engine - no external API)
+// ──────────────────────────────────────────────────────────────────────────
+
+const ZODIACS = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+/** Get geocentric ecliptic longitude (0-360°) for a body at a given AstroTime */
+function eclLon(body: Astronomy.Body, time: Astronomy.AstroTime): number {
+    const vec = Astronomy.GeoVector(body, time, true);
+    const ecl = Astronomy.Ecliptic(vec);
+    return ((ecl.elon % 360) + 360) % 360;
+}
+
+/** Detect retrograde via daily motion sign (negative = retrograde) */
+function isRetro(body: Astronomy.Body, utcDate: Date): boolean {
+    const t1 = Astronomy.MakeTime(new Date(utcDate.getTime() - 86400000));
+    const t2 = Astronomy.MakeTime(new Date(utcDate.getTime() + 86400000));
+    let diff = eclLon(body, t2) - eclLon(body, t1);
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    return diff < 0;
+}
+
+/** Moon's ascending node longitude (Rahu) - IAU 1980 formula, accurate to ~0.05° */
+function rahuLongitude(time: Astronomy.AstroTime): number {
+    const T = time.ut / 36525.0; // Julian centuries from J2000
+    return ((125.04452 - 1934.136261 * T + 0.0020708 * T * T) % 360 + 360) % 360;
+}
+
+/** Compute Ascendant ecliptic degree from Local Sidereal Time and latitude */
+function computeAscendant(time: Astronomy.AstroTime, latDeg: number, lonDeg: number): number {
+    const gst = Astronomy.SiderealTime(time); // sidereal hours
+    const lst = ((gst * 15 + lonDeg) % 360 + 360) % 360; // degrees
+    const lstR = lst * Math.PI / 180;
+    const T = time.ut / 36525;
+    const eps = (23.4392911 - 0.013004167 * T) * Math.PI / 180; // obliquity
+    const latR = latDeg * Math.PI / 180;
+    const asc = Math.atan2(-Math.cos(lstR), Math.sin(lstR) * Math.cos(eps) + Math.tan(latR) * Math.sin(eps));
+    return ((asc * 180 / Math.PI) % 360 + 360) % 360;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// PUBLIC FUNCTIONS
+// ──────────────────────────────────────────────────────────────────────────
 
 export async function getWesternChartData(details: BirthDetails): Promise<WesternChartData | null> {
     try {
-        const payload = {
-            year: details.year,
-            month: details.month,
-            date: details.date,
-            hours: details.hours,
-            minutes: details.minutes,
-            seconds: details.seconds || 0,
-            latitude: details.latitude,
-            longitude: details.longitude,
-            timezone: details.timezone,
-            config: {
-                observation_point: "topocentric",
-                ayanamsha: "tropical" // Western Astrology
-            }
-        };
+        const { year, month, date: day, hours, minutes, seconds = 0, latitude, longitude, timezone } = details;
 
-        // Fetch Planets
-        const planetsRes = await fetch(`${API_BASE_URL}/planets`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': process.env.FREE_ASTRO_API_KEY || ''
-            },
-            body: JSON.stringify(payload)
+        // Convert local birth time → UTC
+        const localMs = Date.UTC(year, month - 1, day, hours, minutes, seconds);
+        const utcDate = new Date(localMs - timezone * 3600 * 1000);
+        const time = Astronomy.MakeTime(utcDate);
+
+        const mkPlanet = (name: string, lon: number, speed: number, retro: boolean): PlanetPosition => ({
+            name,
+            fullDegree: parseFloat(lon.toFixed(4)),
+            normDegree: parseFloat((lon % 30).toFixed(4)),
+            speed,
+            isRetro: retro,
+            sign: ZODIACS[Math.floor(lon / 30) % 12] || "---",
+            house: 0,
         });
 
-        if (!planetsRes.ok) {
-            console.error("API Error (Planets):", await planetsRes.text());
-            return null;
-        }
+        const rahu = rahuLongitude(time);
+        const ketu = (rahu + 180) % 360;
+        const ascDeg = computeAscendant(time, latitude, longitude);
 
+        const planetsRaw: PlanetPosition[] = [
+            mkPlanet("Sun",       eclLon(Astronomy.Body.Sun,     time), 1.0,   false),
+            mkPlanet("Moon",      eclLon(Astronomy.Body.Moon,    time), 13.0,  false),
+            mkPlanet("Mercury",   eclLon(Astronomy.Body.Mercury, time), 1.5,   isRetro(Astronomy.Body.Mercury, utcDate)),
+            mkPlanet("Venus",     eclLon(Astronomy.Body.Venus,   time), 1.2,   isRetro(Astronomy.Body.Venus,   utcDate)),
+            mkPlanet("Mars",      eclLon(Astronomy.Body.Mars,    time), 0.5,   isRetro(Astronomy.Body.Mars,    utcDate)),
+            mkPlanet("Jupiter",   eclLon(Astronomy.Body.Jupiter, time), 0.1,   isRetro(Astronomy.Body.Jupiter, utcDate)),
+            mkPlanet("Saturn",    eclLon(Astronomy.Body.Saturn,  time), 0.05,  isRetro(Astronomy.Body.Saturn,  utcDate)),
+            mkPlanet("Uranus",    eclLon(Astronomy.Body.Uranus,  time), 0.01,  isRetro(Astronomy.Body.Uranus,  utcDate)),
+            mkPlanet("Neptune",   eclLon(Astronomy.Body.Neptune, time), 0.01,  isRetro(Astronomy.Body.Neptune, utcDate)),
+            mkPlanet("Pluto",     eclLon(Astronomy.Body.Pluto,   time), 0.005, isRetro(Astronomy.Body.Pluto,   utcDate)),
+            mkPlanet("Rahu",      rahu,                                 -0.053, true),
+            mkPlanet("Ketu",      ketu,                                 -0.053, true),
+            mkPlanet("Ascendant", ascDeg,                               0,     false),
+        ];
 
-        const planetsData = await planetsRes.json();
+        // Assign house numbers using equal house system (30° per house from Ascendant)
+        const planets: PlanetPosition[] = planetsRaw.map(p => ({
+            ...p,
+            house: Math.floor(((p.fullDegree - ascDeg + 360) % 360) / 30) + 1,
+        }));
 
-        // Zodiac sign mapping (0-11 index to names - using English as base keys for i18n)
-        const zodiacs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-
-        // Extract planets from the unusual structure
-        // The API returns output as an array where the first element is an object with numeric keys
-        const planetsObject = planetsData?.output?.[0] || {};
-        const planets: PlanetPosition[] = [];
-
-        // Iterate through numeric keys (0-12 are planets, 13 is ayanamsa)
-        for (let i = 0; i <= 12; i++) {
-            const planetData = planetsObject[i.toString()];
-            if (planetData && planetData.name && planetData.name !== 'ayanamsa') {
-                const fullDegree = planetData.fullDegree || 0;
-
-                // FALLBACK: Calculate sign index locally if API index is missing or out of bounds
-                let signName = "---";
-                if (zodiacs[planetData.current_sign]) {
-                    signName = zodiacs[planetData.current_sign];
-                } else {
-                    // Calculate from fullDegree (0-360)
-                    // 0-30 = Aries (0), 30-60 = Taurus (1), etc.
-                    const computedIndex = Math.floor(fullDegree / 30) % 12;
-                    signName = zodiacs[computedIndex] || "---";
-                }
-
-                planets.push({
-                    name: planetData.name,
-                    fullDegree: fullDegree,
-                    normDegree: planetData.normDegree || (fullDegree % 30),
-                    speed: planetData.speed || 0,
-                    isRetro: planetData.isRetro === "true" || planetData.isRetro === true,
-                    sign: signName,
-                    signLord: planetData.sign_lord,
-                    house: planetData.house_number || 0
-                });
-            }
-        }
-
-        // FORCE CORRECTION: Ensure Sun Sign matches local Tropical calculation
-        // The API sometimes returns incorrect signs for cusp dates
-        const correctSunSign = getZodiacSign(details.date, details.month);
+        // Force Sun sign via local tropical algorithm (guards against floating-point edge cases)
         const sunPlanet = planets.find(p => p.name === "Sun");
-        if (sunPlanet) {
-            sunPlanet.sign = correctSunSign;
-        }
+        if (sunPlanet) sunPlanet.sign = getZodiacSign(day, month);
 
-        // Calculate houses locally using Equal House system (each house = 30°)
-        // The Ascendant marks the cusp of the 1st house
-        const ascendant = planets.find(p => p.name === "Ascendant");
-        const houses: HouseCusp[] = [];
+        const houses: HouseCusp[] = Array.from({ length: 12 }, (_, i) => {
+            const deg = (ascDeg + i * 30) % 360;
+            return { house: i + 1, fullDegree: deg, normDegree: deg % 30, sign: ZODIACS[Math.floor(deg / 30) % 12] };
+        });
 
-        if (ascendant) {
-            const ascDegree = ascendant.fullDegree;
-
-            for (let i = 0; i < 12; i++) {
-                const houseDegree = (ascDegree + (i * 30)) % 360;
-                const signIndex = Math.floor(houseDegree / 30);
-
-                houses.push({
-                    house: i + 1,
-                    fullDegree: houseDegree,
-                    normDegree: houseDegree % 30,
-                    sign: zodiacs[signIndex] || "---"
-                });
-            }
-        }
-
-        const aspects = calculateAspects(planets);
-
-        return {
-            planets,
-            houses,
-            aspects
-        };
+        return { planets, houses, aspects: calculateAspects(planets) };
 
     } catch (error) {
-        console.error("Astrology API Client Error:", error);
+        console.error("Local Chart Calculation Error:", error);
         return null;
     }
 }
 
+/** Compute real-time planetary transits locally (no external API required) */
 export async function fetchDailyTransits(date = new Date()): Promise<Record<string, unknown>> {
     try {
-        // Format date as DD-MM-YYYY as required by some endpoints, or standard ISO
-        // The endpoint 'natal_transits/daily' usually takes current time if not specified, 
-        // or we might need to pass specific parameters. 
-        // Based on documentation, we'll try to POST with specific date.
+        const time = Astronomy.MakeTime(date);
 
-        const payload = {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            date: date.getDate(),
-            hours: 12, // Noon is a good standard for daily transits
-            minutes: 0,
-            seconds: 0,
-            latitude: 40.7128, // Default to a neutral location (e.g. NYC/Greenwich) as transits are geocentric roughly
-            longitude: -74.0060,
-            timezone: 0,
-            config: {
-                observation_point: "geocentric", // Transits are usually geocentric
-                ayanamsha: "tropical"
-            }
-        };
-
-        const response = await fetch(`${API_BASE_URL}/planets`, { // Using /planets for transits as it gives raw positions
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': process.env.FREE_ASTRO_API_KEY || ''
-            },
-            body: JSON.stringify(payload)
+        const mkEntry = (name: string, lon: number, retro = false) => ({
+            name,
+            fullDegree: parseFloat(lon.toFixed(4)),
+            normDegree: parseFloat((lon % 30).toFixed(4)),
+            current_sign: Math.floor(lon / 30) % 12,
+            isRetro: retro,
         });
 
-        if (!response.ok) {
-            console.error("Error fetching daily transits:", await response.text());
-            return getMockTransits(); // Fallback to avoid 500 error
-        }
+        // Moon's nodes
+        const rahu = rahuLongitude(time);
+        const ketu = (rahu + 180) % 360;
 
-        const data = await response.json();
-        return data?.output?.[0] || getMockTransits();
-
+        return {
+            "0":  mkEntry("Sun",     eclLon(Astronomy.Body.Sun,     time)),
+            "1":  mkEntry("Moon",    eclLon(Astronomy.Body.Moon,    time)),
+            "2":  mkEntry("Mars",    eclLon(Astronomy.Body.Mars,    time), isRetro(Astronomy.Body.Mars,    date)),
+            "3":  mkEntry("Mercury", eclLon(Astronomy.Body.Mercury, time), isRetro(Astronomy.Body.Mercury, date)),
+            "4":  mkEntry("Jupiter", eclLon(Astronomy.Body.Jupiter, time), isRetro(Astronomy.Body.Jupiter, date)),
+            "5":  mkEntry("Venus",   eclLon(Astronomy.Body.Venus,   time), isRetro(Astronomy.Body.Venus,   date)),
+            "6":  mkEntry("Saturn",  eclLon(Astronomy.Body.Saturn,  time), isRetro(Astronomy.Body.Saturn,  date)),
+            "7":  mkEntry("Rahu",    rahu,  true),
+            "8":  mkEntry("Ketu",    ketu,  true),
+            "9":  mkEntry("Uranus",  eclLon(Astronomy.Body.Uranus,  time), isRetro(Astronomy.Body.Uranus,  date)),
+            "10": mkEntry("Neptune", eclLon(Astronomy.Body.Neptune, time), isRetro(Astronomy.Body.Neptune, date)),
+            "11": mkEntry("Pluto",   eclLon(Astronomy.Body.Pluto,   time), isRetro(Astronomy.Body.Pluto,   date)),
+        };
     } catch (error) {
-        console.error("Fetch Daily Transits Error:", error);
+        console.error("Local Transit Calculation Error:", error);
         return getMockTransits();
     }
 }
