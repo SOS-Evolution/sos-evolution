@@ -369,26 +369,40 @@ export class OracleService {
 
         // 3. Generate with AI
         const rawJson = await this.ai.generateJson({ systemPrompt, userPrompt });
-        const content = JSON.parse(rawJson);
+        let content: Record<string, unknown>;
+        try {
+            const cleaned = rawJson.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            content = JSON.parse(cleaned);
+        } catch {
+            console.warn('Failed to parse daily horoscope JSON from AI, using structured fallback');
+            content = {
+                headline: isEn ? "Cosmic Guidance of the Day" : "Guía Cósmica del Día",
+                message: isEn
+                    ? `Today the planetary transits highlight your ${calculatedSunSign} energy, inviting reflection, grounding, and purposeful action.`
+                    : `Hoy los tránsitos planetarios activan tu energía de ${calculatedSunSign}, invitándote a la reflexión, el equilibrio y la acción consciente.`,
+                power_action: isEn ? "Dedicate 5 minutes to meditation or mindful breathing." : "Dedica 5 minutos a la meditación o respiración consciente.",
+                lucky_color: isEn ? "Violet" : "Violeta",
+                lucky_number: 7,
+            };
+        }
 
-        // 4. Save to DB
+        // 4. Save to DB (upsert to handle concurrent requests gracefully)
         const { data: saved, error: saveError } = await this.supabase
             .from('daily_horoscopes')
-            .insert([{
+            .upsert([{
                 user_id: userId,
                 date: dateStr,
                 content,
                 transits_snapshot: transitsData,
                 language: locale,
-            }])
+            }], { onConflict: 'user_id,date,language' })
             .select()
-            .single();
+            .maybeSingle();
 
         if (saveError) {
-            console.error('Error saving horoscope:', saveError);
-            throw new DatabaseError('daily_horoscopes.insert', saveError.message);
+            console.error('Non-critical: Error saving horoscope to DB:', saveError);
         }
 
-        return { content, savedId: saved.id, cost };
+        return { content, savedId: saved?.id || `daily_${dateStr}`, cost };
     }
 }

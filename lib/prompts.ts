@@ -34,7 +34,40 @@ Schema for reference:
     astro_natal_system_es: 'Eres un astrólogo evolutivo y maestro de sabiduría ancestral. Responde estrictamente en formato JSON válido.',
     astro_natal_system_en: 'You are an evolutionary astrologer and spiritual guide. Respond strictly in valid JSON format.',
     astro_natal_user_es: 'Interpreta la siguiente carta natal evolutiva.\nPlanetas: {{planetsData}}\nCasas: {{housesData}}\nAspectos: {{aspectsData}}\nResponde en JSON con: summary, core_personality, strengths, challenges, evolutionary_advice.',
-    astro_natal_user_en: 'Interpret the following evolutionary natal chart.\nPlanets: {{planetsData}}\nHouses: {{housesData}}\nAspects: {{aspectsData}}\nRespond in JSON with: summary, core_personality, strengths, challenges, evolutionary_advice.',
+    astro_natal_user_en: 'Interpret the following evolutionary natal chart.\nPlanets: {{planetsData}}\nHouses: {{housesData}}\nAspectos: {{aspectsData}}\nRespond in JSON with: summary, core_personality, strengths, challenges, evolutionary_advice.',
+    astro_daily_system_es: 'Eres SOS, un astrólogo evolutivo. Responde siempre con JSON válido.',
+    astro_daily_system_en: 'You are SOS, an evolutionary astrologer. Always respond with valid JSON.',
+    astro_daily_user_es: `Contexto: Horóscopo Evolutivo Diario para {{dateStr}}.
+Identidad del Usuario (Signo Solar): {{calculatedSunSign}}
+Contexto Natal: {{simpleNatal}}
+Tránsitos Actuales: {{simpleTransits}}
+
+Tarea: Escribe un horóscopo diario para un {{calculatedSunSign}} basado en los tránsitos actuales.
+Identifica UNA influencia planetaria mayor para hoy.
+
+Devuelve estrictamente JSON válido:
+{
+    "headline": "Título místico corto (3-6 palabras)",
+    "message": "Consejo evolutivo profundo para {{calculatedSunSign}} hoy (40-60 palabras)",
+    "power_action": "Una pequeña acción específica",
+    "lucky_color": "Un color",
+    "lucky_number": 7
+}`,
+    astro_daily_user_en: `Context: Daily Evolutionary Horoscope for {{dateStr}}.
+User Identity (Sun Sign): {{calculatedSunSign}}
+Natal Context: {{simpleNatal}}
+Current Transits: {{simpleTransits}}
+
+Task: Write a daily horoscope for {{calculatedSunSign}} based on current transits.
+
+Return strictly valid JSON:
+{
+    "headline": "Short mystical title (3-6 words)",
+    "message": "Deep evolutionary advice for {{calculatedSunSign}} today (40-60 words)",
+    "power_action": "One specific small action",
+    "lucky_color": "A color",
+    "lucky_number": 7
+}`,
 };
 
 /**

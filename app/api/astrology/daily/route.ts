@@ -85,17 +85,18 @@ export async function POST(req: Request) {
             .from('daily_transits')
             .select('planets_data')
             .eq('date', dateStr)
-            .single();
+            .maybeSingle();
 
-        if (cachedTransits) {
+        if (cachedTransits?.planets_data) {
             transitsData = cachedTransits.planets_data;
         } else {
             transitsData = await fetchDailyTransits(targetDate);
             if (transitsData) {
-                await supabase.from('daily_transits').insert([{
+                // Background/non-blocking cache save
+                supabase.from('daily_transits').upsert([{
                     date: dateStr,
                     planets_data: transitsData,
-                }]);
+                }], { onConflict: 'date' }).then();
             } else {
                 return NextResponse.json({ error: 'Error obteniendo datos astrológicos' }, { status: 500 });
             }

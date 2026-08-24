@@ -25,7 +25,10 @@ export function createAiGateway(): AiGateway {
         throw new ConfigurationError('GROQ_API_KEY no configurada');
     }
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const groq = new Groq({ 
+        apiKey: process.env.GROQ_API_KEY,
+        timeout: 10000, // 10s timeout to prevent hanging serverless functions
+    });
 
     return {
         async generateJson(params: AiCompletionParams): Promise<string> {
@@ -44,6 +47,7 @@ export function createAiGateway(): AiGateway {
                     ],
                     model,
                     temperature,
+                    max_tokens: 800,
                     response_format: { type: 'json_object' },
                 });
 
@@ -61,32 +65,29 @@ export function createAiGateway(): AiGateway {
 
                 const message = error instanceof Error ? error.message : String(error);
 
-                // Rate limit — retry with a smaller/different model
-                if (message.includes('429') || message.includes('quota') || message.includes('rate')) {
-                    console.warn('Groq rate limited, retrying with fallback model...');
-                    try {
-                        const retryCompletion = await groq.chat.completions.create({
-                            messages: [
-                                { role: 'system', content: systemPrompt },
-                                { role: 'user', content: userPrompt },
-                            ],
-                            model: 'llama-3.1-8b-instant',
-                            temperature: temperature + 0.1,
-                            response_format: { type: 'json_object' },
-                        });
+                // Rate limit or timeout — retry with lightweight instant model
+                console.warn('Groq primary model failed/timed out, retrying with fast fallback model...', message);
+                try {
+                    const retryCompletion = await groq.chat.completions.create({
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userPrompt },
+                        ],
+                        model: 'llama-3.1-8b-instant',
+                        temperature: temperature + 0.1,
+                        max_tokens: 800,
+                        response_format: { type: 'json_object' },
+                    });
 
-                        const retryContent = retryCompletion.choices[0]?.message?.content;
-                        if (!retryContent) {
-                            throw new AiProviderError('Groq-Fallback', 'Empty response from fallback model');
-                        }
-                        return retryContent;
-                    } catch (retryError: unknown) {
-                        const retryMessage = retryError instanceof Error ? retryError.message : String(retryError);
-                        throw new AiProviderError('Groq-Fallback', retryMessage);
+                    const retryContent = retryCompletion.choices[0]?.message?.content;
+                    if (!retryContent) {
+                        throw new AiProviderError('Groq-Fallback', 'Empty response from fallback model');
                     }
+                    return retryContent;
+                } catch (retryError: unknown) {
+                    const retryMessage = retryError instanceof Error ? retryError.message : String(retryError);
+                    throw new AiProviderError('Groq-Fallback', retryMessage);
                 }
-
-                throw new AiProviderError('Groq', message);
             }
         },
     };

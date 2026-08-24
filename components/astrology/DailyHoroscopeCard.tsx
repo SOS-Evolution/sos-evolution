@@ -63,30 +63,35 @@ export default function DailyHoroscopeCard() {
                 body: JSON.stringify({ locale })
             });
 
-            const result = await res.json();
+            let result: DailyHoroscopeData & { error?: string } | null = null;
+            try {
+                result = await res.json();
+            } catch {
+                throw new Error(t('error_desc') || 'Error al comunicarse con el servidor. Intenta nuevamente.');
+            }
 
             if (!res.ok) {
                 if (res.status === 402) {
                     toast.error(t('insufficient_aura'), {
                         description: t('insufficient_aura_desc')
                     });
-                    // Open credits modal (optional)
                     return;
                 }
-                throw new Error(result.error || t('error_desc'));
+                throw new Error(result?.error || t('error_desc'));
             }
 
-            setData(result);
-            if (result.creditsUsed && result.creditsUsed > 0) {
-                toast.success(t('revealed'), {
-                    description: t('revealed_desc', { cost: result.creditsUsed })
-                });
-                // TODO: Update global balance context if available
-                router.refresh();
-            } else if (result.alreadyExists) {
-                toast.info(t('recovered'), {
-                    description: t('recovered_desc')
-                });
+            if (result) {
+                setData(result);
+                if (result.creditsUsed && result.creditsUsed > 0) {
+                    toast.success(t('revealed'), {
+                        description: t('revealed_desc', { cost: result.creditsUsed })
+                    });
+                    router.refresh();
+                } else if (result.alreadyExists) {
+                    toast.info(t('recovered'), {
+                        description: t('recovered_desc')
+                    });
+                }
             }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
