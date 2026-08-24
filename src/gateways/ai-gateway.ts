@@ -36,7 +36,7 @@ export function createAiGateway(): AiGateway {
                 systemPrompt,
                 userPrompt,
                 temperature = 0.7,
-                model = 'llama-3.3-70b-versatile',
+                model = 'openai/gpt-oss-120b', // Modelo insignia actual en Groq con gran profundidad analítica
             } = params;
 
             try {
@@ -47,7 +47,7 @@ export function createAiGateway(): AiGateway {
                     ],
                     model,
                     temperature,
-                    max_tokens: 800,
+                    max_tokens: 1200,
                     response_format: { type: 'json_object' },
                 });
 
@@ -65,17 +65,17 @@ export function createAiGateway(): AiGateway {
 
                 const message = error instanceof Error ? error.message : String(error);
 
-                // Rate limit or timeout — retry with lightweight instant model
-                console.warn('Groq primary model failed/timed out, retrying with fast fallback model...', message);
+                // Rate limit, timeout or error — retry with ultra-fast fallback model
+                console.warn('Groq primary model failed/timed out, retrying with fast fallback model (gpt-oss-20b)...', message);
                 try {
                     const retryCompletion = await groq.chat.completions.create({
                         messages: [
                             { role: 'system', content: systemPrompt },
                             { role: 'user', content: userPrompt },
                         ],
-                        model: 'llama-3.1-8b-instant',
+                        model: 'openai/gpt-oss-20b', // Fallback ultrarrápido (<600ms)
                         temperature: temperature + 0.1,
-                        max_tokens: 800,
+                        max_tokens: 1000,
                         response_format: { type: 'json_object' },
                     });
 
