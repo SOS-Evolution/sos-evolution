@@ -40,6 +40,10 @@ export const routing = defineRouting({
             en: '/purchase',
             es: '/comprar'
         },
+        '/credits/success': {
+            en: '/credits/success',
+            es: '/creditos/exito'
+        },
         '/login': '/login',
         '/dashboard/profile': '/dashboard/profile',
         '/dashboard/profile/reset-password': '/dashboard/profile/reset-password'

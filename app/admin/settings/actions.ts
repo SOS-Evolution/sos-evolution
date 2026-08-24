@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { invalidatePromptCache } from "@/lib/prompts";
 
 export async function getSystemSettings() {
     const supabase = await createClient();
@@ -30,6 +31,7 @@ export async function updateSystemSetting(key: string, value: unknown) {
         throw new Error(`Failed to update setting ${key}: ${error.message}`);
     }
 
+    invalidatePromptCache();
     revalidatePath("/admin/settings");
     revalidatePath("/", "layout"); // Revalidar todo para que el cambio de marco se refleje
 
@@ -64,10 +66,11 @@ export async function updateReadingTypeCost(id: string, cost: number) {
     }
 
     revalidatePath("/admin/settings");
-    revalidatePath("/(locale)/dashboard", "page");
-    revalidatePath("/(locale)/astrology", "page");
-    revalidatePath("/(locale)/numerology", "page");
-    revalidatePath("/(locale)/tarot", "page");
+    revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/astrology", "page");
+    revalidatePath("/[locale]/numerology", "page");
+    revalidatePath("/[locale]/tarot", "page");
+    revalidatePath("/", "layout");
 
     return { success: true };
 }

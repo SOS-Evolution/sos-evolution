@@ -15,8 +15,8 @@ export default function GlowingBorderCard({
 }: GlowingBorderCardProps) {
     const glowColors: Record<string, string> = {
         purple: "from-purple-500 via-indigo-500 to-purple-500",
-        cyan: "from-cyan-500 via-blue-500 to-cyan-500",
-        gold: "from-amber-500 via-yellow-500 to-amber-500",
+        cyan: "from-cyan-500 via-teal-500 to-cyan-500",
+        gold: "from-amber-500 via-yellow-400 to-amber-500",
     };
 
     return (

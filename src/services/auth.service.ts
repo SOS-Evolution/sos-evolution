@@ -6,11 +6,7 @@ import { AuthenticationError } from '@/src/domain/errors';
  * @throws AuthenticationError if the request is not authenticated.
  */
 export async function requireAuth(supabase: SupabaseClient) {
-    // PERFORMANCE: getSession() lee JWT local (0 latencia de red).
-    // NOTA: Ignoramos el warning de SSR de Supabase para evitar 
-    // latencias extremas y congelamientos de la UI de hasta 15 segundos.
-    const { data: { session }, error } = await supabase.auth.getSession();
-    const user = session?.user;
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
         throw new AuthenticationError();

@@ -11,16 +11,14 @@ import { NextResponse } from 'next/server';
 export async function getAdminUser() {
     const supabase = await createClient();
 
-    // Single call: get session (uses local JWT, very fast)
-    // Se ignora el warning de Supabase SSR a favor del rendimiento en MS.
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    const user = session?.user;
+    // Validar criptográficamente la sesión del usuario con el servidor de Supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
         return { error: NextResponse.json({ error: 'Unauthorized', details: authError?.message }, { status: 401 }) };
     }
 
-    // Single DB call: check role from profiles table (fast indexed lookup by PK)
+    // Consulta indexada rápida a profiles para verificar rol de admin
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')

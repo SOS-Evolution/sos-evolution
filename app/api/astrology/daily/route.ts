@@ -14,9 +14,11 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const locale = searchParams.get('locale') || 'es';
+        const clientDate = searchParams.get('date');
 
-        const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+        const dateStr = (clientDate && /^\d{4}-\d{2}-\d{2}$/.test(clientDate))
+            ? clientDate
+            : new Date().toISOString().split('T')[0];
 
         const { data: existingHoroscope } = await supabase
             .from('daily_horoscopes')
@@ -45,10 +47,13 @@ export async function POST(req: Request) {
         const oracle = new OracleService(supabase);
 
         const body = await req.json().catch(() => ({}));
-        const { locale = 'es' } = body;
+        const { locale = 'es', date: customDate } = body;
 
-        const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+        const dateStr = (customDate && /^\d{4}-\d{2}-\d{2}$/.test(customDate))
+            ? customDate
+            : new Date().toISOString().split('T')[0];
+
+        const targetDate = new Date(`${dateStr}T12:00:00Z`);
 
         // 1. Check if already generated today
         const { data: existingHoroscope } = await supabase
@@ -83,7 +88,7 @@ export async function POST(req: Request) {
         if (cachedTransits) {
             transitsData = cachedTransits.planets_data;
         } else {
-            transitsData = await fetchDailyTransits(today);
+            transitsData = await fetchDailyTransits(targetDate);
             if (transitsData) {
                 await supabase.from('daily_transits').insert([{
                     date: dateStr,

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e9d5ff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="triGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <filter id="blur1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+    </filter>
+    <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Outer glow -->
+  <circle cx="50" cy="50" r="46" fill="url(#glow)"/>
+
+  <!-- Outer ring -->
+  <circle cx="50" cy="50" r="44" stroke="url(#triGrad)" stroke-width="0.6" opacity="0.5"/>
+
+  <!-- Inner ring -->
+  <circle cx="50" cy="50" r="38" stroke="url(#triGrad)" stroke-width="0.4" opacity="0.3" stroke-dasharray="3 2"/>
+
+  <!-- Triangle glow (blurred duplicate) -->
+  <polygon points="50,14 82,72 18,72" stroke="#a78bfa" stroke-width="2.5" fill="none" opacity="0.25" filter="url(#blur1)"/>
+
+  <!-- Triangle main -->
+  <polygon points="50,14 82,72 18,72" stroke="url(#triGrad)" stroke-width="1.2" fill="none" opacity="0.9"/>
+
+  <!-- Triangle inner lines -->
+  <line x1="50" y1="14" x2="50" y2="72" stroke="url(#triGrad)" stroke-width="0.4" opacity="0.4"/>
+  <line x1="18" y1="72" x2="66" y2="43" stroke="url(#triGrad)" stroke-width="0.4" opacity="0.4"/>
+  <line x1="82" y1="72" x2="34" y2="43" stroke="url(#triGrad)" stroke-width="0.4" opacity="0.4"/>
+
+  <!-- Center star / spark glow -->
+  <circle cx="50" cy="48" r="6" fill="#7c3aed" opacity="0.3" filter="url(#blur1)"/>
+
+  <!-- Center star -->
+  <polygon points="50,42 51.5,47 57,47 52.5,50.5 54,56 50,52.5 46,56 47.5,50.5 43,47 48.5,47" fill="url(#triGrad)" opacity="0.95"/>
+
+  <!-- Corner dots -->
+  <circle cx="50" cy="14" r="1.5" fill="#e9d5ff" opacity="0.9"/>
+  <circle cx="82" cy="72" r="1.5" fill="#fbbf24" opacity="0.9"/>
+  <circle cx="18" cy="72" r="1.5" fill="#a78bfa" opacity="0.9"/>
+</svg>

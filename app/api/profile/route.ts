@@ -66,9 +66,9 @@ export async function PUT(req: Request) {
         const isBirthDataChanged = body.birth_date || body.birth_time || body.birth_place || body.latitude !== undefined || body.longitude !== undefined;
 
         if (body.birth_date) {
-            const date = new Date(body.birth_date);
+            const [, m, d] = body.birth_date.split('-').map(Number);
             updates.life_path_number = getLifePathNumber(body.birth_date);
-            updates.zodiac_sign = getZodiacSign(date.getDate(), date.getMonth() + 1);
+            updates.zodiac_sign = getZodiacSign(d, m);
         }
 
         if (isBirthDataChanged) {

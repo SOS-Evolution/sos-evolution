@@ -28,26 +28,24 @@ export async function POST(req: Request) {
         const { cost, readingType } = await oracle.resolveReadingType(readingTypeCode);
         await billing.ensureSufficientBalance(user.id, cost);
 
-        // 3. Generate readings (AI + DB save) in parallel or sequentially
-        const readings = [];
+        // 3. Generate readings (AI + DB save) in parallel for ultra-fast performance
+        const generatedResults = await Promise.all(
+            cardsToProcess.map((currentCardIndex, i) => {
+                const currentPosition = positionsToProcess[i] || position;
+                return oracle.generateTarotReading(user.id, {
+                    question,
+                    cardIndex: currentCardIndex,
+                    readingTypeCode,
+                    position: currentPosition,
+                    locale,
+                });
+            })
+        );
 
-        for (let i = 0; i < cardsToProcess.length; i++) {
-            const currentCardIndex = cardsToProcess[i];
-            const currentPosition = positionsToProcess[i] || position;
-
-            const result = await oracle.generateTarotReading(user.id, {
-                question,
-                cardIndex: currentCardIndex,
-                readingTypeCode,
-                position: currentPosition,
-                locale,
-            });
-
-            readings.push({
-                ...result.reading,
-                id: result.savedId,
-            });
-        }
+        const readings = generatedResults.map(result => ({
+            ...result.reading,
+            id: result.savedId,
+        }));
 
         // 4. Spend credits ONCE for the entire session
         const newBalance = await billing.spendCredits(
