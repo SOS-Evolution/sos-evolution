@@ -91,14 +91,15 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
             .catch(err => console.error("Error fetching credits:", err));
 
         // Check for Daily Rewards (only if profile is complete / not in onboarding)
-        // sessionStorage guard: only call ONCE per browser tab session
+        // localStorage guard: only call ONCE per day on client side
         const profileComplete = initialProfile?.full_name && initialProfile?.birth_date && initialProfile?.gender;
-        const dailyCheckKey = 'daily_reward_checked';
-        const alreadyChecked = sessionStorage.getItem(dailyCheckKey);
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dailyCheckKey = `daily_reward_checked_${todayStr}`;
+        const alreadyChecked = typeof window !== 'undefined' ? localStorage.getItem(dailyCheckKey) : null;
 
         if (profileComplete && !alreadyChecked) {
             // Mark BEFORE the fetch to prevent any race conditions (React Strict Mode, double mount, etc.)
-            sessionStorage.setItem(dailyCheckKey, 'true');
+            localStorage.setItem(dailyCheckKey, 'true');
 
             fetch('/api/missions/daily', { method: 'POST' })
                 .then(res => res.json())
@@ -129,8 +130,8 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                     }
                 })
                 .catch(err => {
-                    // Si falla, limpiar la marca para que pueda reintentar
-                    sessionStorage.removeItem(dailyCheckKey);
+                    // Si falla por error de red, limpiar la marca para que pueda reintentar
+                    localStorage.removeItem(dailyCheckKey);
                     console.error("Error checking daily reward:", err);
                 });
         }
