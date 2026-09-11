@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, Suspense } from "react";
 import { TarotCard, DECK } from "@/components/features/tarot/TarotCard";
 import TarotDeck from "@/components/features/tarot/TarotDeck";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { ReadingData } from "@/types";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { Link } from "@/i18n/routing";
 import { Input } from "@/components/ui/input";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
@@ -24,8 +24,9 @@ interface CardReadingData extends ReadingData {
   position?: string; // Para tiradas multi-carta
 }
 
-export default function ReadingPage() {
+function ReadingPageContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const t = useTranslations("TarotPage");
   const [step, setStep] = useState<Step>("selection");
   const [selectedMode, setSelectedMode] = useState<ReadingMode>("daily");
@@ -96,6 +97,14 @@ export default function ReadingPage() {
       default: return 1;
     }
   }, [selectedMode]);
+
+  // Auto-detect mode from URL query parameter (?mode=daily | classic | cross | question)
+  useEffect(() => {
+    const modeParam = searchParams.get("mode") as ReadingMode | null;
+    if (modeParam && ["daily", "classic", "cross", "question"].includes(modeParam)) {
+      setPendingMode(modeParam);
+    }
+  }, [searchParams]);
 
   // Queue pending mode if data still loading — auto-enter once loaded
   useEffect(() => {
@@ -870,5 +879,20 @@ export default function ReadingPage() {
         />
       </div>
     </LayoutGroup>
+  );
+}
+
+export default function ReadingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0b0514] flex flex-col items-center justify-center text-amber-300 gap-3">
+          <Sparkles className="w-8 h-8 animate-spin" />
+          <span className="font-serif tracking-widest text-sm uppercase">Sintonizando el Oráculo...</span>
+        </div>
+      }
+    >
+      <ReadingPageContent />
+    </Suspense>
   );
 }

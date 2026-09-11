@@ -1,37 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link } from "@/i18n/routing";
-import {
-    Trophy,
-    Sparkles,
-    Star,
-    BookOpen,
-    ChevronRight,
-    Hash,
-    Layers,
-    ArrowRight,
-    Lock,
-    Wand2
-} from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { unlockFeature } from "@/app/[locale]/dashboard/actions";
 import { getReadingTypes } from "@/app/admin/settings/actions";
-import { Card } from "@/components/ui/card";
-import UserProfile from "@/components/dashboard/UserProfile";
-import AnimatedSection from "@/components/landing/AnimatedSection";
-import CreditsDisplay from "@/components/dashboard/CreditsDisplay";
-import CardStats from "@/components/dashboard/CardStats";
-import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
+import CelestialHero from "@/components/dashboard/CelestialHero";
+import CosmicEnergyBar from "@/components/dashboard/CosmicEnergyBar";
+import RitualPortals from "@/components/dashboard/RitualPortals";
+import DailyHoroscopeCard from "@/components/astrology/DailyHoroscopeCard";
 import OnboardingModal from "@/components/dashboard/OnboardingModal";
-import { useTranslations } from 'next-intl';
-import { getLifePathNumber, getZodiacSign } from "@/lib/soul-math";
+import TransactionModal from "@/components/dashboard/TransactionModal";
 import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal";
-
-import { Profile, CardStat, ReadingType } from "@/types";
-import { User } from "@supabase/supabase-js";
+import RewardPopup from "@/components/dashboard/RewardPopup";
+import AnimatedSection from "@/components/landing/AnimatedSection";
+import { useTranslations } from "next-intl";
+import { getLifePathNumber, getZodiacSign } from "@/lib/soul-math";
+import type { Profile, CardStat, ReadingType } from "@/types";
+import type { User } from "@supabase/supabase-js";
+import { Sun } from "lucide-react";
 
 interface DashboardClientProps {
     profile: Profile | null;
@@ -39,20 +25,16 @@ interface DashboardClientProps {
     user: User | null;
 }
 
-import TransactionModal from "@/components/dashboard/TransactionModal";
-
-
-
-import RewardPopup from "@/components/dashboard/RewardPopup";
-
-export default function DashboardClient({ profile: initialProfile, stats, user }: DashboardClientProps) {
-    const t = useTranslations('Dashboard');
-    const tz = useTranslations('Zodiac');
-    const tn = useTranslations('Numerology');
+export default function DashboardClient({
+    profile: initialProfile,
+    stats,
+    user
+}: DashboardClientProps) {
+    const t = useTranslations("Dashboard");
     const [profile, setProfile] = useState(initialProfile);
     const [isEditingManual, setIsEditingManual] = useState(false);
     const [readingCosts, setReadingCosts] = useState<{ [key: string]: number }>({});
-    const [balance, setBalance] = useState<number>(0);
+    const [balance, setBalance] = useState<number | null>(null);
     const [insufficientAuraModalOpen, setInsufficientAuraModalOpen] = useState(false);
     const [neededAmount, setNeededAmount] = useState(50);
 
@@ -81,81 +63,92 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         loadCosts();
 
         // Fetch initial balance
-        fetch('/api/credits')
-            .then(res => res.json())
-            .then(data => {
-                if (data && typeof data.balance === 'number') {
+        fetch("/api/credits")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data && typeof data.balance === "number") {
                     setBalance(data.balance);
                 }
             })
-            .catch(err => console.error("Error fetching credits:", err));
+            .catch((err) => console.error("Error fetching credits:", err));
 
-        // Check for Daily Rewards (only if profile is complete / not in onboarding)
-        // localStorage guard: only call ONCE per day on client side
-        const profileComplete = initialProfile?.full_name && initialProfile?.birth_date && initialProfile?.gender;
-        const todayStr = new Date().toISOString().split('T')[0];
+        // Check for Daily Rewards (only if profile is complete)
+        const profileComplete =
+            initialProfile?.full_name &&
+            initialProfile?.birth_date &&
+            initialProfile?.gender;
+        const todayStr = new Date().toISOString().split("T")[0];
         const dailyCheckKey = `daily_reward_checked_${todayStr}`;
-        const alreadyChecked = typeof window !== 'undefined' ? localStorage.getItem(dailyCheckKey) : null;
+        const alreadyChecked =
+            typeof window !== "undefined"
+                ? localStorage.getItem(dailyCheckKey)
+                : null;
 
         if (profileComplete && !alreadyChecked) {
-            // Mark BEFORE the fetch to prevent any race conditions (React Strict Mode, double mount, etc.)
-            localStorage.setItem(dailyCheckKey, 'true');
+            localStorage.setItem(dailyCheckKey, "true");
 
-            fetch('/api/missions/daily', { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
+            fetch("/api/missions/daily", { method: "POST" })
+                .then((res) => res.json())
+                .then((data) => {
                     if (data.success && data.rewarded) {
-                        // Fetch the precise new balance and dispatch global event to sync Navbar
-                        fetch('/api/credits')
-                            .then(r => r.json())
-                            .then(creditData => {
-                                if (creditData && typeof creditData.balance === 'number') {
+                        fetch("/api/credits")
+                            .then((r) => r.json())
+                            .then((creditData) => {
+                                if (
+                                    creditData &&
+                                    typeof creditData.balance === "number"
+                                ) {
                                     setBalance(creditData.balance);
-                                    window.dispatchEvent(new CustomEvent('credits-updated', {
-                                        detail: { newBalance: creditData.balance }
-                                    }));
+                                    window.dispatchEvent(
+                                        new CustomEvent("credits-updated", {
+                                            detail: {
+                                                newBalance: creditData.balance
+                                            }
+                                        })
+                                    );
                                 }
                             });
 
-                        // Show Popup
                         setRewardPopup({
                             isOpen: true,
-                            title: data.is_milestone ? "¡Racha de 3 Días!" : "Recompensa Diaria",
+                            title: data.is_milestone
+                                ? "¡Racha de 3 Días!"
+                                : "Recompensa Diaria",
                             description: data.is_milestone
-                                ? "Tu constancia ha sido recompensada por el universo."
+                                ? "Tu constancia ha sido recompensada por el cosmos."
                                 : "Gracias por volver a conectar con tu esencia hoy.",
                             credits: data.credits,
                             icon: data.is_milestone ? "🔥" : "✨"
                         });
                     }
                 })
-                .catch(err => {
-                    // Si falla por error de red, limpiar la marca para que pueda reintentar
+                .catch((err) => {
                     localStorage.removeItem(dailyCheckKey);
                     console.error("Error checking daily reward:", err);
                 });
         }
 
-        // Global event listener for rewards (triggered by other components)
+        // Global event listener for rewards
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleReward = (e: any) => {
             if (e.detail) {
                 setRewardPopup({
                     isOpen: true,
                     title: e.detail.title || "¡Misión Completada!",
-                    description: e.detail.description || "Has desbloqueado un nuevo logro en tu camino.",
+                    description:
+                        e.detail.description ||
+                        "Has desbloqueado un nuevo logro en tu camino.",
                     credits: e.detail.credits || 0,
                     icon: e.detail.icon || "🎯"
                 });
-                // Update balance if provided
                 if (e.detail.newBalance) {
                     setBalance(e.detail.newBalance);
                 } else if (e.detail.credits) {
-                    setBalance(prev => prev + e.detail.credits);
+                    setBalance((prev) => (prev ?? 0) + e.detail.credits);
                 }
             }
         };
-        window.addEventListener('mission-completed', handleReward);
+        window.addEventListener("mission-completed", handleReward);
 
         // Sync balance updates
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,14 +157,13 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
                 setBalance(e.detail.newBalance);
             }
         };
-        window.addEventListener('credits-updated', handleUpdate);
+        window.addEventListener("credits-updated", handleUpdate);
 
         return () => {
-            window.removeEventListener('credits-updated', handleUpdate);
-            window.removeEventListener('mission-completed', handleReward);
+            window.removeEventListener("credits-updated", handleUpdate);
+            window.removeEventListener("mission-completed", handleReward);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [initialProfile]);
 
     // Transaction Modal State
     const [transactionModalOpen, setTransactionModalOpen] = useState(false);
@@ -179,34 +171,26 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
     const [transactionLoading, setTransactionLoading] = useState(false);
 
     const unlockedFeatures = profile?.unlocked_features || [];
-
-    // Verificamos si el perfil está completo
-    const isComplete = profile?.full_name && profile?.birth_date && profile?.gender;
-
-    // Mostrar modal si no está completo O si el usuario hizo clic en editar
+    const isComplete = Boolean(
+        profile?.full_name && profile?.birth_date && profile?.gender
+    );
     const showModal = !isComplete || isEditingManual;
 
-    // Cálculos Astrológicos dinámicos
+    // Calculations
     let zodiacSign = "---";
     let lifePathNum = 0;
-    let lifePathWord = "---";
 
     if (profile?.birth_date) {
-        const [, m, d] = profile.birth_date.split('-').map(Number);
+        const [, m, d] = profile.birth_date.split("-").map(Number);
         zodiacSign = getZodiacSign(d, m);
         lifePathNum = getLifePathNumber(profile.birth_date);
-        if (lifePathNum > 0) {
-            lifePathWord = tn(`${lifePathNum}.powerWord`);
-        }
     }
 
-    // ABRIR MODAL DE CONFIRMACIÓN
     const handleUnlockClick = (feature: string) => {
         setSelectedFeature(feature);
         setTransactionModalOpen(true);
     };
 
-    // EJECUTAR DESBLOQUEO (CONFIRMADO)
     const handleConfirmUnlock = async () => {
         if (!selectedFeature) return;
 
@@ -214,24 +198,38 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         try {
             const result = await unlockFeature(selectedFeature);
             if (result.success) {
-                toast.success(t('transaction.success', {
-                    feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
-                }));
+                toast.success(
+                    t("transaction.success", {
+                        feature:
+                            selectedFeature === "astrology"
+                                ? t("astrology.title")
+                                : t("numerology.title")
+                    })
+                );
                 setProfile((prev: Profile | null) => {
                     if (!prev) return prev;
                     return {
                         ...prev,
-                        unlocked_features: [...(prev.unlocked_features || []), selectedFeature]
+                        unlocked_features: [
+                            ...(prev.unlocked_features || []),
+                            selectedFeature
+                        ]
                     };
                 });
-                // Dispatch event to update CreditsDisplay
-                window.dispatchEvent(new CustomEvent('credits-updated', {
-                    detail: { newBalance: result.newBalance }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent("credits-updated", {
+                        detail: { newBalance: result.newBalance }
+                    })
+                );
                 setTransactionModalOpen(false);
             } else {
-                if (result.error && result.error.includes("Insufficient credits")) {
-                    setNeededAmount(readingCosts[`unlock_${selectedFeature}`] ?? 50);
+                if (
+                    result.error &&
+                    result.error.includes("Insufficient credits")
+                ) {
+                    setNeededAmount(
+                        readingCosts[`unlock_${selectedFeature}`] ?? 50
+                    );
                     setInsufficientAuraModalOpen(true);
                     setTransactionModalOpen(false);
                 } else {
@@ -245,318 +243,117 @@ export default function DashboardClient({ profile: initialProfile, stats, user }
         }
     };
 
-    const FeatureCard = ({ feature, href, color, icon, title, description, badge }: {
-        feature: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        href: any;
-        color: string;
-        icon: React.ReactNode;
-        title: string;
-        description: string;
-        badge?: string | null;
-    }) => {
-        const isUnlocked = unlockedFeatures.includes(feature);
-
-        // Ya no usamos el estado local 'unlocking' para el loader del botón de la tarjeta
-        // porque el loader ahora está en el modal.
-
-        const content = (
-            <GlowingBorderCard className="h-full overflow-hidden relative group" glowColor={color}>
-                {/* Contenido Principal (Ahora siempre visible para mostrar el "sample") */}
-                <div className={`flex h-full min-h-[140px] transition-all duration-300 ${!isUnlocked ? 'opacity-80' : ''}`}>
-                    {/* Sector Izquierdo: Icono */}
-                    <div className={`w-1/3 bg-${color}-500/10 border-r border-${color}-500/20 flex items-center justify-center group-hover:bg-${color}-500/20 transition-colors relative`}>
-                        <div className={`absolute inset-0 bg-${color}-500/5 group-hover:bg-${color}-500/10 blur-xl transition-colors`} />
-                        {icon}
-                    </div>
-
-                    {/* Sector Derecho: Contenido */}
-                    <div className="flex-1 p-6 pr-10 pt-4 pb-8 flex flex-col justify-start relative">
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400/50 group-hover:text-indigo-300 group-hover:translate-x-1 transition-all duration-300">
-                            {isUnlocked ? (
-                                <ChevronRight className="w-8 h-8" strokeWidth={2.5} />
-                            ) : (
-                                <Lock className="w-5 h-5 text-slate-500" strokeWidth={2} />
-                            )}
-                        </div>
-                        <h3 className={`text-xs font-bold text-${color}-300 uppercase tracking-widest mb-1.5 flex items-center gap-2`}>
-                            {title}
-                        </h3>
-                        <div className="text-xl font-serif font-bold text-white group-hover:text-indigo-200 transition-colors truncate">
-                            {badge}
-                        </div>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                            {description}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Overlay de Sombra y Botón de Desbloqueo */}
-                {!isUnlocked && (
-                    <>
-                        <div className="absolute inset-0 bg-slate-950/10 pointer-events-none z-10" />
-                        <div className="absolute bottom-3 right-3 z-20 flex items-center justify-end">
-                            <Button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleUnlockClick(feature);
-                                }}
-                                variant="secondary"
-                                className="bg-purple-600 hover:bg-purple-500 text-white border-none shadow-2xl h-10 px-4 font-bold rounded-full transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Wand2 className="w-3.5 h-3.5 text-purple-200" />
-                                    <span className="text-xs uppercase tracking-wider font-bold">{t('unlock_button')}</span>
-                                </div>
-                                <div className="bg-yellow-500 text-black text-xs px-3 py-1 rounded-full font-black flex items-center justify-center gap-1.5 border border-yellow-400 shadow-[0_2px_5px_rgba(234,179,8,0.2)]">
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    <span className="leading-none pt-[1px]">{readingCosts[`unlock_${feature}`] ?? 50}</span>
-                                </div>
-                            </Button>
-                        </div>
-                    </>
-                )}
-            </GlowingBorderCard>
-        );
-
-        if (isUnlocked) {
-            return <Link href={href} className="block group h-full">{content}</Link>;
-        }
-        return (
-            <div
-                className="block h-full cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
-                onClick={() => handleUnlockClick(feature)}
-            >
-                {content}
-            </div>
-        );
-    };
-
     return (
-        <div className="min-h-screen text-slate-100 pb-20 relative overflow-hidden">
-            {/* Overlay de Bloqueo si no está completo */}
+        <div className="min-h-screen text-slate-100 pb-24 relative overflow-hidden">
+            {/* Background Celestial Mist and Orbs (Tarotoo style deep purple & gold) */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-900/15 rounded-full blur-[140px] animate-pulse" />
+                <div className="absolute top-[30%] left-[-10%] w-[450px] h-[450px] bg-amber-600/10 rounded-full blur-[130px] animate-pulse delay-1000" />
+                <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-indigo-900/15 rounded-full blur-[120px]" />
+                <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-30" />
+            </div>
+
+            {/* Overlay if profile is not completed */}
             {!isComplete && (
-                <div className="fixed inset-0 z-[90] bg-slate-950/40 backdrop-blur-[2px]" />
+                <div className="fixed inset-0 z-[90] bg-slate-950/50 backdrop-blur-[3px]" />
             )}
 
+            {/* Onboarding / Edit Profile Modal */}
             {showModal && (
                 <OnboardingModal
                     initialData={profile}
                     isEdit={isEditingManual}
-                    astrologyUnlockCost={readingCosts['unlock_astrology'] ?? 50}
+                    astrologyUnlockCost={readingCosts["unlock_astrology"] ?? 50}
                     onComplete={(updatedProfile) => {
                         setProfile(updatedProfile);
                         setIsEditingManual(false);
-                        // Force hard reload to clear all caches (server + client + interpretations)
-                        // location.reload() ensures browser doesn't serve cached pages
                         setTimeout(() => {
                             window.location.reload();
                         }, 500);
                     }}
-                    onClose={isComplete ? () => setIsEditingManual(false) : undefined}
+                    onClose={
+                        isComplete ? () => setIsEditingManual(false) : undefined
+                    }
                 />
             )}
 
-            {/* MODAL DE TRANSACCIÓN */}
+            {/* Transaction Confirmation Modal */}
             <TransactionModal
                 isOpen={transactionModalOpen}
                 onClose={() => setTransactionModalOpen(false)}
                 onConfirm={handleConfirmUnlock}
-                title={t('transaction.title')}
-                description={t('transaction.description', {
-                    feature: selectedFeature === 'astrology' ? t('astrology.title') : t('numerology.title')
+                title={t("transaction.title")}
+                description={t("transaction.description", {
+                    feature:
+                        selectedFeature === "astrology"
+                            ? t("astrology.title")
+                            : t("numerology.title")
                 })}
-                cost={50}
+                cost={readingCosts[`unlock_${selectedFeature}`] ?? 50}
                 loading={transactionLoading}
-                confirmText={t('transaction.confirm')}
-                cancelText={t('transaction.cancel')}
+                confirmText={t("transaction.confirm")}
+                cancelText={t("transaction.cancel")}
             />
 
+            {/* Insufficient Aura Modal */}
             <InsufficientAuraModal
                 isOpen={insufficientAuraModalOpen}
                 onClose={() => setInsufficientAuraModalOpen(false)}
                 requiredAmount={neededAmount}
-                currentBalance={balance}
+                currentBalance={balance ?? 0}
             />
 
+            {/* Daily Reward / Milestone Popup */}
             <RewardPopup
                 isOpen={rewardPopup.isOpen}
-                onClose={() => setRewardPopup(prev => ({ ...prev, isOpen: false }))}
+                onClose={() =>
+                    setRewardPopup((prev) => ({ ...prev, isOpen: false }))
+                }
                 title={rewardPopup.title}
                 description={rewardPopup.description}
                 credits={rewardPopup.credits}
                 icon={rewardPopup.icon}
             />
 
-            {/* Fondo animado */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-900/10 rounded-full blur-[100px] animate-pulse" />
-                <div className="absolute top-[40%] left-[20%] w-[20%] h-[20%] bg-indigo-900/10 rounded-full blur-[80px] animate-pulse delay-1000" />
-            </div>
-
-            <main className="max-w-6xl mx-auto p-6 relative z-10 space-y-4">
-
-                {/* FILA 1: NUEVA DISTRIBUCIÓN */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-10 space-y-8">
+                {/* 1. HERO CELESTIAL & COORDENADAS NATALES */}
                 <AnimatedSection delay={0.1}>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <CelestialHero
+                        profile={profile}
+                        fullName={
+                            profile?.full_name ||
+                            user?.user_metadata?.full_name
+                        }
+                        onEditProfile={() => setIsEditingManual(true)}
+                    />
+                </AnimatedSection>
 
-                        {/* COLUMNA IZQUIERDA (2/3): Saldo + Misiones + Identidad */}
-                        <div className="lg:col-span-2 flex flex-col gap-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <CreditsDisplay />
+                {/* 2. BARRA DE ENERGÍA SAGRADA & ARCANO GUARDIÁN */}
+                <AnimatedSection delay={0.2}>
+                    <CosmicEnergyBar balance={balance} stats={stats} />
+                </AnimatedSection>
 
-                                <Link href="/missions" className="block group h-full">
-                                    <Card className="h-full bg-gradient-to-br from-amber-950/80 to-slate-900 border-yellow-500/20 p-4 relative overflow-hidden group transition-all hover:border-yellow-500/40">
-                                        <div className="absolute top-1/2 -translate-y-1/2 right-0 p-3 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110 group-hover:rotate-12 duration-500">
-                                            <Trophy className="w-16 h-16 text-yellow-500" />
-                                        </div>
-
-                                        <div className="relative z-10">
-                                            <div className="flex items-center gap-2 mb-1 text-yellow-500/80">
-                                                <Trophy className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] uppercase tracking-wider font-bold">{t('rewards')}</span>
-                                            </div>
-
-                                            <div className="text-3xl font-serif font-bold text-white group-hover:text-yellow-101 transition-colors">
-                                                {t('missions')}
-                                            </div>
-
-                                            <div className="mt-4 flex items-center gap-1.5 text-yellow-500/60 group-hover:text-yellow-500/80 transition-colors">
-                                                <Sparkles className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] uppercase tracking-wider font-bold">{t('gain_aura')}</span>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </Link>
-                            </div>
-                            <UserProfile
-                                user={user}
-                                profile={profile}
-                                onEdit={() => setIsEditingManual(true)}
-                                className="flex-1"
-                            />
+                {/* 3. WIDGET DE HORÓSCOPO EVOLUTIVO DIARIO */}
+                <AnimatedSection delay={0.25}>
+                    <div className="rounded-3xl border border-amber-500/20 bg-gradient-to-r from-[#1c112e]/90 via-[#130b20]/95 to-[#1c112e]/90 p-5 md:p-6 backdrop-blur-xl shadow-lg relative overflow-hidden">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-400 mb-3">
+                            <Sun className="w-4 h-4 text-amber-400" />
+                            <span>Mensaje Evolutivo del Día</span>
                         </div>
-
-                        {/* COLUMNA DERECHA (1/3): Afinididad de Arcano (Altura Completa) */}
-                        <div className="lg:col-span-1">
-                            <CardStats stats={stats} className="h-full" />
-                        </div>
-
+                        <DailyHoroscopeCard />
                     </div>
                 </AnimatedSection>
 
-
-                {/* SECCIÓN: PANEL DE CONTROL */}
-                <div className="flex flex-col">
-                    <AnimatedSection delay={0.25}>
-                        <div className="flex items-center gap-4 py-2 opacity-80">
-                            <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent flex-1" />
-                            <span className="text-xs font-bold tracking-[0.2em] text-slate-500 uppercase">{t('control_panel')}</span>
-                            <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent flex-1" />
-                        </div>
-                    </AnimatedSection>
-
-                    <div className="space-y-6 mt-2">
-                        {/* FILA 2: ASTRO + NUMEROLOGIA */}
-                        <AnimatedSection delay={0.3}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* ASTROLOGÍA */}
-                                <FeatureCard
-                                    feature="astrology"
-                                    href="/astrology"
-                                    color="purple"
-                                    title={t('astrology.title')}
-                                    badge={zodiacSign !== "---" ? tz(zodiacSign) : t('astrology.unknown')}
-                                    description={zodiacSign !== "---" ? t('astrology.essence') : t('astrology.setup')}
-                                    icon={zodiacSign !== "---" ? (
-                                        <span className="text-5xl md:text-6xl text-indigo-400 font-serif relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 select-none">
-                                            {{
-                                                "Aries": "♈", "Tauro": "♉", "Géminis": "♊", "Cáncer": "♋",
-                                                "Leo": "♌", "Virgo": "♍", "Libra": "♎", "Escorpio": "♏",
-                                                "Sagitario": "♐", "Capricornio": "♑", "Acuario": "♒", "Piscis": "♓"
-                                            }[zodiacSign] || <Star className="w-10 h-10" />}
-                                        </span>
-                                    ) : (
-                                        <Star className="w-10 h-10 text-indigo-400 relative z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500" />
-                                    )}
-                                />
-
-                                {/* NUMEROLOGÍA */}
-                                <FeatureCard
-                                    feature="numerology"
-                                    href="/numerology"
-                                    color="pink"
-                                    title={t('numerology.title')}
-                                    badge={lifePathNum > 0 ? t('numerology.path', { count: lifePathNum }) : t('numerology.calculate')}
-                                    description={lifePathNum > 0 ? lifePathWord : t('numerology.discovery')}
-                                    icon={lifePathNum > 0 ? (
-                                        <span className="text-5xl md:text-6xl font-bold text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500 select-none font-serif">
-                                            {lifePathNum}
-                                        </span>
-                                    ) : (
-                                        <Hash className="w-10 h-10 text-pink-400 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500" />
-                                    )}
-                                />
-                            </div>
-                        </AnimatedSection>
-
-                        {/* FILA 3: LECTURA y DIARIO */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <AnimatedSection delay={0.4}>
-                                <GlowingBorderCard className="h-full" glowColor="purple">
-                                    <div className="p-8 flex flex-col h-full min-h-[220px]">
-                                        <div className="flex-grow mb-6">
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/30">
-                                                    <Layers className="w-6 h-6 text-white" />
-                                                </div>
-                                                <h2 className="text-2xl font-bold text-white">{t('tarot.title')}</h2>
-                                            </div>
-                                            <p className="text-slate-400 text-sm leading-relaxed pl-[4rem]">
-                                                {t('tarot.desc')}
-                                            </p>
-                                        </div>
-                                        <div className="mt-auto">
-                                            <Link href="/tarot" className="block w-full">
-                                                <Button className="w-full bg-white text-purple-950 hover:bg-purple-50 font-bold py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] group">
-                                                    {t('tarot.button')}
-                                                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </GlowingBorderCard>
-                            </AnimatedSection>
-
-                            <AnimatedSection delay={0.5}>
-                                <GlowingBorderCard className="h-full" glowColor="cyan">
-                                    <div className="p-8 flex flex-col h-full min-h-[220px]">
-                                        <div className="flex-grow mb-6">
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center border border-slate-600">
-                                                    <BookOpen className="w-6 h-6 text-slate-300" />
-                                                </div>
-                                                <h2 className="text-2xl font-bold text-white">{t('journal.title')}</h2>
-                                            </div>
-                                            <p className="text-slate-400 text-sm leading-relaxed pl-[4rem]">
-                                                {t('journal.desc')}
-                                            </p>
-                                        </div>
-                                        <div className="mt-auto">
-                                            <Link href="/historial" className="block w-full">
-                                                <Button className="w-full bg-slate-800 text-white hover:bg-slate-700 font-bold py-4 rounded-xl shadow-lg border border-slate-600 transition-all hover:scale-[1.02] group">
-                                                    {t('journal.button')}
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </GlowingBorderCard>
-                            </AnimatedSection>
-                        </div>
-                    </div>
-                </div>
-
+                {/* 4. LOS PORTALES DEL ORÁCULO & BÓVEDAS RITUALES */}
+                <AnimatedSection delay={0.3}>
+                    <RitualPortals
+                        unlockedFeatures={unlockedFeatures}
+                        readingCosts={readingCosts}
+                        onUnlockClick={handleUnlockClick}
+                        userZodiac={zodiacSign}
+                        lifePathNum={lifePathNum}
+                    />
+                </AnimatedSection>
             </main>
         </div>
     );
