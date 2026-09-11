@@ -17,7 +17,7 @@ import InsufficientAuraModal from "@/components/dashboard/InsufficientAuraModal"
 
 import { getReadingTypes } from "@/app/admin/settings/actions";
 
-type ReadingMode = "daily" | "question" | "classic"; // classic = 3 cartas, daily = 1 carta
+type ReadingMode = "daily" | "question" | "classic" | "cross"; // classic = 3 cartas, cross = 5 cartas, daily = 1 carta
 type Step = "selection" | "question_input" | "card_selection" | "reveal" | "reading";
 
 interface CardReadingData extends ReadingData {
@@ -84,12 +84,14 @@ export default function ReadingPage() {
     return () => window.removeEventListener('credits-updated', handleUpdate);
   }, []);
 
-  // Etiquetas para la tirada de 3 cartas (enviadas a la API)
+  // Etiquetas para las tiradas multi-carta (enviadas a la API)
   const CLASSIC_LABELS_KEYS = ["Pasado", "Presente", "Futuro"];
+  const CROSS_LABELS_KEYS = ["Presente", "Desafio", "Pasado", "Consejo", "Desenlace"];
 
   // Número de cartas según el modo
   const getMaxCards = useCallback(() => {
     switch (selectedMode) {
+      case "cross": return 5;
       case "classic": return 3;
       default: return 1;
     }
@@ -107,11 +109,12 @@ export default function ReadingPage() {
   // Actually enter the mode (check credits and navigate)
   const enterMode = (mode: ReadingMode) => {
     let costCode = "general";
-    if (mode === "classic") costCode = "classic";
+    if (mode === "cross") costCode = "cross";
+    else if (mode === "classic") costCode = "classic";
     else if (mode === "daily") costCode = "daily";
     else if (mode === "question") costCode = "general";
 
-    const cost = readingCosts[costCode] ?? 20;
+    const cost = readingCosts[costCode] ?? (mode === "cross" ? 150 : (mode === "classic" ? 100 : 20));
 
     if (balance !== null && balance < cost) {
       setNeededAmount(cost);
@@ -150,6 +153,10 @@ export default function ReadingPage() {
     setSelectedCards(newSelected);
   };
 
+  const handleCardDeselect = (cardIndex: number) => {
+    setSelectedCards(prev => prev.filter(id => id !== cardIndex));
+  };
+
   // Start loading phase animation
   const startLoadingPhases = () => {
     setLoadingPhase(0);
@@ -178,10 +185,13 @@ export default function ReadingPage() {
 
     try {
       let readingTypeCode = "general";
-      if (selectedMode === "classic") readingTypeCode = "classic";
+      if (selectedMode === "cross") readingTypeCode = "cross";
+      else if (selectedMode === "classic") readingTypeCode = "classic";
       else if (selectedMode === "daily") readingTypeCode = "daily";
 
-      const positions = selectedMode === "classic" ? CLASSIC_LABELS_KEYS : undefined;
+      const positions = selectedMode === "cross"
+        ? CROSS_LABELS_KEYS
+        : (selectedMode === "classic" ? CLASSIC_LABELS_KEYS : undefined);
 
       const response = await fetch("/api/lectura", {
         method: "POST",
@@ -200,7 +210,7 @@ export default function ReadingPage() {
       if (!response.ok) {
         if (response.status === 402) {
           const costCode = readingTypeCode;
-          const cost = readingCosts[costCode] ?? 20;
+          const cost = readingCosts[costCode] ?? (selectedMode === "cross" ? 150 : (selectedMode === "classic" ? 100 : 20));
           setNeededAmount(cost);
           setInsufficientAuraModalOpen(true);
           setStep("selection");
@@ -223,13 +233,24 @@ export default function ReadingPage() {
       }
 
       // La API ahora devolverá un array de lecturas
-      const readings: CardReadingData[] = data.readings.map((r: { keywords?: string[]; description?: string; action?: string; cardName: string }, idx: number) => ({
-        ...r,
-        keywords: Array.isArray(r.keywords) ? r.keywords : [],
-        description: r.description || '',
-        action: r.action || '',
-        position: selectedMode === "classic" ? t(`labels.${CLASSIC_LABELS_KEYS[idx]}`) : undefined
-      }));
+      const readings: CardReadingData[] = data.readings.map((r: { keywords?: string[]; description?: string; action?: string; cardName: string }, idx: number) => {
+        let positionLabel: string | undefined = undefined;
+        if (selectedMode === "cross") {
+          const key = CROSS_LABELS_KEYS[idx];
+          positionLabel = t.has(`labels.${key}`) ? t(`labels.${key}`) : key;
+        } else if (selectedMode === "classic") {
+          const key = CLASSIC_LABELS_KEYS[idx];
+          positionLabel = t.has(`labels.${key}`) ? t(`labels.${key}`) : key;
+        }
+
+        return {
+          ...r,
+          keywords: Array.isArray(r.keywords) ? r.keywords : [],
+          description: r.description || '',
+          action: r.action || '',
+          position: positionLabel
+        };
+      });
 
       // Update balance globally once
       if (data.newBalance !== undefined) {
@@ -349,13 +370,12 @@ export default function ReadingPage() {
                   {t('choose_path_desc')}
                 </p>
 
-                <div className="grid md:grid-cols-3 gap-6 w-full max-w-3xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl mx-auto">
 
                   {/* Opción 1: Oráculo Diario (1 carta) */}
                   <div onClick={() => selectMode("daily")} className="cursor-pointer group relative">
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'daily' ? 'ring-2 ring-purple-400/50' : ''}`} glowColor="purple">
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge */}
                         {/* Price Badge */}
                         <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
                           <Sparkles className="w-3.5 h-3.5" />
@@ -389,7 +409,6 @@ export default function ReadingPage() {
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'question' ? 'ring-2 ring-cyan-400/50' : ''}`} glowColor="cyan">
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
                         {/* Price Badge */}
-                        {/* Price Badge */}
                         <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
                           <Sparkles className="w-3.5 h-3.5" />
                           <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['general'] ?? 20)}</span>
@@ -421,8 +440,7 @@ export default function ReadingPage() {
                   <div onClick={() => selectMode("classic")} className="cursor-pointer group relative">
                     <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'classic' ? 'ring-2 ring-amber-400/50' : ''}`} glowColor="amber">
                       <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge - Replaces NEW badge */}
-                        {/* Price Badge - Replaces NEW badge */}
+                        {/* Price Badge */}
                         <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
                           <Sparkles className="w-3.5 h-3.5" />
                           <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['classic'] ?? 100)}</span>
@@ -445,6 +463,38 @@ export default function ReadingPage() {
                         </p>
                         <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
                           <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
+                        </div>
+                      </div>
+                    </GlowingBorderCard>
+                  </div>
+
+                  {/* Opción 4: Cruz Guía Evolutiva (5 cartas) */}
+                  <div onClick={() => selectMode("cross")} className="cursor-pointer group relative">
+                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'cross' ? 'ring-2 ring-emerald-400/50' : ''}`} glowColor="emerald">
+                      <div className="p-6 flex flex-col items-center text-center h-full relative">
+                        {/* Price Badge */}
+                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['cross'] ?? 150)}</span>
+                        </div>
+
+                        <div className="w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          {pendingMode === 'cross' ? (
+                            <Sparkles className="w-7 h-7 text-emerald-400 animate-pulse" />
+                          ) : (
+                            <Sparkles className="w-7 h-7 text-emerald-400" />
+                          )}
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
+                          {t('mode_cross_title')}
+                        </h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
+                          {pendingMode === 'cross'
+                            ? (t('loading_energies') || 'Canalizando energías...')
+                            : t('mode_cross_desc')}
+                        </p>
+                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
+                          <span className="text-emerald-400 text-xs font-bold">{t('five_cards')}</span>
                         </div>
                       </div>
                     </GlowingBorderCard>
@@ -510,15 +560,21 @@ export default function ReadingPage() {
                         {t('choose_card')}
                       </h2>
                       <p className="text-slate-400 text-sm">
-                        {t('channeling', { count: selectedMode === "classic" ? 3 : 1 })}
+                        {t('channeling', { count: selectedMode === "cross" ? 5 : (selectedMode === "classic" ? 3 : 1) })}
                       </p>
                     </div>
 
                     <TarotDeck
                       onSelectCard={handleCardSelect}
+                      onDeselectCard={handleCardDeselect}
                       maxSelections={getMaxCards()}
                       onSelectionComplete={handleSelectionComplete}
                       selectedCards={selectedCards}
+                      slotLabels={
+                        selectedMode === "cross"
+                          ? CROSS_LABELS_KEYS.map(k => (t.has(`labels.${k}`) ? t(`labels.${k}`) : k))
+                          : (selectedMode === "classic" ? CLASSIC_LABELS_KEYS.map(k => (t.has(`labels.${k}`) ? t(`labels.${k}`) : k)) : undefined)
+                      }
                     />
                   </>
                 ) : (
@@ -681,7 +737,7 @@ export default function ReadingPage() {
                           cardName={reading.cardName}
                           isRevealed={revealedCards[index]}
                           onClick={() => !revealedCards[index] && handleRevealCard(index)}
-                          className={`w-64 h-96 cursor-pointer transition-shadow duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}
+                          className={`${readingData.length >= 5 ? 'w-48 h-72 md:w-56 md:h-84' : 'w-64 h-96'} cursor-pointer transition-shadow duration-500 ${!revealedCards[index] && 'hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]'}`}
                         />
                       </motion.div>
                     </motion.div>
@@ -720,6 +776,13 @@ export default function ReadingPage() {
                     {selectedMode === "classic" && (
                       <h2 className="text-2xl font-serif text-white">
                         {t.rich('evolution_title', {
+                          purple: (chunks) => <span className="text-purple-400">{chunks}</span>
+                        }) as React.ReactNode}
+                      </h2>
+                    )}
+                    {selectedMode === "cross" && (
+                      <h2 className="text-2xl font-serif text-white">
+                        {t.rich('cross_title', {
                           purple: (chunks) => <span className="text-purple-400">{chunks}</span>
                         }) as React.ReactNode}
                       </h2>

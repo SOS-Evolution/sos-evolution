@@ -477,7 +477,8 @@
         "selected": "Selection Completed",
         "choose_more": "Choose {count, plural, =1 {<span>1 more Arcane</span>} other {<span>{count} more Arcanes</span>}}",
         "select_order": "The order of selection influences the reading",
-        "synchronicity": "Trust your intuition and synchronicity"
+        "synchronicity": "Trust your intuition and synchronicity",
+        "slot_card": "Card {number}"
     },
     "TarotPage": {
         "choose_path": "Choose your <purple>Path</purple>",
@@ -488,8 +489,11 @@
         "mode_question_desc": "Formulate a question and receive specific guidance.",
         "mode_classic_title": "Temporal Evolution",
         "mode_classic_desc": "Past, Present, and Future. The trajectory of your energy.",
+        "mode_cross_title": "Evolutionary Cross Spread",
+        "mode_cross_desc": "Deep 5-card reading: Present, Challenge, Root, Guidance, and Outcome.",
         "one_card": "1 Card",
         "three_cards": "3 Cards",
+        "five_cards": "5 Cards",
         "new_badge": "New",
         "question_title": "What's on your mind?",
         "question_placeholder": "Write your question here...",
@@ -501,6 +505,7 @@
         "touch_reveal": "{count, plural, =1 {Tap the card to reveal} other {Tap the cards to reveal}}",
         "reveal_all": "Reveal All",
         "evolution_title": "Your <purple>Temporal Evolution</purple>",
+        "cross_title": "Your <purple>Evolutionary Cross Spread</purple>",
         "your_question": "Your Question",
         "mission": "Mission",
         "new_reading": "New Reading",
@@ -510,7 +515,10 @@
         "labels": {
             "Pasado": "Past",
             "Presente": "Present",
-            "Futuro": "Future"
+            "Futuro": "Future",
+            "Desafio": "Challenge",
+            "Consejo": "Guidance",
+            "Desenlace": "Outcome"
         },
         "error_quota": "Cosmic Overload",
         "error_quota_desc": "The energies are very intense right now. Please wait a moment and try again.",

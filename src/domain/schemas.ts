@@ -46,6 +46,7 @@ export const READING_COSTS: Record<string, number> = {
     'daily': 20,
     'general': 20,
     'classic': 100,
+    'cross': 150,
 };
 
 /** Tarot AI response JSON schema definition for LLM prompt */

@@ -477,7 +477,8 @@
         "selected": "Selección Completada",
         "choose_more": "Elige {count, plural, =1 {<span>1 Arcano</span> más} other {<span>{count} Arcanos</span> más}}",
         "select_order": "El orden de selección influye en la lectura",
-        "synchronicity": "Confía en tu intuición y en la sincronicidad"
+        "synchronicity": "Confía en tu intuición y en la sincronicidad",
+        "slot_card": "Carta {number}"
     },
     "TarotPage": {
         "choose_path": "Elige tu <purple>Camino</purple>",
@@ -488,8 +489,11 @@
         "mode_question_desc": "Formula una pregunta y recibe guía específica.",
         "mode_classic_title": "Evolución Temporal",
         "mode_classic_desc": "Pasado, Presente y Futuro. La trayectoria de tu energía.",
+        "mode_cross_title": "Cruz Guía Evolutiva",
+        "mode_cross_desc": "Lectura profunda de 5 cartas: Presente, Desafío, Origen, Consejo y Desenlace.",
         "one_card": "1 Carta",
         "three_cards": "3 Cartas",
+        "five_cards": "5 Cartas",
         "new_badge": "Nuevo",
         "question_title": "¿Qué inquietud tienes?",
         "question_placeholder": "Escribe tu pregunta aquí...",
@@ -501,6 +505,7 @@
         "touch_reveal": "{count, plural, =1 {Toca la carta para revelar} other {Toca las cartas para revelar}}",
         "reveal_all": "Revelar Todas",
         "evolution_title": "Tu <purple>Evolución Temporal</purple>",
+        "cross_title": "Tu <purple>Cruz Guía Evolutiva</purple>",
         "your_question": "Tu Pregunta",
         "mission": "Misión",
         "new_reading": "Nueva Lectura",
@@ -510,7 +515,10 @@
         "labels": {
             "Pasado": "Pasado",
             "Presente": "Presente",
-            "Futuro": "Futuro"
+            "Futuro": "Futuro",
+            "Desafio": "Desafío",
+            "Consejo": "Consejo",
+            "Desenlace": "Desenlace"
         },
         "error_quota": "Sobrecarga Cósmica",
         "error_quota_desc": "Las energías están muy intensas en este momento. Por favor espera un instante y vuelve a intentar.",

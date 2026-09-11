@@ -2,17 +2,19 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Check } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useTranslations } from 'next-intl';
 
-interface TarotDeckProps {
+export interface TarotDeckProps {
     onSelectCard: (cardIndex: number) => void;
+    onDeselectCard?: (cardIndex: number) => void;
     onSelectionComplete?: (selectedCards: number[]) => void;
     disabled?: boolean;
-    maxSelections?: number;  // 1 para básica, 3 para clásica
-    selectedCards?: number[];  // Cartas ya seleccionadas (controlado externamente)
-    animatingCards?: number[];  // Cartas que se están animando al centro
-    fadeOthers?: boolean;  // Si true, las cartas no seleccionadas hacen fade out
+    maxSelections?: number; // 1 para básica, 3 para clásica, 5 para cruzada
+    selectedCards?: number[]; // Cartas ya seleccionadas (controlado externamente)
+    animatingCards?: number[]; // Cartas que se están animando al centro
+    fadeOthers?: boolean; // Si true, las cartas no seleccionadas hacen fade out
+    slotLabels?: string[]; // Nombres o etiquetas para los slots de selección
 }
 
 const DECK_SIZE = 22;
@@ -22,18 +24,84 @@ export const CARD_SIZE = {
     desktop: { width: 110, height: 165 }
 };
 
+/**
+ * Calcula dinámicamente las coordenadas y escalas de las cartas seleccionadas
+ * para que nunca se amontonen una encima de la otra, adaptándose a 1, 3, 5 o más cartas.
+ */
+export function getSelectedCardPosition(
+    selIndex: number,
+    totalCards: number,
+    isMobile: boolean
+) {
+    if (totalCards <= 1) {
+        return {
+            x: 0,
+            y: isMobile ? -65 : -110,
+            scale: isMobile ? 1.2 : 1.3,
+            rotate: 0
+        };
+    }
+
+    const centerIndex = (totalCards - 1) / 2;
+    const offset = selIndex - centerIndex;
+
+    let spacing: number;
+    let scale: number;
+    let yOffset: number;
+
+    if (isMobile) {
+        if (totalCards <= 3) {
+            spacing = 84;
+            scale = 0.86;
+            yOffset = -75;
+        } else {
+            // 4, 5+ cartas en pantallas móviles
+            spacing = 56;
+            scale = 0.70;
+            yOffset = -75;
+        }
+    } else {
+        if (totalCards <= 3) {
+            spacing = 140;
+            scale = 1.1;
+            yOffset = -120;
+        } else {
+            // 4, 5+ cartas en pantallas de escritorio
+            spacing = 114;
+            scale = 0.90;
+            yOffset = -125;
+        }
+    }
+
+    return {
+        x: offset * spacing,
+        y: yOffset,
+        scale,
+        rotate: 0
+    };
+}
+
 export default function TarotDeck({
     onSelectCard,
+    onDeselectCard,
     onSelectionComplete,
     disabled = false,
     maxSelections = 1,
     selectedCards = [],
     animatingCards = [],
-    fadeOthers = false
+    fadeOthers = false,
+    slotLabels = []
 }: TarotDeckProps) {
     const t = useTranslations('TarotDeck');
     const [isShuffling, setIsShuffling] = useState(true);
     const [internalSelected, setInternalSelected] = useState<number[]>([]);
+
+    // Mantener sincronizado el estado interno cuando cambie externamente
+    useEffect(() => {
+        if (selectedCards) {
+            setInternalSelected(selectedCards);
+        }
+    }, [selectedCards]);
 
     // Usar selección externa si se provee, sino usar interna
     const currentSelected = selectedCards.length > 0 ? selectedCards : internalSelected;
@@ -75,21 +143,28 @@ export default function TarotDeck({
     const handleCardClick = (cardIndex: number) => {
         if (disabled || isShuffling) return;
 
-        // Verificar si ya está seleccionada
-        if (currentSelected.includes(cardIndex)) return;
+        // Si ya está seleccionada y aún no se completó la tirada, permitir deseleccionar
+        if (currentSelected.includes(cardIndex)) {
+            if (currentSelected.length < maxSelections) {
+                const newSelected = currentSelected.filter(id => id !== cardIndex);
+                setInternalSelected(newSelected);
+                onDeselectCard?.(cardIndex);
+            }
+            return;
+        }
 
         // Verificar si ya se alcanzó el máximo
         if (currentSelected.length >= maxSelections) return;
 
-        const newSelected = [...internalSelected, cardIndex];
+        const newSelected = [...currentSelected, cardIndex];
         setInternalSelected(newSelected);
         onSelectCard(cardIndex);
 
-        // Si se completó la selección, notificar con un ligero retraso para ver la animación
+        // Si se completó la selección, notificar con un ligero retraso para apreciar la animación
         if (newSelected.length >= maxSelections && onSelectionComplete) {
             setTimeout(() => {
                 onSelectionComplete(newSelected);
-            }, 1000);
+            }, 1200);
         }
     };
 
@@ -137,6 +212,60 @@ export default function TarotDeck({
             </motion.h2>
 
             <div className="relative w-full max-w-[350px] md:max-w-4xl h-[400px] md:h-[600px] flex items-center justify-center scale-90 md:scale-100 origin-center perspective-1000">
+
+                {/* Ranuras guía para lecturas multi-carta (1 a 5 cartas) */}
+                {!isShuffling && maxSelections > 1 && (
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        {Array.from({ length: maxSelections }).map((_, slotIdx) => {
+                            const isFilled = currentSelected.length > slotIdx;
+                            const pos = getSelectedCardPosition(slotIdx, maxSelections, isMobile);
+                            const label = slotLabels?.[slotIdx] || t('slot_card', { number: slotIdx + 1 });
+
+                            return (
+                                <motion.div
+                                    key={`slot-${slotIdx}`}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: pos.scale }}
+                                    transition={{ delay: 0.15 + slotIdx * 0.05, duration: 0.4 }}
+                                    className="absolute flex flex-col items-center justify-center"
+                                    style={{
+                                        transformOrigin: "center center",
+                                        x: pos.x,
+                                        y: pos.y,
+                                    }}
+                                >
+                                    <div
+                                        className={`
+                                            relative
+                                            w-[90px] h-[135px] md:w-[110px] md:h-[165px]
+                                            ${!isShuffling ? "-mt-[160px] md:-mt-[260px]" : ""}
+                                            rounded-xl border-2 border-dashed
+                                            flex flex-col items-center justify-center gap-1 p-2
+                                            transition-all duration-500
+                                            ${isFilled
+                                                ? "border-purple-500/40 bg-purple-950/20 shadow-[0_0_20px_rgba(168,85,247,0.15)]"
+                                                : "border-purple-500/25 bg-slate-900/40 shadow-inner backdrop-blur-[2px]"
+                                            }
+                                        `}
+                                    >
+                                        {!isFilled && (
+                                            <>
+                                                <div className="w-6 h-6 md:w-7 md:h-7 rounded-full border border-purple-400/40 bg-purple-500/10 flex items-center justify-center text-[10px] md:text-xs font-mono font-bold text-purple-300">
+                                                    {slotIdx + 1}
+                                                </div>
+                                                <span className="text-[9px] md:text-[11px] font-serif text-purple-300/70 text-center leading-tight line-clamp-2 px-1">
+                                                    {label}
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* Mazo de cartas desplegado */}
                 <AnimatePresence>
                     {shuffledIndices.map((originalIndex, visualIndex) => {
                         const isSelected = isCardSelected(originalIndex);
@@ -147,13 +276,17 @@ export default function TarotDeck({
                         if (isAnimating) return null;
 
                         // Lógica del abanico
-                        const totalDegrees = 300; // Ángulo unificado para móvil y escritorio
+                        const totalDegrees = 300;
                         const anglePerCard = totalDegrees / (DECK_SIZE - 1);
                         const startRotation = -totalDegrees / 2;
                         const finalRotation = startRotation + (anglePerCard * visualIndex);
 
                         // Si fadeOthers está activo y la carta no está seleccionada, hacer fade
                         const shouldFade = fadeOthers && !isSelected;
+                        const selIndex = currentSelected.indexOf(originalIndex);
+                        const targetPos = isSelected
+                            ? getSelectedCardPosition(selIndex, maxSelections, isMobile)
+                            : { x: 0, y: 0, rotate: finalRotation, scale: 1 };
 
                         const variants = {
                             shuffle: {
@@ -172,17 +305,17 @@ export default function TarotDeck({
                                 }
                             },
                             fan: {
-                                x: 0,
-                                y: isSelected ? (isMobile ? -60 : -100) : 0,
-                                rotate: isSelected ? 0 : finalRotation,
-                                scale: isSelected ? 1.3 : 1,
+                                x: targetPos.x,
+                                y: targetPos.y,
+                                rotate: targetPos.rotate,
+                                scale: targetPos.scale,
                                 opacity: shouldFade ? 0 : 1,
-                                zIndex: isSelected ? 100 : visualIndex,
+                                zIndex: isSelected ? 120 + selIndex : visualIndex,
                                 transition: {
                                     delay: isSelected ? 0 : visualIndex * 0.04,
                                     type: "spring",
-                                    stiffness: 200,
-                                    damping: 20
+                                    stiffness: 220,
+                                    damping: 22
                                 }
                             },
                             exit: {
@@ -210,15 +343,17 @@ export default function TarotDeck({
                                             zIndex: 100,
                                             transition: { duration: 0.2 }
                                         }
-                                        : {}
+                                        : (isSelected && currentSelected.length < maxSelections ? {
+                                            scale: targetPos.scale * 1.05,
+                                            transition: { duration: 0.2 }
+                                        } : {})
                                 }
-                                whileTap={!disabled && !isShuffling && !isSelected ? {
-                                    scale: 1.15,
-                                    y: -20,
+                                whileTap={!disabled && !isShuffling ? {
+                                    scale: 1.05,
                                     transition: { duration: 0.15 }
                                 } : {}}
                                 onClick={() => handleCardClick(originalIndex)}
-                                className={`absolute cursor-pointer ${disabled || isShuffling || isSelected || currentSelected.length >= maxSelections ? "pointer-events-none" : ""}`}
+                                className={`absolute cursor-pointer ${disabled || isShuffling || (currentSelected.length >= maxSelections && !isSelected) ? "pointer-events-none" : ""}`}
                                 style={{
                                     transformOrigin: "center bottom",
                                     touchAction: "manipulation"
@@ -232,7 +367,7 @@ export default function TarotDeck({
                                         bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950
                                         border-2 
                                         ${isSelected
-                                            ? "border-purple-400 shadow-purple-500/60"
+                                            ? "border-purple-400 shadow-purple-500/60 ring-2 ring-purple-400/40"
                                             : "border-purple-500/50 hover:border-purple-400 hover:shadow-purple-500/60"
                                         }
                                         rounded-xl shadow-2xl
@@ -247,7 +382,7 @@ export default function TarotDeck({
                                         <motion.div
                                             className="absolute inset-0 bg-purple-500/20 rounded-xl"
                                             initial={{ opacity: 0 }}
-                                            animate={{ opacity: [0.2, 0.4, 0.2] }}
+                                            animate={{ opacity: [0.2, 0.45, 0.2] }}
                                             transition={{ duration: 1.5, repeat: Infinity }}
                                         />
                                     )}
@@ -255,14 +390,30 @@ export default function TarotDeck({
                                     {/* Brillo místico interno */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent" />
 
-                                    {/* Badge de selección (para multi-selección) */}
+                                    {/* Badge numérico de orden de selección (para multi-selección) */}
                                     {isSelected && maxSelections > 1 && (
                                         <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            className="absolute top-1 right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center z-20"
+                                            initial={{ scale: 0, rotate: -45 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                            className="absolute top-1.5 right-1.5 w-6 h-6 md:w-7 md:h-7 bg-gradient-to-br from-purple-500 via-indigo-600 to-purple-700 rounded-full flex items-center justify-center z-30 shadow-[0_0_12px_rgba(168,85,247,0.7)] border border-white/30"
                                         >
-                                            <Check className="w-3 h-3 text-white" />
+                                            <span className="text-[11px] md:text-xs font-mono font-bold text-white leading-none">
+                                                {selIndex + 1}
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Etiqueta de posición debajo de la carta seleccionada */}
+                                    {isSelected && slotLabels && slotLabels[selIndex] && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="absolute bottom-1.5 inset-x-1 z-30 text-center pointer-events-none"
+                                        >
+                                            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider text-purple-200 bg-black/80 px-1.5 py-0.5 rounded backdrop-blur-xs border border-purple-500/30 truncate inline-block max-w-full">
+                                                {slotLabels[selIndex]}
+                                            </span>
                                         </motion.div>
                                     )}
 
