@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { adjustUserCredits } from "./actions";
+import { OracleService } from "@/src/services/oracle.service";
 
 export default async function UserDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -45,23 +46,18 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
     const balance = balanceResult.data;
 
     // PERFORMANCE: Credits y readings en paralelo
-    const [creditsResult, readingsResult] = await Promise.all([
+    const oracle = new OracleService(supabase);
+    const [creditsResult, journalEntries] = await Promise.all([
         supabase
             .from("user_credits")
             .select("*")
             .eq("user_id", userId)
             .order("created_at", { ascending: false })
             .limit(10),
-        supabase
-            .from("lecturas")
-            .select("*")
-            .eq("user_id", userId)
-            .order("created_at", { ascending: false })
-            .limit(10),
+        oracle.getUserSoulJournal(userId, 10),
     ]);
 
     const credits = creditsResult.data;
-    const readings = readingsResult.data;
 
 
     return (
@@ -173,7 +169,7 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                                 <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">Lecturas Totales</span>
                                 <History className="w-4 h-4 text-purple-500" />
                             </div>
-                            <p className="text-3xl font-bold text-white">{readings?.length || 0}</p>
+                            <p className="text-3xl font-bold text-white">{journalEntries?.length || 0}</p>
                         </div>
                     </div>
 
@@ -207,21 +203,36 @@ export default async function UserDetailPage(props: { params: Promise<{ id: stri
                         </div>
                     </div>
 
-                    {/* HISTORIAL LECTURAS */}
+                    {/* HISTORIAL LECTURAS (TIRADAS AGRUPADAS) */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest ml-1">Bitácora del Oráculo</h3>
+                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest ml-1">Bitácora del Oráculo (Tiradas)</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {readings?.map(read => (
-                                <div key={read.id} className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-purple-500/30 transition-all group">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className="text-purple-400 font-serif font-bold group-hover:text-purple-300 transition-colors uppercase tracking-tighter text-sm">{read.card_name}</span>
-                                        <span className="text-[10px] text-slate-600 font-mono">{new Date(read.created_at).toLocaleDateString()}</span>
+                            {journalEntries?.map((spread, sIdx) => (
+                                <div key={spread.spreadId || sIdx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-purple-500/30 transition-all group space-y-2">
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-xs font-bold text-purple-400 font-serif">
+                                            {spread.readingTypeName} ({spread.cards.length} {spread.cards.length === 1 ? 'carta' : 'cartas'})
+                                        </span>
+                                        <span className="text-[10px] text-slate-600 font-mono">
+                                            {new Date(spread.createdAt).toLocaleDateString()}
+                                        </span>
                                     </div>
-                                    <p className="text-xs text-slate-400 italic line-clamp-2">&quot;{read.question || 'Sin pregunta registrada'}&quot;</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {spread.cards.map((c, cIdx) => (
+                                            <span key={cIdx} className="text-[10px] px-1.5 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-500/20">
+                                                {c.position ? `${c.position}: ` : ''}{c.cardName}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {spread.question && (
+                                        <p className="text-xs text-slate-400 italic line-clamp-2">
+                                            &quot;{spread.question}&quot;
+                                        </p>
+                                    )}
                                 </div>
                             ))}
                         </div>
-                        {(!readings || readings.length === 0) && (
+                        {(!journalEntries || journalEntries.length === 0) && (
                             <div className="p-8 rounded-xl border border-dashed border-slate-800 text-center text-slate-600 italic">
                                 Este usuario aún no ha consultado a las estrellas.
                             </div>

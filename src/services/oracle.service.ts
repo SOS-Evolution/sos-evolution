@@ -15,6 +15,7 @@ import {
     ASTROLOGY_FALLBACK,
 } from '@/src/domain/schemas';
 import { DatabaseError } from '@/src/domain/errors';
+import { SoulJournalEntry } from '@/types';
 
 // =============================================
 // OracleService — AI Reading Orchestrator
@@ -26,6 +27,8 @@ export interface TarotReadingParams {
     readingTypeCode?: string;
     position?: string;
     locale?: string;
+    spreadId?: string;
+    cardOrder?: number;
 }
 
 export interface TarotReadingResult {
@@ -97,6 +100,8 @@ export class OracleService {
             readingTypeCode = 'general',
             position,
             locale = 'es',
+            spreadId,
+            cardOrder = 0,
         } = params;
 
         // 1. Resolve reading type
@@ -178,18 +183,24 @@ export class OracleService {
         }
 
         // 5. Save to DB
+        const insertPayload: Record<string, unknown> = {
+            card_name: aiResponse.cardName,
+            keywords: aiResponse.keywords,
+            description: aiResponse.description,
+            action: aiResponse.action,
+            user_id: userId,
+            reading_type_id: readingType.id,
+            question: question || null,
+            position: position || null,
+            card_order: cardOrder,
+        };
+        if (spreadId) {
+            insertPayload.spread_id = spreadId;
+        }
+
         const { data: savedReading, error: dbError } = await this.supabase
             .from('lecturas')
-            .insert([{
-                card_name: aiResponse.cardName,
-                keywords: aiResponse.keywords,
-                description: aiResponse.description,
-                action: aiResponse.action,
-                user_id: userId,
-                reading_type_id: readingType.id,
-                question: question || null,
-                position: position || null,
-            }])
+            .insert([insertPayload])
             .select()
             .single();
 
@@ -204,6 +215,108 @@ export class OracleService {
             readingTypeName: readingType.name,
             cost,
         };
+    }
+
+    /**
+     * Retrieve the user's Soul Journal entries grouped cleanly by spread_id.
+     * Backwards-compatible with legacy single-card rows.
+     */
+    async getUserSoulJournal(userId: string, limit: number = 30): Promise<SoulJournalEntry[]> {
+        const { data: lecturas, error } = await this.supabase
+            .from('lecturas')
+            .select(`
+                id,
+                card_name,
+                position,
+                card_order,
+                keywords,
+                description,
+                action,
+                question,
+                created_at,
+                spread_id,
+                reading_type:reading_types(code, name)
+            `)
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(limit * 5); // Fetch enough rows to assemble `limit` distinct spreads
+
+        if (error) {
+            console.error('Error fetching soul journal:', error);
+            throw new DatabaseError('lecturas.select', error.message);
+        }
+
+        if (!lecturas || lecturas.length === 0) {
+            return [];
+        }
+
+        // Group rows by spread_id (or fallback to id if spread_id was null)
+        const spreadMap = new Map<string, SoulJournalEntry>();
+
+        for (const row of lecturas) {
+            const spreadKey = (row.spread_id as string) || `legacy-${row.id}`;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const readingTypeData = Array.isArray(row.reading_type) ? (row.reading_type[0] as any) : (row.reading_type as any);
+            const code = readingTypeData?.code || 'general';
+            const name = readingTypeData?.name || 'Consulta General';
+
+            if (!spreadMap.has(spreadKey)) {
+                spreadMap.set(spreadKey, {
+                    spreadId: spreadKey,
+                    readingTypeCode: code,
+                    readingTypeName: name,
+                    question: row.question || null,
+                    createdAt: row.created_at,
+                    cards: [],
+                });
+            }
+
+            const entry = spreadMap.get(spreadKey)!;
+            entry.cards.push({
+                id: row.id,
+                cardName: row.card_name,
+                position: row.position || null,
+                cardOrder: typeof row.card_order === 'number' ? row.card_order : 0,
+                keywords: Array.isArray(row.keywords) ? row.keywords : [],
+                description: row.description || '',
+                action: row.action || '',
+            });
+        }
+
+        // Sort cards within each spread by cardOrder asc, and return entries up to limit
+        const result: SoulJournalEntry[] = [];
+        for (const entry of spreadMap.values()) {
+            entry.cards.sort((a, b) => a.cardOrder - b.cardOrder);
+            result.push(entry);
+            if (result.length >= limit) break;
+        }
+
+        return result;
+    }
+
+    /**
+     * Extracts an LLM-friendly summary of the user's recent readings
+     * to power future personalized AI consultations and history tracking.
+     */
+    async getUserEvolutionaryHistoryContext(userId: string, count: number = 5): Promise<string> {
+        try {
+            const journal = await this.getUserSoulJournal(userId, count);
+            if (journal.length === 0) {
+                return 'El usuario no tiene consultas previas en su Diario del Alma.';
+            }
+
+            const lines = journal.map((entry, idx) => {
+                const dateStr = new Date(entry.createdAt).toLocaleDateString('es-ES');
+                const cardList = entry.cards.map(c => c.position ? `${c.position}: ${c.cardName}` : c.cardName).join(', ');
+                const q = entry.question ? ` (Pregunta: "${entry.question}")` : '';
+                return `${idx + 1}. [${dateStr}] ${entry.readingTypeName}${q} -> Cartas: ${cardList}`;
+            });
+
+            return `Historial evolutivo reciente del usuario:\n${lines.join('\n')}`;
+        } catch (e) {
+            console.warn('Failed to build user evolutionary history context:', e);
+            return '';
+        }
     }
 
     /**

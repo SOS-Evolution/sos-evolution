@@ -31,6 +31,9 @@ export async function POST(req: Request) {
         await billing.ensureSufficientBalance(user.id, cost);
 
         // 3. Generate readings (AI + DB save) in parallel for ultra-fast performance
+        // All cards from the same spread share the same spreadId
+        const spreadId = crypto.randomUUID();
+
         const generatedResults = await Promise.all(
             cardsToProcess.map((currentCardIndex, i) => {
                 const currentPosition = positionsToProcess[i] || position;
@@ -40,6 +43,8 @@ export async function POST(req: Request) {
                     readingTypeCode,
                     position: currentPosition,
                     locale,
+                    spreadId,
+                    cardOrder: i,
                 });
             })
         );
@@ -57,8 +62,9 @@ export async function POST(req: Request) {
             null // Legacy int IDs — pass null for UUID reference
         );
 
-        // 5. Return response with readings array
+        // 5. Return response with readings array and spreadId
         return NextResponse.json({
+            spreadId,
             readings,
             creditsUsed: cost,
             newBalance,

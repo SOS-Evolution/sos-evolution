@@ -10,6 +10,46 @@ export interface ReadingData {
   action: string;
 }
 
+export interface SoulJournalCard {
+  id?: number | string;
+  cardName: string;
+  position?: string | null;
+  cardOrder: number;
+  keywords: string[];
+  description: string;
+  action: string;
+}
+
+export interface SoulJournalEntry {
+  spreadId: string;
+  readingTypeCode: string;
+  readingTypeName: string;
+  question?: string | null;
+  createdAt: string;
+  cards: SoulJournalCard[];
+}
+
+export interface AdminReadingSpread {
+  spread_id: string;
+  reading_type_name: string;
+  reading_type_code: string;
+  question?: string | null;
+  created_at: string;
+  full_name?: string | null;
+  email?: string | null;
+  cards_count: number;
+  cards_summary: string;
+  cards_detail: Array<{
+    id: number | string;
+    card_name: string;
+    position?: string | null;
+    card_order: number;
+    keywords?: string[];
+    description?: string;
+    action?: string;
+  }>;
+}
+
 // === PROFILES ===
 export interface Profile {
   id: string;
