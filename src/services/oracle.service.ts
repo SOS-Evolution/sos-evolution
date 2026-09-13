@@ -29,6 +29,8 @@ export interface TarotReadingParams {
     locale?: string;
     spreadId?: string;
     cardOrder?: number;
+    // Optional: pre-resolved readingType to skip a redundant DB call
+    resolvedReadingType?: { id: string | number; name: string; code: string; credit_cost: number; description: string };
 }
 
 export interface TarotReadingResult {
@@ -104,8 +106,10 @@ export class OracleService {
             cardOrder = 0,
         } = params;
 
-        // 1. Resolve reading type
-        const { readingType, cost } = await this.resolveReadingType(readingTypeCode);
+        // 1. Resolve reading type — skip if already resolved by caller to save a DB roundtrip
+        const { readingType, cost } = params.resolvedReadingType
+            ? { readingType: params.resolvedReadingType, cost: params.resolvedReadingType.credit_cost }
+            : await this.resolveReadingType(readingTypeCode);
 
         // 2. Select card
         const selectedCard = (typeof cardIndex === 'number' && cardIndex >= 0 && cardIndex < TAROT_DECK.length)

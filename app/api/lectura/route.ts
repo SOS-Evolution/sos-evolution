@@ -22,20 +22,24 @@ export async function POST(req: Request) {
 
         // 1. Auth + Services
         const supabase = await createClient();
-        const user = await requireAuth(supabase);
         const billing = new BillingService(supabase);
         const oracle = new OracleService(supabase);
 
-        // 2. Resolve cost & check balance. EL COSTE ES POR TODA LA LECTURA (ej: 100 para la de 3 cartas)
-        const { cost, readingType } = await oracle.resolveReadingType(readingTypeCode);
+        // 2. Parallelize auth + reading type resolution — both are independent of each other
+        const [user, { cost, readingType }] = await Promise.all([
+            requireAuth(supabase),
+            oracle.resolveReadingType(readingTypeCode),
+        ]);
+
+        // 3. Check balance AFTER we know the cost
         await billing.ensureSufficientBalance(user.id, cost);
 
-        // 3. Generate readings (AI + DB save) in parallel for ultra-fast performance
-        // All cards from the same spread share the same spreadId
+        // 4. Generate readings (AI + DB save) in parallel for ultra-fast performance.
+        // All cards from the same spread share the same spreadId.
         const spreadId = crypto.randomUUID();
 
         const generatedResults = await Promise.all(
-            cardsToProcess.map((currentCardIndex, i) => {
+            cardsToProcess.map((currentCardIndex: number, i: number) => {
                 const currentPosition = positionsToProcess[i] || position;
                 return oracle.generateTarotReading(user.id, {
                     question,
@@ -45,6 +49,8 @@ export async function POST(req: Request) {
                     locale,
                     spreadId,
                     cardOrder: i,
+                    // Pass the already-resolved readingType to skip a redundant DB roundtrip per card
+                    resolvedReadingType: readingType,
                 });
             })
         );
@@ -54,7 +60,7 @@ export async function POST(req: Request) {
             id: result.savedId,
         }));
 
-        // 4. Spend credits ONCE for the entire session
+        // 5. Spend credits ONCE for the entire session
         const newBalance = await billing.spendCredits(
             user.id,
             cost,
@@ -62,7 +68,7 @@ export async function POST(req: Request) {
             null // Legacy int IDs — pass null for UUID reference
         );
 
-        // 5. Return response with readings array and spreadId
+        // 6. Return response with readings array and spreadId
         return NextResponse.json({
             spreadId,
             readings,

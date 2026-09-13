@@ -27,7 +27,9 @@ export function createAiGateway(): AiGateway {
 
     const groq = new Groq({ 
         apiKey: process.env.GROQ_API_KEY,
-        timeout: 10000, // 10s timeout to prevent hanging serverless functions
+        // 8s per attempt — with one retry we stay well under Vercel's 30s limit.
+        // (8s primary + 8s fallback + ~2s overhead = ~18s total max)
+        timeout: 8000,
     });
 
     return {
@@ -36,7 +38,9 @@ export function createAiGateway(): AiGateway {
                 systemPrompt,
                 userPrompt,
                 temperature = 0.7,
-                model = 'llama-3.3-70b-versatile', // Groq's most capable model with great analytical depth
+                // qwen3.8-27b: fast + supports json_object mode natively. 
+                // Switched from gpt-oss-120b which was causing Vercel 502s due to slow response times.
+                model = 'qwen/qwen3.8-27b',
             } = params;
 
             try {
@@ -66,14 +70,14 @@ export function createAiGateway(): AiGateway {
                 const message = error instanceof Error ? error.message : String(error);
 
                 // Rate limit, timeout or error — retry with ultra-fast fallback model
-                console.warn('Groq primary model failed/timed out, retrying with fast fallback model (gpt-oss-20b)...', message);
+                console.warn('Groq primary model failed/timed out, retrying with fast fallback model (openai/gpt-oss-20b)...', message);
                 try {
                     const retryCompletion = await groq.chat.completions.create({
                         messages: [
                             { role: 'system', content: systemPrompt },
                             { role: 'user', content: userPrompt },
                         ],
-                        model: 'llama-3.1-8b-instant', // Ultra-fast fallback model (<600ms)
+                        model: 'openai/gpt-oss-20b', // Fallback ultrarrápido (<600ms) — always available
                         temperature: temperature + 0.1,
                         max_tokens: 1000,
                         response_format: { type: 'json_object' },

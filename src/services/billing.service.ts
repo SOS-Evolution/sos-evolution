@@ -42,6 +42,7 @@ export class BillingService {
 
     /**
      * Spend credits for a user. Should only be called AFTER the operation succeeds.
+     * Returns the new balance as returned by the DB function (no extra roundtrip).
      */
     async spendCredits(
         userId: string,
@@ -53,7 +54,7 @@ export class BillingService {
             return this.getBalance(userId);
         }
 
-        const { error } = await this.supabase.rpc('spend_credits_v2', {
+        const { data: newBalance, error } = await this.supabase.rpc('spend_credits_v2', {
             p_user_id: userId,
             p_amount: amount,
             p_description: description,
@@ -63,11 +64,11 @@ export class BillingService {
         if (error) {
             console.error('CRITICAL: BillingService.spendCredits failed:', error);
             // Don't throw — the operation already succeeded, we just log the billing failure
-        } else {
-            console.log(`BillingService: Spent ${amount} credits for user ${userId}`);
+            return 0;
         }
 
-        // Return updated balance
-        return this.getBalance(userId);
+        console.log(`BillingService: Spent ${amount} credits for user ${userId}. New balance: ${newBalance}`);
+        // spend_credits_v2 returns the new balance directly — no extra getBalance call needed
+        return typeof newBalance === 'number' ? newBalance : 0;
     }
 }
