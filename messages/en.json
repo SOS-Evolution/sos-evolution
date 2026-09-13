@@ -690,7 +690,8 @@
         "loading_energies": "Channelling energies... please wait a moment",
         "loading_phase_1": "Connecting with the cosmos...",
         "loading_phase_2": "Channeling your card's energy...",
-        "loading_phase_3": "Interpreting the symbols..."
+        "loading_phase_3": "Interpreting the symbols...",
+        "loading_phase_ready": "Your message is ready..."
     },
     "SuccessPage": {
         "title": "Recharge Completed",

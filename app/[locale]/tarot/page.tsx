@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Sparkles, RotateCcw, Home, MessageCircleQuestion, ScanEye, Clock, Moon, Star } from "lucide-react";
 import { ReadingData } from "@/types";
-import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { Link } from "@/i18n/routing";
 import { Input } from "@/components/ui/input";
 import { useParams, useSearchParams } from "next/navigation";
@@ -379,135 +378,241 @@ function ReadingPageContent() {
                   {t('choose_path_desc')}
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 w-full max-w-5xl mx-auto">
 
                   {/* Opción 1: Oráculo Diario (1 carta) */}
-                  <div onClick={() => selectMode("daily")} className="cursor-pointer group relative">
-                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'daily' ? 'ring-2 ring-purple-400/50' : ''}`} glowColor="purple">
-                      <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge */}
-                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['daily'] ?? 20)}</span>
+                  <motion.div
+                    onClick={() => selectMode("daily")}
+                    className="cursor-pointer group"
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                  >
+                    <div className={`relative h-full rounded-2xl overflow-hidden border transition-all duration-500
+                      ${pendingMode === 'daily'
+                        ? 'border-violet-500/60 shadow-[0_0_30px_rgba(139,92,246,0.35)]'
+                        : 'border-white/8 hover:border-violet-500/40 hover:shadow-[0_0_24px_rgba(139,92,246,0.2)]'
+                      }`}
+                    >
+                      {/* Card background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/80 via-slate-950/90 to-indigo-950/80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-violet-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Decorative circles */}
+                      <div className="absolute -top-6 -right-6 w-28 h-28 bg-violet-500/10 rounded-full blur-xl group-hover:bg-violet-500/20 transition-colors duration-500" />
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-lg" />
+
+                      {/* Price badge */}
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{isDataLoading ? '...' : (readingCosts['daily'] ?? 20)}</span>
+                      </div>
+
+                      <div className="relative z-10 p-6 flex flex-col h-full">
+                        {/* Icon */}
+                        <div className="mb-5">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${pendingMode === 'daily'
+                              ? 'bg-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.4)]'
+                              : 'bg-violet-500/15 group-hover:bg-violet-500/25 group-hover:shadow-[0_0_16px_rgba(139,92,246,0.3)]'}`}
+                          >
+                            {pendingMode === 'daily'
+                              ? <Sparkles className="w-7 h-7 text-violet-300 animate-pulse" />
+                              : <ScanEye className="w-7 h-7 text-violet-300" />
+                            }
+                          </div>
                         </div>
 
-                        <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          {pendingMode === 'daily' ? (
-                            <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" />
-                          ) : (
-                            <ScanEye className="w-7 h-7 text-purple-400" />
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
-                          {t('mode_oracle_title')}
-                        </h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {pendingMode === 'daily'
-                            ? (t('loading_energies') || 'Canalizando energías...')
-                            : t('mode_oracle_desc')}
+                        {/* Text */}
+                        <h3 className="text-lg font-bold text-white mb-1.5 leading-tight">{t('mode_oracle_title')}</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-5 flex-1">
+                          {pendingMode === 'daily' ? (t('loading_energies') || 'Canalizando energías...') : t('mode_oracle_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
-                          <span className="text-purple-400 text-xs font-bold">{t('one_card')}</span>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                          <span className="text-violet-400 text-xs font-semibold tracking-wide">{t('one_card')}</span>
+                          <div className="flex gap-0.5">
+                            {[...Array(1)].map((_, i) => (
+                              <div key={i} className="w-5 h-7 rounded-sm bg-violet-500/30 border border-violet-500/40" />
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </GlowingBorderCard>
-                  </div>
+                    </div>
+                  </motion.div>
 
                   {/* Opción 2: Pregunta (1 carta) */}
-                  <div onClick={() => selectMode("question")} className="cursor-pointer group relative">
-                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'question' ? 'ring-2 ring-cyan-400/50' : ''}`} glowColor="cyan">
-                      <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge */}
-                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['general'] ?? 20)}</span>
+                  <motion.div
+                    onClick={() => selectMode("question")}
+                    className="cursor-pointer group"
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                  >
+                    <div className={`relative h-full rounded-2xl overflow-hidden border transition-all duration-500
+                      ${pendingMode === 'question'
+                        ? 'border-cyan-500/60 shadow-[0_0_30px_rgba(6,182,212,0.35)]'
+                        : 'border-white/8 hover:border-cyan-500/40 hover:shadow-[0_0_24px_rgba(6,182,212,0.2)]'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/80 via-slate-950/90 to-teal-950/80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute -top-6 -right-6 w-28 h-28 bg-cyan-500/10 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-teal-500/10 rounded-full blur-lg" />
+
+                      {/* Price badge */}
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{isDataLoading ? '...' : (readingCosts['general'] ?? 20)}</span>
+                      </div>
+
+                      <div className="relative z-10 p-6 flex flex-col h-full">
+                        <div className="mb-5">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${pendingMode === 'question'
+                              ? 'bg-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.4)]'
+                              : 'bg-cyan-500/15 group-hover:bg-cyan-500/25 group-hover:shadow-[0_0_16px_rgba(6,182,212,0.3)]'}`}
+                          >
+                            {pendingMode === 'question'
+                              ? <Sparkles className="w-7 h-7 text-cyan-300 animate-pulse" />
+                              : <MessageCircleQuestion className="w-7 h-7 text-cyan-300" />
+                            }
+                          </div>
                         </div>
 
-                        <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          {pendingMode === 'question' ? (
-                            <Sparkles className="w-7 h-7 text-cyan-400 animate-pulse" />
-                          ) : (
-                            <MessageCircleQuestion className="w-7 h-7 text-cyan-400" />
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
-                          {t('mode_question_title')}
-                        </h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {pendingMode === 'question'
-                            ? (t('loading_energies') || 'Canalizando energías...')
-                            : t('mode_question_desc')}
+                        <h3 className="text-lg font-bold text-white mb-1.5 leading-tight">{t('mode_question_title')}</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-5 flex-1">
+                          {pendingMode === 'question' ? (t('loading_energies') || 'Canalizando energías...') : t('mode_question_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
-                          <span className="text-cyan-400 text-xs font-bold">{t('one_card')}</span>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                          <span className="text-cyan-400 text-xs font-semibold tracking-wide">{t('one_card')}</span>
+                          <div className="flex gap-0.5">
+                            {[...Array(1)].map((_, i) => (
+                              <div key={i} className="w-5 h-7 rounded-sm bg-cyan-500/30 border border-cyan-500/40" />
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </GlowingBorderCard>
-                  </div>
+                    </div>
+                  </motion.div>
 
                   {/* Opción 3: Evolución Temporal (3 cartas) */}
-                  <div onClick={() => selectMode("classic")} className="cursor-pointer group relative">
-                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'classic' ? 'ring-2 ring-amber-400/50' : ''}`} glowColor="amber">
-                      <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge */}
-                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['classic'] ?? 100)}</span>
+                  <motion.div
+                    onClick={() => selectMode("classic")}
+                    className="cursor-pointer group"
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                  >
+                    <div className={`relative h-full rounded-2xl overflow-hidden border transition-all duration-500
+                      ${pendingMode === 'classic'
+                        ? 'border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.35)]'
+                        : 'border-white/8 hover:border-amber-500/40 hover:shadow-[0_0_24px_rgba(245,158,11,0.2)]'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-950/80 via-slate-950/90 to-orange-950/80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-amber-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute -top-6 -right-6 w-28 h-28 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-orange-500/10 rounded-full blur-lg" />
+
+                      {/* Price badge */}
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{isDataLoading ? '...' : (readingCosts['classic'] ?? 100)}</span>
+                      </div>
+
+                      <div className="relative z-10 p-6 flex flex-col h-full">
+                        <div className="mb-5">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${pendingMode === 'classic'
+                              ? 'bg-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+                              : 'bg-amber-500/15 group-hover:bg-amber-500/25 group-hover:shadow-[0_0_16px_rgba(245,158,11,0.3)]'}`}
+                          >
+                            {pendingMode === 'classic'
+                              ? <Sparkles className="w-7 h-7 text-amber-300 animate-pulse" />
+                              : <Clock className="w-7 h-7 text-amber-300" />
+                            }
+                          </div>
                         </div>
 
-                        <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          {pendingMode === 'classic' ? (
-                            <Sparkles className="w-7 h-7 text-amber-400 animate-pulse" />
-                          ) : (
-                            <Clock className="w-7 h-7 text-amber-400" />
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
-                          {t('mode_classic_title')}
-                        </h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {pendingMode === 'classic'
-                            ? (t('loading_energies') || 'Canalizando energías...')
-                            : t('mode_classic_desc')}
+                        <h3 className="text-lg font-bold text-white mb-1.5 leading-tight">{t('mode_classic_title')}</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-5 flex-1">
+                          {pendingMode === 'classic' ? (t('loading_energies') || 'Canalizando energías...') : t('mode_classic_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
-                          <span className="text-amber-400 text-xs font-bold">{t('three_cards')}</span>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                          <span className="text-amber-400 text-xs font-semibold tracking-wide">{t('three_cards')}</span>
+                          <div className="flex gap-0.5">
+                            {[...Array(3)].map((_, i) => (
+                              <div key={i} className="w-4 h-7 rounded-sm bg-amber-500/30 border border-amber-500/40" style={{ transform: `rotate(${(i - 1) * 8}deg)` }} />
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </GlowingBorderCard>
-                  </div>
+                    </div>
+                  </motion.div>
 
                   {/* Opción 4: Cruz Guía Evolutiva (5 cartas) */}
-                  <div onClick={() => selectMode("cross")} className="cursor-pointer group relative">
-                    <GlowingBorderCard className={`h-full hover:scale-[1.02] transition-transform ${pendingMode === 'cross' ? 'ring-2 ring-emerald-400/50' : ''}`} glowColor="emerald">
-                      <div className="p-6 flex flex-col items-center text-center h-full relative">
-                        {/* Price Badge */}
-                        <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 shadow-[0_4px_10px_rgba(234,179,8,0.3)] z-10 border border-yellow-400">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span className="leading-none pb-[1px]">{isDataLoading ? '...' : (readingCosts['cross'] ?? 150)}</span>
+                  <motion.div
+                    onClick={() => selectMode("cross")}
+                    className="cursor-pointer group"
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                  >
+                    <div className={`relative h-full rounded-2xl overflow-hidden border transition-all duration-500
+                      ${pendingMode === 'cross'
+                        ? 'border-emerald-500/60 shadow-[0_0_30px_rgba(16,185,129,0.35)]'
+                        : 'border-white/8 hover:border-emerald-500/40 hover:shadow-[0_0_24px_rgba(16,185,129,0.2)]'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/80 via-slate-950/90 to-teal-950/80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute -top-6 -right-6 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-teal-500/10 rounded-full blur-lg" />
+
+                      {/* Price badge */}
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{isDataLoading ? '...' : (readingCosts['cross'] ?? 150)}</span>
+                      </div>
+
+                      {/* "Más completo" badge */}
+                      <div className="absolute top-3 left-3 z-10 flex items-center gap-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <Star className="w-2.5 h-2.5" />
+                        <span>PRO</span>
+                      </div>
+
+                      <div className="relative z-10 p-6 flex flex-col h-full">
+                        <div className="mb-5 mt-3">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${pendingMode === 'cross'
+                              ? 'bg-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+                              : 'bg-emerald-500/15 group-hover:bg-emerald-500/25 group-hover:shadow-[0_0_16px_rgba(16,185,129,0.3)]'}`}
+                          >
+                            {pendingMode === 'cross'
+                              ? <Sparkles className="w-7 h-7 text-emerald-300 animate-pulse" />
+                              : <Star className="w-7 h-7 text-emerald-300" />
+                            }
+                          </div>
                         </div>
 
-                        <div className="w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                          {pendingMode === 'cross' ? (
-                            <Sparkles className="w-7 h-7 text-emerald-400 animate-pulse" />
-                          ) : (
-                            <Sparkles className="w-7 h-7 text-emerald-400" />
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
-                          {t('mode_cross_title')}
-                        </h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4 min-h-[2.5rem] flex items-start justify-center">
-                          {pendingMode === 'cross'
-                            ? (t('loading_energies') || 'Canalizando energías...')
-                            : t('mode_cross_desc')}
+                        <h3 className="text-lg font-bold text-white mb-1.5 leading-tight">{t('mode_cross_title')}</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed mb-5 flex-1">
+                          {pendingMode === 'cross' ? (t('loading_energies') || 'Canalizando energías...') : t('mode_cross_desc')}
                         </p>
-                        <div className="mt-auto pt-3 border-t border-white/5 w-full flex items-center justify-center">
-                          <span className="text-emerald-400 text-xs font-bold">{t('five_cards')}</span>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                          <span className="text-emerald-400 text-xs font-semibold tracking-wide">{t('five_cards')}</span>
+                          {/* Cross pattern representation */}
+                          <div className="relative w-9 h-9 flex items-center justify-center">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3.5 rounded-sm bg-emerald-500/40 border border-emerald-500/50" />
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3.5 rounded-sm bg-emerald-500/40 border border-emerald-500/50" />
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-3.5 h-3 rounded-sm bg-emerald-500/40 border border-emerald-500/50" />
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3 rounded-sm bg-emerald-500/40 border border-emerald-500/50" />
+                            <div className="w-3 h-3 rounded-sm bg-emerald-400/60 border border-emerald-400/70" />
+                          </div>
                         </div>
                       </div>
-                    </GlowingBorderCard>
-                  </div>
+                    </div>
+                  </motion.div>
                 </div>
               </motion.div>
             )}

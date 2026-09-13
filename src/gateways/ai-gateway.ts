@@ -36,7 +36,7 @@ export function createAiGateway(): AiGateway {
                 systemPrompt,
                 userPrompt,
                 temperature = 0.7,
-                model = 'openai/gpt-oss-120b', // Modelo insignia actual en Groq con gran profundidad analítica
+                model = 'llama-3.3-70b-versatile', // Groq's most capable model with great analytical depth
             } = params;
 
             try {
@@ -73,7 +73,7 @@ export function createAiGateway(): AiGateway {
                             { role: 'system', content: systemPrompt },
                             { role: 'user', content: userPrompt },
                         ],
-                        model: 'openai/gpt-oss-20b', // Fallback ultrarrápido (<600ms)
+                        model: 'llama-3.1-8b-instant', // Ultra-fast fallback model (<600ms)
                         temperature: temperature + 0.1,
                         max_tokens: 1000,
                         response_format: { type: 'json_object' },

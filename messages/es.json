@@ -688,7 +688,8 @@
         "loading_energies": "Canalizando energías... espera un momento",
         "loading_phase_1": "Conectando con el cosmos...",
         "loading_phase_2": "Canalizando la energía de tu carta...",
-        "loading_phase_3": "Interpretando los símbolos..."
+        "loading_phase_3": "Interpretando los símbolos...",
+        "loading_phase_ready": "Tu mensaje está listo..."
     },
     "SuccessPage": {
         "title": "Carga Completada",
