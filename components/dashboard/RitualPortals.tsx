@@ -263,23 +263,23 @@ export default function RitualPortals({
                                 </div>
 
                                 {/* Zodiac Signs Orbit Strip */}
-                                <div className="my-4 py-2 px-3 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
-                                    <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar py-1">
+                                <div className="my-4 py-2 px-2.5 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm overflow-hidden">
+                                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1 w-full">
                                         {ALL_ZODIAC_SIGNS.map((sign) => {
                                             const isUserSign = userZodiac !== "---" && (userZodiac.toLowerCase() === sign.toLowerCase() || tz(userZodiac).toLowerCase() === sign.toLowerCase());
                                             return (
                                                 <div
                                                     key={sign}
                                                     title={`${tz(sign)} (${getZodiacMetadata(sign).elementNameEs})`}
-                                                    className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer ${
+                                                    className={`relative flex items-center justify-center h-8 rounded-lg transition-all duration-200 cursor-pointer ${
                                                         isUserSign
-                                                            ? "bg-purple-600/30 border border-amber-400/60 shadow-[0_0_12px_rgba(251,191,36,0.35)] scale-110"
-                                                            : "hover:bg-white/10 opacity-70 hover:opacity-100 hover:scale-105"
+                                                            ? "bg-purple-600/30 border border-amber-400/70 shadow-[0_0_12px_rgba(251,191,36,0.35)] scale-105 z-10"
+                                                            : "hover:bg-white/10 opacity-70 hover:opacity-100"
                                                     }`}
                                                 >
-                                                    <ZodiacIcon name={sign} size={16} />
+                                                    <ZodiacIcon name={sign} size={15} />
                                                     {isUserSign && (
-                                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                                        <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                                                     )}
                                                 </div>
                                             );
@@ -397,8 +397,8 @@ export default function RitualPortals({
                                 </div>
 
                                 {/* Sacred Number Ribbon (1-9, 11, 22, 33) */}
-                                <div className="my-4 py-2 px-3 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
-                                    <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar py-1">
+                                <div className="my-4 py-2 px-2.5 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm overflow-hidden">
+                                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1 w-full">
                                         {ALL_NUMEROLOGY_NUMBERS.map((num) => {
                                             const isUserNumber = lifePathNum === num;
                                             const meta = getNumberMetadata(num);
@@ -406,15 +406,23 @@ export default function RitualPortals({
                                                 <div
                                                     key={num}
                                                     title={`${meta.title} (${meta.keyword})`}
-                                                    className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer ${
+                                                    className={`relative flex items-center justify-center h-8 rounded-lg transition-all duration-200 cursor-pointer ${
                                                         isUserNumber
-                                                            ? "bg-amber-500/30 border border-amber-400/80 shadow-[0_0_14px_rgba(245,158,11,0.4)] scale-110"
-                                                            : "hover:bg-white/10 opacity-70 hover:opacity-100 hover:scale-105"
+                                                            ? "bg-amber-500/25 border border-amber-400/80 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.35)] scale-105 z-10"
+                                                            : "hover:bg-white/10 opacity-75 hover:opacity-100"
                                                     }`}
                                                 >
-                                                    <NumerologyGlyph number={num} size={28} variant="pure" />
+                                                    <span
+                                                        className="font-mono font-bold text-xs sm:text-sm leading-none"
+                                                        style={{
+                                                            color: meta.color,
+                                                            textShadow: `0 0 8px ${meta.glowColor}`
+                                                        }}
+                                                    >
+                                                        {num}
+                                                    </span>
                                                     {isUserNumber && (
-                                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                                        <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                                                     )}
                                                 </div>
                                             );

@@ -308,3 +308,13 @@ html {
   background: rgba(147, 51, 234, 0.4);
   color: white;
 }
+
+/* Hide scrollbar across all browsers */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
