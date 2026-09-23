@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import AuraActionButton from "@/components/ui/AuraActionButton";
+import ZodiacIcon from "@/components/astrology/ZodiacIcon";
 
 interface DailyHoroscopeData {
     headline: string;
@@ -19,7 +20,11 @@ interface DailyHoroscopeData {
     alreadyExists?: boolean;
 }
 
-export default function DailyHoroscopeCard() {
+interface DailyHoroscopeCardProps {
+    userSign?: string;
+}
+
+export default function DailyHoroscopeCard({ userSign }: DailyHoroscopeCardProps = {}) {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<DailyHoroscopeData | null>(null);
     const router = useRouter();
@@ -109,9 +114,17 @@ export default function DailyHoroscopeCard() {
             <Card className="border-purple-500/30 bg-black/40 backdrop-blur-sm text-white overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10 pointer-events-none" />
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-xl font-serif text-purple-200 flex items-center gap-2">
-                        <Sun className="w-5 h-5 text-yellow-500" />
-                        {t('title')}
+                    <CardTitle className="text-xl font-serif text-purple-200 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Sun className="w-5 h-5 text-yellow-500" />
+                            <span>{t('title')}</span>
+                        </div>
+                        {userSign && (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-xs text-purple-200">
+                                <ZodiacIcon name={userSign} size={16} />
+                                <span>{userSign}</span>
+                            </div>
+                        )}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -148,7 +161,13 @@ export default function DailyHoroscopeCard() {
             <CardContent className="flex flex-col items-center justify-center py-8 space-y-4">
                 <div className="relative">
                     <div className="absolute inset-0 bg-purple-500 blur-xl opacity-20 animate-pulse" />
-                    <Sparkles className="w-10 h-10 text-purple-300 relative z-10" />
+                    {userSign ? (
+                        <div className="relative z-10 w-12 h-12 rounded-2xl bg-purple-900/40 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                            <ZodiacIcon name={userSign} size={28} />
+                        </div>
+                    ) : (
+                        <Sparkles className="w-10 h-10 text-purple-300 relative z-10" />
+                    )}
                 </div>
 
                 <div className="text-center space-y-1">

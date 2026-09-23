@@ -19,6 +19,12 @@ import {
 import { Button } from "@/components/ui/button";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { useTranslations } from "next-intl";
+import ZodiacIcon, { getZodiacMetadata } from "@/components/astrology/ZodiacIcon";
+
+const ALL_ZODIAC_SIGNS = [
+    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
 
 interface RitualPortalsProps {
     unlockedFeatures: string[];
@@ -200,20 +206,41 @@ export default function RitualPortals({
                         className="h-full"
                         glowColor={isAstrologyUnlocked ? "purple" : "purple"}
                     >
-                        <div className="p-6 md:p-8 flex flex-col justify-between h-full min-h-[260px] relative">
-                            <div>
+                        <div className="p-6 md:p-8 flex flex-col justify-between h-full min-h-[300px] relative overflow-hidden group">
+                            {/* Ambient background celestial nebula */}
+                            <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-purple-600/10 blur-3xl pointer-events-none group-hover:bg-purple-600/20 transition-all duration-700" />
+                            <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
+
+                            <div className="relative z-10">
+                                {/* Header Info */}
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-purple-900/40">
-                                            <Compass className="w-6 h-6" />
-                                        </div>
+                                        {userZodiac !== "---" ? (
+                                            <ZodiacIcon
+                                                name={userZodiac}
+                                                variant="badge"
+                                                size={24}
+                                                className="shadow-lg shadow-purple-900/40"
+                                            />
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-purple-900/40">
+                                                <Compass className="w-6 h-6" />
+                                            </div>
+                                        )}
                                         <div>
-                                            <h3 className="text-xl font-serif font-bold text-white">
-                                                {t("astrology_title")}
-                                            </h3>
-                                            <p className="text-xs text-purple-300/80">
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-xl font-serif font-bold text-white tracking-wide">
+                                                    {t("astrology_title")}
+                                                </h3>
+                                                {userZodiac !== "---" && (
+                                                    <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                        {getZodiacMetadata(userZodiac).elementNameEs}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-purple-300/80 mt-0.5">
                                                 {userZodiac !== "---"
-                                                    ? `Signo Solar en ${tz(userZodiac)}`
+                                                    ? `Signo Solar en ${tz(userZodiac)} • Mapa de Nacimiento`
                                                     : t("astrology_subtitle")}
                                             </p>
                                         </div>
@@ -232,34 +259,67 @@ export default function RitualPortals({
                                     )}
                                 </div>
 
-                                <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                                {/* Zodiac Signs Orbit Strip */}
+                                <div className="my-4 py-2 px-3 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
+                                    <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar py-1">
+                                        {ALL_ZODIAC_SIGNS.map((sign) => {
+                                            const isUserSign = userZodiac !== "---" && (userZodiac.toLowerCase() === sign.toLowerCase() || tz(userZodiac).toLowerCase() === sign.toLowerCase());
+                                            return (
+                                                <div
+                                                    key={sign}
+                                                    title={`${tz(sign)} (${getZodiacMetadata(sign).elementNameEs})`}
+                                                    className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer ${
+                                                        isUserSign
+                                                            ? "bg-purple-600/30 border border-amber-400/60 shadow-[0_0_12px_rgba(251,191,36,0.35)] scale-110"
+                                                            : "hover:bg-white/10 opacity-70 hover:opacity-100 hover:scale-105"
+                                                    }`}
+                                                >
+                                                    <ZodiacIcon name={sign} size={16} />
+                                                    {isUserSign && (
+                                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-slate-300 leading-relaxed mb-5">
                                     {t("astrology_chart_desc")}
                                 </p>
 
                                 {/* Badges de Módulos Astrológicos */}
-                                <div className="grid grid-cols-3 gap-2 text-center text-[11px] mb-6">
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px] mb-6">
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-indigo-400 font-serif text-sm mb-0.5">☸</div>
                                         <span className="block font-bold text-white">Carta Natal</span>
-                                        <span className="text-slate-400 text-[10px]">Rueda SVG</span>
+                                        <span className="text-slate-400 text-[10px]">Rueda 360°</span>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-                                        <span className="block font-bold text-white">Tránsitos</span>
-                                        <span className="text-slate-400 text-[10px]">En Vivo</span>
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-amber-400 font-serif text-sm mb-0.5">☉</div>
+                                        <span className="block font-bold text-white">Planetas</span>
+                                        <span className="text-slate-400 text-[10px]">10+ Cuerpos</span>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-                                        <span className="block font-bold text-white">Sinastría</span>
-                                        <span className="text-slate-400 text-[10px]">Parejas</span>
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-emerald-400 font-serif text-sm mb-0.5">🏛️</div>
+                                        <span className="block font-bold text-white">12 Casas</span>
+                                        <span className="text-slate-400 text-[10px]">Cúspides</span>
+                                    </div>
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-purple-400 font-serif text-sm mb-0.5">☌</div>
+                                        <span className="block font-bold text-white">Aspectos</span>
+                                        <span className="text-slate-400 text-[10px]">Geometría</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Botón de Entrada o Desbloqueo */}
-                            <div className="pt-2">
+                            <div className="pt-2 relative z-10">
                                 {isAstrologyUnlocked ? (
                                     <Link href="/astrology" className="block w-full">
-                                        <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-5 rounded-xl shadow-lg shadow-purple-900/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2">
+                                        <Button className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-5 rounded-xl shadow-lg shadow-purple-900/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 group">
                                             <span>Explorar Bóveda Astrológica</span>
-                                            <ArrowRight className="w-4 h-4" />
+                                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 ) : (

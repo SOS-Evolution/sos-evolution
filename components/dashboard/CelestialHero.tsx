@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { getZodiacSign, reduceNumber } from "@/lib/soul-math";
 import type { Profile } from "@/types";
+import ZodiacIcon from "@/components/astrology/ZodiacIcon";
 
 interface CelestialHeroProps {
     profile: Profile | null;
@@ -14,22 +15,6 @@ interface CelestialHeroProps {
     onEditProfile?: () => void;
     onQuickOracle?: () => void;
 }
-
-const ZODIAC_GLYPHS: Record<string, string> = {
-    Aries: "♈",
-    Taurus: "♉",
-    Gemini: "♊",
-    Cancer: "♋",
-    Leo: "♌",
-    Virgo: "♍",
-    Libra: "♎",
-    Scorpio: "♏",
-    Sagittarius: "♐",
-    Capricorn: "♑",
-    Aquarius: "♒",
-    Pisces: "♓",
-    "---": "✨"
-};
 
 export default function CelestialHero({
     profile,
@@ -157,9 +142,7 @@ export default function CelestialHero({
                         <div className="flex flex-wrap items-center gap-3 pt-2">
                             {userZodiac !== "---" && (
                                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-950/80 to-indigo-950/80 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-xs font-medium text-purple-200 shadow-sm hover:border-purple-400/50 transition-colors">
-                                    <span className="text-base text-amber-300 font-serif leading-none">
-                                        {ZODIAC_GLYPHS[userZodiac] || "✦"}
-                                    </span>
+                                    <ZodiacIcon name={userZodiac} size={16} />
                                     <span className="font-semibold text-white">
                                         {tz(userZodiac)}
                                     </span>

@@ -82,20 +82,23 @@ export default function AstrologyWheel({ planets, houses, size = 500 }: Astrolog
                             <title>{tz(sign.name)}</title>
                             <path
                                 d={d}
-                                fill="rgba(15, 23, 42, 0.4)"
-                                stroke="rgba(99, 102, 241, 0.4)"
+                                fill="rgba(15, 23, 42, 0.5)"
+                                stroke={sign.color ? `${sign.color}60` : "rgba(99, 102, 241, 0.4)"}
                                 strokeWidth="1.5"
-                                className="transition-all group-hover:fill-indigo-500/10 cursor-pointer"
+                                className="transition-all group-hover:fill-indigo-500/20 cursor-pointer"
                             />
                             <text
                                 x={polarToCartesian(center, center, midRadius, startAngle + 15).x}
                                 y={polarToCartesian(center, center, midRadius, startAngle + 15).y}
-                                fill="white"
-                                fontSize="26"
+                                fill={sign.color || "white"}
+                                fontSize="24"
                                 fontWeight="bold"
                                 textAnchor="middle"
                                 alignmentBaseline="middle"
-                                className="opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all pointer-events-none drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]"
+                                className="opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all pointer-events-none font-serif"
+                                style={{
+                                    filter: `drop-shadow(0 0 8px ${sign.color}90)`
+                                }}
                             >
                                 {sign.symbol}
                             </text>
