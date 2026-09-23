@@ -20,11 +20,14 @@ import { Button } from "@/components/ui/button";
 import GlowingBorderCard from "@/components/landing/GlowingBorderCard";
 import { useTranslations } from "next-intl";
 import ZodiacIcon, { getZodiacMetadata } from "@/components/astrology/ZodiacIcon";
+import NumerologyGlyph, { getNumberMetadata } from "@/components/numerology/NumerologyGlyph";
 
 const ALL_ZODIAC_SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
+
+const ALL_NUMEROLOGY_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33];
 
 interface RitualPortalsProps {
     unlockedFeatures: string[];
@@ -340,20 +343,41 @@ export default function RitualPortals({
                         className="h-full"
                         glowColor={isNumerologyUnlocked ? "gold" : "cyan"}
                     >
-                        <div className="p-6 md:p-8 flex flex-col justify-between h-full min-h-[260px] relative">
-                            <div>
+                        <div className="p-6 md:p-8 flex flex-col justify-between h-full min-h-[300px] relative overflow-hidden group">
+                            {/* Ambient background sacred geometry nebula */}
+                            <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-amber-500/10 blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-all duration-700" />
+                            <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-rose-500/10 blur-3xl pointer-events-none group-hover:bg-rose-500/20 transition-all duration-700" />
+
+                            <div className="relative z-10">
+                                {/* Header Info */}
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-600 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-amber-900/40">
-                                            <Hash className="w-6 h-6" />
-                                        </div>
+                                    <div className="flex items-center gap-3.5">
+                                        {lifePathNum > 0 ? (
+                                            <NumerologyGlyph
+                                                number={lifePathNum}
+                                                variant="badge"
+                                                size={48}
+                                                className="shadow-lg shadow-amber-900/40"
+                                            />
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-600 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-amber-900/40">
+                                                <Hash className="w-6 h-6" />
+                                            </div>
+                                        )}
                                         <div>
-                                            <h3 className="text-xl font-serif font-bold text-white">
-                                                {t("numerology_title")}
-                                            </h3>
-                                            <p className="text-xs text-amber-300/80">
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-xl font-serif font-bold text-white tracking-wide">
+                                                    {t("numerology_title")}
+                                                </h3>
+                                                {lifePathNum > 0 && (
+                                                    <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                        {getNumberMetadata(lifePathNum).keyword.split("&")[0].trim()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-amber-300/80 mt-0.5">
                                                 {lifePathNum > 0
-                                                    ? `Camino de Vida ${lifePathNum}`
+                                                    ? `Camino ${lifePathNum} • ${getNumberMetadata(lifePathNum).title}`
                                                     : t("numerology_subtitle")}
                                             </p>
                                         </div>
@@ -372,23 +396,57 @@ export default function RitualPortals({
                                     )}
                                 </div>
 
-                                <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                                {/* Sacred Number Ribbon (1-9, 11, 22, 33) */}
+                                <div className="my-4 py-2 px-3 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
+                                    <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar py-1">
+                                        {ALL_NUMEROLOGY_NUMBERS.map((num) => {
+                                            const isUserNumber = lifePathNum === num;
+                                            const meta = getNumberMetadata(num);
+                                            return (
+                                                <div
+                                                    key={num}
+                                                    title={`${meta.title} (${meta.keyword})`}
+                                                    className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer ${
+                                                        isUserNumber
+                                                            ? "bg-amber-500/30 border border-amber-400/80 shadow-[0_0_14px_rgba(245,158,11,0.4)] scale-110"
+                                                            : "hover:bg-white/10 opacity-70 hover:opacity-100 hover:scale-105"
+                                                    }`}
+                                                >
+                                                    <NumerologyGlyph number={num} size={28} variant="pure" />
+                                                    {isUserNumber && (
+                                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-slate-300 leading-relaxed mb-5">
                                     {t("numerology_lifepath_desc")}
                                 </p>
 
                                 {/* Badges de Números Sagrados */}
-                                <div className="grid grid-cols-3 gap-2 text-center text-[11px] mb-6">
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px] mb-6">
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-amber-400 font-serif text-sm mb-0.5">🛤️</div>
                                         <span className="block font-bold text-white">Camino Vida</span>
-                                        <span className="text-amber-300 text-xs font-serif font-bold">
-                                            {lifePathNum > 0 ? lifePathNum : "—"}
+                                        <span className="text-amber-300 font-mono text-[11px] font-bold">
+                                            {lifePathNum > 0 ? `#${lifePathNum}` : "—"}
                                         </span>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-indigo-400 font-serif text-sm mb-0.5">⚡</div>
+                                        <span className="block font-bold text-white">Destino</span>
+                                        <span className="text-slate-400 text-[10px]">Nombre</span>
+                                    </div>
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-rose-400 font-serif text-sm mb-0.5">🤍</div>
                                         <span className="block font-bold text-white">Deseo Alma</span>
                                         <span className="text-slate-400 text-[10px]">Vocales</span>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+                                    <div className="bg-white/5 hover:bg-white/10 transition-colors p-2.5 rounded-xl border border-white/5 flex flex-col items-center justify-center">
+                                        <div className="text-cyan-400 font-serif text-sm mb-0.5">📅</div>
                                         <span className="block font-bold text-white">Año Personal</span>
                                         <span className="text-slate-400 text-[10px]">Ciclo 2026</span>
                                     </div>
@@ -396,12 +454,12 @@ export default function RitualPortals({
                             </div>
 
                             {/* Botón de Entrada o Desbloqueo */}
-                            <div className="pt-2">
+                            <div className="pt-2 relative z-10">
                                 {isNumerologyUnlocked ? (
                                     <Link href="/numerology" className="block w-full">
-                                        <Button className="w-full bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white font-bold py-5 rounded-xl shadow-lg shadow-amber-900/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2">
+                                        <Button className="w-full bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-slate-950 hover:from-amber-400 hover:to-yellow-400 font-bold py-5 rounded-xl shadow-lg shadow-amber-900/30 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 group">
                                             <span>Consultar Matriz Numérica</span>
-                                            <ArrowRight className="w-4 h-4" />
+                                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 ) : (

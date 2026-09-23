@@ -114,3 +114,68 @@ export interface LifePathDetails {
 export function getNumerologyDetails(number: number): { number: number } {
     return { number };
 }
+
+/**
+ * Calcula el Año Personal para una fecha dada en el año actual (o año especificado)
+ */
+export function getPersonalYearNumber(dateString: string, targetYear?: number): number {
+    const date = new Date(dateString.includes("T") ? dateString : dateString + "T00:00:00");
+    if (isNaN(date.getTime())) return 1;
+
+    const day = reduceNumber(date.getUTCDate());
+    const month = reduceNumber(date.getUTCMonth() + 1);
+    const year = reduceNumber(targetYear || new Date().getFullYear());
+
+    return reduceNumber(day + month + year);
+}
+
+export interface PythagoreanLetterItem {
+    char: string;
+    value: number;
+    isVowel: boolean;
+}
+
+/**
+ * Desglosa un nombre completo en palabras y letras con sus valores pitagóricos
+ */
+export function getPythagoreanLetterMap(fullName: string): {
+    words: { word: string; letters: PythagoreanLetterItem[] }[];
+    vowelsSum: number;
+    consonantsSum: number;
+    totalSum: number;
+} {
+    const vowels = "aeiou";
+    const words = fullName.trim().split(/\s+/).filter(Boolean);
+
+    let vowelsSum = 0;
+    let consonantsSum = 0;
+    let totalSum = 0;
+
+    const mappedWords = words.map((word) => {
+        const letters: PythagoreanLetterItem[] = [];
+        for (const rawChar of word) {
+            const cleanChar = rawChar.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const val = letterValues[cleanChar] || 0;
+            if (val > 0) {
+                const isV = vowels.includes(cleanChar);
+                if (isV) vowelsSum += val;
+                else consonantsSum += val;
+                totalSum += val;
+                letters.push({
+                    char: rawChar,
+                    value: val,
+                    isVowel: isV
+                });
+            }
+        }
+        return { word, letters };
+    });
+
+    return {
+        words: mappedWords,
+        vowelsSum,
+        consonantsSum,
+        totalSum
+    };
+}
+
